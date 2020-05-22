@@ -86,7 +86,7 @@ filename = sprintf('%s_DetID.bin',myname);
 disp(['loading ' filename])
 tic
     fid = fopen(filename, 'rb');
-    DetID = fread(fid, 'float');
+    DetID = fread(fid, 'int');
     fclose(fid);
 toc
 
