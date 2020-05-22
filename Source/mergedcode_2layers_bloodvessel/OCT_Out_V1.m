@@ -1,4 +1,5 @@
 %% Remove the outliers using .9 quantile of L
+automatic 
 L_threshold = quantile(DetL,0.9);
 ix = find(DetL < L_threshold );
 % end of removing outliers
