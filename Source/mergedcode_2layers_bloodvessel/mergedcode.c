@@ -346,8 +346,8 @@ int main(int argc, const char * argv[])
 	 *****/
 	RandomGen(0, -(int)time(NULL)%(1<<15), NULL); 
 	/* initiate with seed = 1, or any long integer. */
-	for(j=0; j<NN;j++) 	F[j] = 0.0; // ensure F[] starts empty.	
-	for(j=0; j<Nyx;j++) R[j] = 0.0; 
+	for(j=0; j<NN;j++) 	F[j] = 0.0; // ensure F[] starts empty.
+	for(j=0; j<Nyx;j++) R[j] = 0.0;  // RMT ensure R[] starts empty.
 	Rd = 0.0;
 	
 	/**** RUN
@@ -361,7 +361,7 @@ int main(int argc, const char * argv[])
     c_photon = 0;
     //a = 0.925; //KE: Lima et al 2012
 	do { 
-        // KE: while (i_photon < Nphotons)
+        // KE: while (i_photon < Nphotons) RMT: Main loop simulated all photons.
 		/**** LAUNCH: Initialize photon position and trajectory *****/
 		i_photon += 1;				/* increment photon count */
 		W = 1.0;                    /* set photon weight to one */
@@ -1018,6 +1018,9 @@ int main(int argc, const char * argv[])
 		/* If photon DEAD, then launch new photon. */	
         
 	} while (i_photon < Nphotons);  /* end RUN */
+	//RMT: End of the monte carlo simulation. All photons were simulated.
+	
+	
 	printf("collected photons = %ld\n",c_photon);
     
 	printf("------------------------------------------------------\n");
