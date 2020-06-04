@@ -9,8 +9,8 @@ L = DetL(ix)';
 ID = DetID(ix)'; %Raphael
 
 %% k sampling, (needs to be corrected for proper values) Raphael
-lambda_start = 1200e-9;
-lambda_stop = 1300e-9;
+lambda_start = 1220e-7;
+lambda_stop = 1380e-7;
 k_start = 2*pi/lambda_stop;
 k_stop = 2*pi/lambda_start;
 k = linspace(k_stop,k_start,1024)';
@@ -26,6 +26,8 @@ k = linspace(k_stop,k_start,1024)';
 %% Construct signal
 %Building photon phase and amplitude
 s = exp(1i.*k.*S).*sqrt(W.*L);
+
+s = exp(1i.*k.*S).*sqrt(W);
 
 %Adding all the photons from a same detector together
 s_sample = zeros(length(k),max(ID));
@@ -83,6 +85,7 @@ imagesc(db(OCT))
 %% Debugging
 n = 144;
 s_sample = sum(s(:,find(ID==n)),2);
+S_sample = S(:,find(ID==n));
 test = L(ID==n);
 hist(test)
 ref_amp = max(mean(abs(s_sample),1));
