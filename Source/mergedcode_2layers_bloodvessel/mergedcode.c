@@ -434,7 +434,7 @@ int main(int argc, const char * argv[])
 		/****************************/
 		/* Initial position. */		
 		
-		/* trajectory */
+		/* trajectory */ // 
 		if (launchflag==1) // manually set launch
 		{
             x	= xs + detx; 
@@ -569,6 +569,7 @@ int main(int argc, const char * argv[])
           
 			do{  // while sleft>0   
                 s     = sleft/mus;				/* Step size [cm].*/
+				s_total += s; // RMT Update the total distance here.
                 // printf("mus = %f\n",mus); // KE: check mus
                 
 				tempx = x + s*ux;				/* Update positions. [cm] */
@@ -604,7 +605,8 @@ int main(int argc, const char * argv[])
 				{
 					/* step to voxel face + "littlest step" so just inside new voxel. */         
                     s = ls + FindVoxelFace2(x, y, z, &det_num, Pick_det, detx, det_radius, det_z, cos_accept, Ndetectors, dx, dy, dz, ux, uy, uz);
-                   
+                    s_total += s; // RMT Update the total distance here.
+				   
 					/*** DROP: Drop photon weight (W) into local bin  ***/
 					absorb = W*(1-exp(-mua*s));  /* photon weight absorbed at this step */
 					W -= absorb;                 /* decrement WEIGHT by amount absorbed */
@@ -618,7 +620,7 @@ int main(int argc, const char * argv[])
                         // KE: det_num changes in FindVoxelFace2 function when photon gets detected
 
                       /* Update total path length */
-                         s_total += s;
+                         // s_total += s; RMT: Not the right place to compute it.
 
                          /* Save properties of interest */
                          if (L_current > 0 &&  det_num == Pick_det) 
