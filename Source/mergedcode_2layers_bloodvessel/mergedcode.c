@@ -569,7 +569,6 @@ int main(int argc, const char * argv[])
           
 			do{  // while sleft>0   
                 s     = sleft/mus;				/* Step size [cm].*/
-				s_total += s; // RMT Update the total distance here.
                 // printf("mus = %f\n",mus); // KE: check mus
                 
 				tempx = x + s*ux;				/* Update positions. [cm] */
@@ -600,6 +599,8 @@ int main(int argc, const char * argv[])
 					/* Update sleft */
 					sleft = 0;		/* dimensionless step remaining */
                    
+				    /* Update total path length */ // RMT
+				    s_total += s; // RMT Update the total distance here.
 				}
 				else /* photon has crossed voxel boundary */
 				{
@@ -620,7 +621,7 @@ int main(int argc, const char * argv[])
                         // KE: det_num changes in FindVoxelFace2 function when photon gets detected
 
                       /* Update total path length */
-                         // s_total += s; RMT: Not the right place to compute it.
+                      s_total += s;
 
                          /* Save properties of interest */
                          if (L_current > 0 &&  det_num == Pick_det) 
@@ -646,7 +647,7 @@ int main(int argc, const char * argv[])
                          photon_status = DEAD;
                          sleft = 0;
                     }
-                    else 
+                    else // RMT not detected
                     {
                         /* Update sleft */
                         sleft -= s*mus;  /* dimensionless step remaining */
@@ -656,7 +657,10 @@ int main(int argc, const char * argv[])
                         x += s*ux;
                         y += s*uy;
                         z += s*uz;
-					
+					    
+						/* Update total path length */ // RMT
+						s_total += s; //RMT
+						
                         // pointers to voxel containing optical properties
                         ix = (int)(Nx/2 + x/dx);
                         iy = (int)(Ny/2 + y/dy);
