@@ -90,6 +90,15 @@ tic
     fclose(fid);
 toc
 
+%% Load E probing varaible
+filename = sprintf('%s_DetE.bin',myname);
+disp(['loading ' filename])
+tic
+    fid = fopen(filename, 'rb');
+    DetE = fread(fid, 'float');
+    fclose(fid);
+toc
+
 %% Load Fluence rate F(y,x,z) 
 filename = sprintf('%s_F.bin',myname);
 disp(['loading ' filename])

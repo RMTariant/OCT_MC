@@ -148,7 +148,7 @@ double det_z;
 double f_HG, f_B;
 long c_photon; // count collected photons
 int *DetID;
-float *DetW, *DetL, *DetS, *DetZ;
+float *DetW, *DetL, *DetS, *DetZ, *DetE; // RMT: I added DetE as a debugging variable for DetS
 /**** KE end : Declaration of variables ****/  
         
         
@@ -313,6 +313,7 @@ int main(int argc, const char * argv[])
     
     DetID  = malloc(sizeof(int));	// KE: photon ID at det_num
     DetS = malloc(sizeof(float)); // KE: photon path length
+	DetE = malloc(sizeof(float)); // RMT: Debugging variable. Plays no role.
     DetW  = malloc(sizeof(float));	// KE: photon weight
     DetL  = malloc(sizeof(float));	// KE: likelihood ratio
     DetZ  = malloc(sizeof(float));	// KE: photons reached depth
@@ -345,8 +346,8 @@ int main(int argc, const char * argv[])
 	 *****/
 	RandomGen(0, -(int)time(NULL)%(1<<15), NULL); 
 	/* initiate with seed = 1, or any long integer. */
-	for(j=0; j<NN;j++) 	F[j] = 0.0; // ensure F[] starts empty.	
-	for(j=0; j<Nyx;j++) R[j] = 0.0; 
+	for(j=0; j<NN;j++) 	F[j] = 0.0; // ensure F[] starts empty.
+	for(j=0; j<Nyx;j++) R[j] = 0.0;  // RMT ensure R[] starts empty.
 	Rd = 0.0;
 	
 	/**** RUN
@@ -360,7 +361,7 @@ int main(int argc, const char * argv[])
     c_photon = 0;
     //a = 0.925; //KE: Lima et al 2012
 	do { 
-        // KE: while (i_photon < Nphotons)
+        // KE: while (i_photon < Nphotons) RMT: Main loop simulated all photons.
 		/**** LAUNCH: Initialize photon position and trajectory *****/
 		i_photon += 1;				/* increment photon count */
 		W = 1.0;                    /* set photon weight to one */
@@ -374,7 +375,7 @@ int main(int argc, const char * argv[])
         L_current = 1; /* photon 's initial likelihood */
         s_total = 0; /* photon 's initial path length */
         z_max = 0; /* photon 's initial depth reached */
-        Ndetectors = 512; // KE: number of detectors 
+        Ndetectors = 1; // KE: number of detectors RMT: Changed to one for debugging
         det_radius = 0.001; //KE: Zhao's thesis chapter 3.3.4 10micro m 
         cos_accept = cos(5); //KE: Zhao's thesis chapter 3.3.4
         
@@ -433,7 +434,7 @@ int main(int argc, const char * argv[])
 		/****************************/
 		/* Initial position. */		
 		
-		/* trajectory */
+		/* trajectory */ // 
 		if (launchflag==1) // manually set launch
 		{
             x	= xs + detx; 
@@ -541,7 +542,7 @@ int main(int argc, const char * argv[])
 			// printf("sleft = %f\n",sleft); // KE: check sleft
             
              
-			if (photon_status == DEAD) 
+			if (photon_status == DEAD) // RMT error here. what continuing photon?
             { // load the continuing photon and update the flags
 
                  x = x_cont;
@@ -567,6 +568,8 @@ int main(int argc, const char * argv[])
              
           
 			do{  // while sleft>0   
+			// RMT: in this loop, we are looking at the different medium the photon is
+			//      going through. Where it is absorbed, detected or escape the simulation
                 s     = sleft/mus;				/* Step size [cm].*/
                 // printf("mus = %f\n",mus); // KE: check mus
                 
@@ -598,12 +601,15 @@ int main(int argc, const char * argv[])
 					/* Update sleft */
 					sleft = 0;		/* dimensionless step remaining */
                    
+				    /* Update total path length */ // RMT
+				    s_total += s; // RMT Update the total distance here.
 				}
 				else /* photon has crossed voxel boundary */
 				{
 					/* step to voxel face + "littlest step" so just inside new voxel. */         
                     s = ls + FindVoxelFace2(x, y, z, &det_num, Pick_det, detx, det_radius, det_z, cos_accept, Ndetectors, dx, dy, dz, ux, uy, uz);
-                   
+                    s_total += s; // RMT Update the total distance here.
+				   
 					/*** DROP: Drop photon weight (W) into local bin  ***/
 					absorb = W*(1-exp(-mua*s));  /* photon weight absorbed at this step */
 					W -= absorb;                 /* decrement WEIGHT by amount absorbed */
@@ -617,7 +623,7 @@ int main(int argc, const char * argv[])
                         // KE: det_num changes in FindVoxelFace2 function when photon gets detected
 
                       /* Update total path length */
-                         s_total += s;
+                      s_total += s;
 
                          /* Save properties of interest */
                          if (L_current > 0 &&  det_num == Pick_det) 
@@ -625,7 +631,9 @@ int main(int argc, const char * argv[])
                              // Def: float *DetW, *DetL, *DetS, *DetZ;
                              // DetS  = malloc(sizeof(float));                           
                              DetS = realloc(DetS,(c_photon+2)* sizeof(float));
+							 DetE = realloc(DetE,(c_photon+2)* sizeof(float)); // RMT
                              DetS[c_photon]=s_total;
+							 DetE[c_photon]=s; // RMT, redone
                              DetID = realloc(DetID,(c_photon+2)* sizeof(int));
                              DetID[c_photon] = det_num;
                              DetW = realloc(DetW,(c_photon+2)* sizeof(float));
@@ -638,10 +646,10 @@ int main(int argc, const char * argv[])
                              c_photon += 1;  
                          }
                          // if( c_photon ==1) { printf (" OK at 590;\ n") ;}
-                         photon_status = DEAD;
+                         photon_status = DEAD; // RMT This might need to be "dead"
                          sleft = 0;
                     }
-                    else 
+                    else // RMT photon not detected
                     {
                         /* Update sleft */
                         sleft -= s*mus;  /* dimensionless step remaining */
@@ -651,7 +659,10 @@ int main(int argc, const char * argv[])
                         x += s*ux;
                         y += s*uy;
                         z += s*uz;
-					
+					    
+						/* Update total path length */ // RMT
+						s_total += s; //RMT
+						
                         // pointers to voxel containing optical properties
                         ix = (int)(Nx/2 + x/dx);
                         iy = (int)(Ny/2 + y/dy);
@@ -671,7 +682,7 @@ int main(int argc, const char * argv[])
                         }
                         if (z<0) // escape cube
                         { 
-                            photon_status = DEAD;
+                            photon_status = DEAD; // RMT: as in really dead this time
                             sleft = 0;
                         }                    
                         else // No escape
@@ -726,7 +737,7 @@ int main(int argc, const char * argv[])
             /***
             * KE start: this part is from the A.4 of Zhao's thesis 
             ***/
-            /**** SPIN AND SPLIT
+            /**** SPIN AND SPLIT // RMT: Spin referers to scattering the photon
             * The Spin process is to scatter photon into new
             trajectory defined by theta and psi. Theta is specied by cos(theta) , which is determined based
             on the Henyey-Greenstein scattering function, and then convert theta and psi into
@@ -1015,6 +1026,9 @@ int main(int argc, const char * argv[])
 		/* If photon DEAD, then launch new photon. */	
         
 	} while (i_photon < Nphotons);  /* end RUN */
+	//RMT: End of the monte carlo simulation. All photons were simulated.
+	
+	
 	printf("collected photons = %ld\n",c_photon);
     
 	printf("------------------------------------------------------\n");
@@ -1036,6 +1050,13 @@ int main(int argc, const char * argv[])
     printf("saving %s\n",filename);
     fid = fopen(filename, "wb");   /* 3D voxel output */
     fwrite(DetS, sizeof(float), c_photon, fid);
+    fclose(fid);
+	
+	strcpy(filename,myname); // RMT extra saved data. Whole paragraph was added.
+    strcat(filename,"_DetE.bin");
+    printf("saving %s\n",filename);
+    fid = fopen(filename, "wb");   /* 3D voxel output */
+    fwrite(DetE, sizeof(float), c_photon, fid);
     fclose(fid);
     
      // Save the binary file
@@ -1115,6 +1136,7 @@ int main(int argc, const char * argv[])
     free(DetID);
     free(DetW);
     free(DetS);
+	free(DetE); // RMT, added probe
     free(DetL);
     free(DetZ);
     return 0;
