@@ -542,7 +542,7 @@ int main(int argc, const char * argv[])
 			// printf("sleft = %f\n",sleft); // KE: check sleft
             
              
-			if (photon_status == DEAD) 
+			if (photon_status == DEAD) // RMT error here. what continuing photon?
             { // load the continuing photon and update the flags
 
                  x = x_cont;
@@ -568,6 +568,8 @@ int main(int argc, const char * argv[])
              
           
 			do{  // while sleft>0   
+			// RMT: in this loop, we are looking at the different medium the photon is
+			//      going through. Where it is absorbed, detected or escape the simulation
                 s     = sleft/mus;				/* Step size [cm].*/
                 // printf("mus = %f\n",mus); // KE: check mus
                 
@@ -644,10 +646,10 @@ int main(int argc, const char * argv[])
                              c_photon += 1;  
                          }
                          // if( c_photon ==1) { printf (" OK at 590;\ n") ;}
-                         photon_status = DEAD;
+                         photon_status = DEAD; // RMT This might need to be "dead"
                          sleft = 0;
                     }
-                    else // RMT not detected
+                    else // RMT photon not detected
                     {
                         /* Update sleft */
                         sleft -= s*mus;  /* dimensionless step remaining */
@@ -680,7 +682,7 @@ int main(int argc, const char * argv[])
                         }
                         if (z<0) // escape cube
                         { 
-                            photon_status = DEAD;
+                            photon_status = DEAD; // RMT: as in really dead this time
                             sleft = 0;
                         }                    
                         else // No escape
@@ -735,7 +737,7 @@ int main(int argc, const char * argv[])
             /***
             * KE start: this part is from the A.4 of Zhao's thesis 
             ***/
-            /**** SPIN AND SPLIT
+            /**** SPIN AND SPLIT // RMT: Spin referers to scattering the photon
             * The Spin process is to scatter photon into new
             trajectory defined by theta and psi. Theta is specied by cos(theta) , which is determined based
             on the Henyey-Greenstein scattering function, and then convert theta and psi into
