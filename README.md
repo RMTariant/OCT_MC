@@ -3,7 +3,18 @@ Monte-Carlo simulation of an FD-OCT B-Scan.
 
 Description
 
-
+===Missing Features (to be implemented)===
+-Select the number of photons for the simulation
+-Fresnel reflection
+-Mirror reflection
+-Photon pathlength dependent on the refractive index
+-Refraction
+-Noise
+-Gaussian beam source
+-Dispersion?
+-Wavelength width on the detection
+-Focusing/diverging beams instead of perfectly foccus
+-Check cone of acceptance in the fiber
 
 MergedCode.c
 
