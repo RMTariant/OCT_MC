@@ -737,7 +737,7 @@ int main(int argc, const char * argv[])
             /***
             * KE start: this part is from the A.4 of Zhao's thesis 
             ***/
-            /**** SPIN AND SPLIT // RMT: Spin referers to scattering the photon
+            /**** SPIN AND SPLIT
             * The Spin process is to scatter photon into new
             trajectory defined by theta and psi. Theta is specied by cos(theta) , which is determined based
             on the Henyey-Greenstein scattering function, and then convert theta and psi into
