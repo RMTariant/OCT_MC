@@ -26,7 +26,7 @@ a: Variable used in the original code to determine if two positions are in the s
 b: Variable used in the original code to determine if two positions are in the same voxel
 c: Variable used in the original code to determine if two positions are in the same voxel
 W: Photon weigth (max(W) = 1)
-photon_status: ALIVE or DEAD?
+photon_status: ALIVE or DEAD? Might be only partially dead if a split occured. (The photon died but his split survived.)
 i_photon: increment of photon photon packet
 c_photon: count of collected photon packet
 j: increment of a for loop. used twice?
@@ -84,7 +84,7 @@ mus: Current scattering coeficient in cm
 musv: Possible scattering coeficients in the simulation in cm
 g: Current anisotropy
 gv: Possible anisotropy in the simulation
-cont_exist: Determines if a photon split will occures 0=no and 1=yes
+cont_exist: Determines if a photon will split and continue moving? 0=no and 1=yes
 first_bias_done: Determines if a scaterred bias has occured yet =1 or not =0
 
 
