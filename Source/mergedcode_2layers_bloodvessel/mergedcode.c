@@ -361,7 +361,7 @@ int main(int argc, const char * argv[])
     c_photon = 0;
     //a = 0.925; //KE: Lima et al 2012
 	do { 
-        // KE: while (i_photon < Nphotons) RMT: Main loop simulated all photons.
+        // KE: while (i_photon < Nphotons) RMT: Main loop simulating all photons.
 		/**** LAUNCH: Initialize photon position and trajectory *****/
 		i_photon += 1;				/* increment photon count */
 		W = 1.0;                    /* set photon weight to one */
@@ -542,7 +542,7 @@ int main(int argc, const char * argv[])
 			// printf("sleft = %f\n",sleft); // KE: check sleft
             
              
-			if (photon_status == DEAD) // RMT error here. what continuing photon?
+			if (photon_status == DEAD) //
             { // load the continuing photon and update the flags
 
                  x = x_cont;
@@ -633,7 +633,7 @@ int main(int argc, const char * argv[])
                              DetS = realloc(DetS,(c_photon+2)* sizeof(float));
 							 DetE = realloc(DetE,(c_photon+2)* sizeof(float)); // RMT
                              DetS[c_photon]=s_total;
-							 DetE[c_photon]=s; // RMT, redone
+							 DetE[c_photon]=p; // RMT, redone
                              DetID = realloc(DetID,(c_photon+2)* sizeof(int));
                              DetID[c_photon] = det_num;
                              DetW = realloc(DetW,(c_photon+2)* sizeof(float));
@@ -831,7 +831,7 @@ int main(int argc, const char * argv[])
                          }
                          sintheta = sqrt(1.0 - costheta * costheta); /* sqrt () is faster than sin (). */
                          /* Sample psi . */
-                         // KE: equal to equation 3.22 in the manual
+                         // KE: equal to equation 3.22 in the manual RMT: From the original code
                          psi = 2.0 * PI * RandomNum;
                          cospsi = cos(psi);
                          if (psi < PI)
@@ -839,7 +839,7 @@ int main(int argc, const char * argv[])
                          else
                                 sinpsi = -sqrt(1.0 - cospsi * cospsi);
                          /* New trajectory . */
-                         // KE: equal to equation 3.22 in the manual
+                         // KE: equal to equation 3.22 in the manual RMT: From the original code
                          if (1 - fabs(uz) <= ONE_MINUS_COSZERO) 
                          { /* close to perpendicular . */
                            uxx = sintheta * cospsi;
@@ -848,7 +848,7 @@ int main(int argc, const char * argv[])
                          }
                          else 
                          { /* usually use this option */
-                           // KE: equal to equation 3.21 in the manual
+                           // KE: equal to equation 3.21 in the manual RMT: From the original code
                            temp = sqrt(1.0 - uz * uz);
                            uxx = sintheta * (ux * uz * cospsi - uy * sinpsi) / temp + ux * costheta;
                            uyy = sintheta * (uy * uz * cospsi + ux * sinpsi) / temp + uy * costheta;
@@ -905,7 +905,7 @@ int main(int argc, const char * argv[])
                   if (Ndetectors == 1) 
                       detx = 0;
                   else 
-                      detx = 2 * radius * (Pick_det - 1) / (Ndetectors - 1) - radius;
+                      detx = 2 * radius * (Pick_det - 1) / (Ndetectors - 1) - radius; // RMT: a;ready calculated
                   dety = 0;
                   detz = det_z;
                   temp = sqrt((x - detx) * (x - detx) + (y - dety) * (y - dety) + (z - detz) * (z - detz));
@@ -977,7 +977,8 @@ int main(int argc, const char * argv[])
                   /* Compute the unit vector v towards the actual position of the ...
                   detector , where detx is chosen uniformly along the centers of the ...
                   collecting fiber array . */
-                  if (Ndetectors == 1) 
+				  // RMT: I don't think calculating detx is necessary here. It was already done before.
+                  if (Ndetectors == 1)  
                       detx = 0;
                   else 
                       detx = 2 * radius * (Pick_det - 1) / (Ndetectors - 1) - radius;
