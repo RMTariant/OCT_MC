@@ -1103,7 +1103,7 @@ int main(int argc, const char * argv[])
     fwrite(F, sizeof(float), NN, fid);
     fclose(fid);
     
-    /* save reflectance */
+    /* save reflectance */ // RMT: Not fully implemented. I don't think it is useful to implement it.
     temp = dx*dy*Nphotons;
 	for (i=0; i<Nyx; i++) R[i] /= temp;
 	strcpy(filename,myname);
