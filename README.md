@@ -16,11 +16,20 @@ Description
 -Wavelength width on the detection
 -Focusing/diverging beams instead of perfectly foccus
 -Check cone of acceptance in the fiber
+-DetZ, the photon maximum reached depth, is not fully implemented
+
 
 MergedCode.c
 
+===Parameters===
+p: Parameter determining the probability of the photon doing more bias scattering after the first one. It was equal to 0
+
+
 ===Functions===
-RandomNum: Generates a double precision random number ranging from 0 to 1
+RandomGen: Generates a double precision random number ranging from 0 to 1 inclusive. Based on W.H. Press, S.A. Teukolsky, W.T. Vetterling, and B.P. Flannery, "Numerical Recipes in C," Cambridge University Press, 2nd edition, (1992).
+RandomNum: Shorten version of RandomGen to be more convient. RandomNum = (double) RandomGen(1, 0, NULL)
+SameVoxel:
+
 
 ===Variables===
 a: Variable used in the original code to determine if two positions are in the same voxel
