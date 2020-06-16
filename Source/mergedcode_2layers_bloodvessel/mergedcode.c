@@ -1288,63 +1288,6 @@ double min3(double a, double b, double c) {
 }
 
 /***********************************************************
- * KE: samplepsi
- ****/
-/*
- void samplepsi()
- {
-     double psi;//, cospsi, sinpsi;
-     double ret[] = {0, 0};
-     psi = 2.0 * PI * RandomNum;
-     // cospsi = cos(psi);
-     ret[0] = cos(psi); // return cospsi
-     if (psi < PI)
-     ret[1] = sqrt(1.0 - ret[0] * ret[0]); //sinpsi  sqrt () is faster than sin ().
-     else
-     ret[1] = -sqrt(1.0 - ret[0] * ret[0]); // sinpsi
-     return ret;
- }
- */
-/********************
- * my version of FindVoxelFace for no scattering.
- * s = ls + FindVoxelFace2(x,y,z, tempx, tempy, tempz, dx, dy, dz, ux, uy, uz);
- ****/
-// KE: version of Zaho is used
-/*
-double FindVoxelFace2(double x1,double y1,double z1, double x2, double y2, double z2,
-					double dx,double dy,double dz, double ux, double uy, double uz)
-{
-    int ix1 = floor(x1/dx);
-    int iy1 = floor(y1/dy);
-    int iz1 = floor(z1/dz);
-
-    int ix2,iy2,iz2;
-    if (ux>=0)
-        ix2=ix1+1;
-    else
-        ix2 = ix1;
-
-    if (uy>=0)
-        iy2=iy1+1;
-    else
-        iy2 = iy1;
-
-    if (uz>=0)
-        iz2=iz1+1;
-    else
-        iz2 = iz1;
-
-    double xs = fabs( (ix2*dx - x1)/ux);
-    double ys = fabs( (iy2*dy - y1)/uy);
-    double zs = fabs( (iz2*dz - z1)/uz);
-
-    double s = min3(xs,ys,zs);
-
-    return (s);
-}
-
-*/
-/***********************************************************
  *	FRESNEL REFLECTANCE
  * Computes reflectance as photon passes from medium 1 to
  * medium 2 with refractive indices n1,n2. Incident
