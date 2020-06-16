@@ -4,6 +4,9 @@ Monte-Carlo simulation of an FD-OCT B-Scan.
 Description
 
 ===Missing Features (to be implemented)===
+-Making a map of the code
+-Testing the functions
+-Removing the extra code
 -Parameter p is not determined.
 -Select the number of photons for the simulation
 -Fresnel reflection
@@ -28,8 +31,13 @@ p: Parameter determining the probability of the photon doing more bias scatterin
 ===Functions===
 RandomGen: Generates a double precision random number ranging from 0 to 1 inclusive. Based on W.H. Press, S.A. Teukolsky, W.T. Vetterling, and B.P. Flannery, "Numerical Recipes in C," Cambridge University Press, 2nd edition, (1992).
 RandomNum: Shorten version of RandomGen to be more convient. RandomNum = (double) RandomGen(1, 0, NULL)
-SameVoxel:
-
+SameVoxel: Determine if the two position are located in the same voxel. Returns 1 if same voxel, 0 if not same voxel.
+max2: Fast calculation of which between 2 values is the biggest. (checked)
+min2: Fast calculation of which between 2 values is the smallest. (checked)
+min3: Fast calculation of which between 3 values is the smallest. (checked)
+RFresnel: Computes reflectance as photon passes from medium 1 to medium 2 with refractive indices n1,n2. Incident angle a1 is specified by cosine value ca1 = cos(a1). Program returns value of transmitted angle a1 as value in *ca2_Ptr = cos(a2).
+FindVoxelFace: (not used) the boundary is the face of some voxel. Find the the photon's hitting position on the nearest face of the voxel and update the step size.
+FindVoxelFace2: Modified version of Jacques code. 
 
 ===Variables===
 a: Variable used in the original code to determine if two positions are in the same voxel
