@@ -181,7 +181,7 @@ int main(int argc, const char * argv[])
 	fid = fopen(filename,"r");
 	fgets(buf, 32, fid);
 	// run parameters
-	sscanf(buf, "%f", &time_min); // desired time duration of run [min]
+	sscanf(buf, "%f", &Nphotons); // desired time duration of run [min]
 	fgets(buf, 32, fid);
 	sscanf(buf, "%d", &Nx);  // # of bins
 	fgets(buf, 32,fid);
@@ -250,7 +250,7 @@ int main(int argc, const char * argv[])
 	}
     fclose(fid);
 
-    printf("time_min = %0.2f min\n",time_min);
+    printf("Number of photons = %0.4f \n",Nphotons);
     printf("Nx = %d, dx = %0.4f [cm]\n",Nx,dx);
     printf("Ny = %d, dy = %0.4f [cm]\n",Ny,dy);
     printf("Nz = %d, dz = %0.4f [cm]\n",Nz,dz);
@@ -355,8 +355,8 @@ int main(int argc, const char * argv[])
 	 *****/
 	printf("------------- Begin Monte Carlo -------------\n");
     printf("%s\n",myname);
-    printf("requesting %0.1f min\n",time_min);
-	Nphotons = 200; // will be updated to achieve desired run time, time_min.
+    printf("requesting unknown time\n");
+	//Nphotons = 200; // will be updated to achieve desired run time, time_min.
 	i_photon = 0;
     c_photon = 0;
     //a = 0.925; //KE: Lima et al 2012
@@ -422,8 +422,8 @@ int main(int argc, const char * argv[])
 		if (i_photon==200)
 		{
 			finish_time = clock();
-			Nphotons = (long)( time_min*60*999*CLOCKS_PER_SEC/(finish_time-temp_time) );
-			printf("Nphotons = %0.0f for simulation time = %0.2f min\n",Nphotons,time_min)
+			//Nphotons = (long)( time_min*60*999*CLOCKS_PER_SEC/(finish_time-temp_time) );
+			printf("Nphotons = %0.0f for unkown time\n",Nphotons)
 			;
 		}
 
