@@ -375,7 +375,7 @@ int main(int argc, const char * argv[])
         L_current = 1; /* photon 's initial likelihood */
         s_total = 0; /* photon 's initial path length */
         z_max = 0; /* photon 's initial depth reached */
-        Ndetectors = 1; // KE: number of detectors RMT: Changed to one for debugging
+        Ndetectors = 512; // KE: number of detectors RMT: Changed to one for debugging
         det_radius = 0.001; //KE: Zhao's thesis chapter 3.3.4 10micro m 
         cos_accept = cos(5); //KE: Zhao's thesis chapter 3.3.4
         
