@@ -119,7 +119,8 @@ z = 1/(k(1)-k(2))*(0:(length(k)/2))/length(k);
 x = linspace(-radius,radius,Ndetector);
 
 imagesc(x,z,db(OCT))
-
+xlabel('Position [cm]')
+ylabel('Depth [cm]')
 
 
 
