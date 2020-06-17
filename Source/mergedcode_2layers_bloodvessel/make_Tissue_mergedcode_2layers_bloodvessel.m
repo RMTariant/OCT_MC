@@ -34,7 +34,8 @@ SAVEON      = 1;        % 1 = save myname_T.bin, myname_H.mci
 
 myname      = 'skinvessel2layersb';%_2layers_bloodvessel';% name for files: myname_T.bin, myname_H.mci  
 time_min    = 1;      	% RMT No longuer used time duration of the simulation [min] <----- run time -----
-Nphotons    = 10000;    % RMT Number of photons used in the simulation.
+Nphotons    = 1000;     % RMT Number of photons used in the simulation.
+p           = 0.5;      % RMT Probability that the foward photon has bias scattering.
 nm          = 532;   	% desired wavelength of simulation
 Nbins       = 200;    	% # of bins in each dimension of cube  Nbins     
 binsize     = 0.00045; 	% size of each bin, eg. [cm] or [mm] binsize   
@@ -162,6 +163,7 @@ if SAVEON
     fid = fopen(filename,'w');
         % run parameters
         fprintf(fid,'%0.0f\n',Nphotons);
+        fprintf(fid,'%0.4f\n',p);
         fprintf(fid,'%d\n'   ,Nx);
         fprintf(fid,'%d\n'   ,Ny);
         fprintf(fid,'%d\n'   ,Nz);

@@ -181,7 +181,9 @@ int main(int argc, const char * argv[])
 	fid = fopen(filename,"r");
 	fgets(buf, 32, fid);
 	// run parameters
-	sscanf(buf, "%f", &Nphotons); // desired time duration of run [min] RMT now photons isntead
+	sscanf(buf, "%lf", &Nphotons); // desired time duration of run [min] RMT now photons isntead
+	fgets(buf, 32, fid);
+	sscanf(buf, "%lf", &p); // RMT chance of a foward photon doing a bias scattering.
 	fgets(buf, 32, fid);
 	sscanf(buf, "%d", &Nx);  // # of bins
 	fgets(buf, 32,fid);
