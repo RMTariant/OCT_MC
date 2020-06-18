@@ -185,6 +185,8 @@ int main(int argc, const char * argv[])
 	fgets(buf, 32, fid);
 	sscanf(buf, "%lf", &p); // RMT chance of a foward photon doing a bias scattering.
 	fgets(buf, 32, fid);
+	sscanf(buf, "%d", &Ndetectors); // RMT chance of a foward photon doing a bias scattering.
+	fgets(buf, 32, fid);
 	sscanf(buf, "%d", &Nx);  // # of bins
 	fgets(buf, 32,fid);
 	sscanf(buf, "%d", &Ny);  // # of bins
@@ -242,7 +244,7 @@ int main(int argc, const char * argv[])
     printf("Nt = %d\n",Nt); // KE: check
 
 	double s_total2[Nt]; // RMT : Create s_total here
-	double s_total2_cont[Nt]; // RMT : Create s_total here
+	double s_total_cont2[Nt]; // RMT : Create s_total here
 
 	for (i=1; i<=Nt; i++)
     {
@@ -385,7 +387,7 @@ int main(int argc, const char * argv[])
 			s_total2[m] = 0;
 		}
         z_max = 0; /* photon 's initial depth reached */
-        Ndetectors = 512; // KE: number of detectors RMT: Changed to one for debugging
+        //Ndetectors = 512; // KE: number of detectors RMT: Changed to one for debugging
         det_radius = 0.001; //KE: Zhao's thesis chapter 3.3.4 10micro m
         cos_accept = cos(5); //KE: Zhao's thesis chapter 3.3.4
 
@@ -647,10 +649,10 @@ int main(int argc, const char * argv[])
                          { // avoid NAN and zero likelihood, and avoid cross - detection
                              // Def: float *DetW, *DetL, *DetS, *DetZ;
                              // DetS  = malloc(sizeof(float));
-                             DetS = realloc(DetS,(c_photon+2)* sizeof(float)); RMT
+                             DetS = realloc(DetS,(c_photon+2)* sizeof(float)); //RMT
 							 DetS2 = realloc(DetS2,((c_photon+2)*Nt)* sizeof(float));
 							 DetE = realloc(DetE,(c_photon+2)* sizeof(float)); // RMT
-                             DetS[c_photon]=s_total; RMT
+                             DetS[c_photon]=s_total; //RMT
 							 for (m=0; m<Nt; m++)
 							 {
 								 DetS2[Nt*c_photon+m] = s_total2[m];
