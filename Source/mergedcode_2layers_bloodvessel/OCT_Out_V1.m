@@ -157,14 +157,14 @@ z = pi/(k(1)-k(2))*(0:(length(k)/2))/length(k);
 x = linspace(-radius,radius,Ndetectors);
 
 figure
-title('Refractive index equal to 1')
 imagesc(x,z,db(OCT))
+title('Refractive index equal to 1')
 xlabel('Position [cm]')
 ylabel('Depth [cm]')
 
 figure
-title('Example of impact of the refractive index')
 imagesc(x,z,db(OCT2))
+title('Example of impact of the refractive index')
 xlabel('Position [cm]')
 ylabel('Depth [cm]')
 
