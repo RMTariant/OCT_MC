@@ -123,7 +123,7 @@ int det_num; // photon not detected yet/
 double first_bias_done ; // photon not biased back - scattered yet
 double cont_exist; // no split generated yet // check if a continuing photon packet exists
 double L_current; // photon 's initial likelihood
-//double s_total; // photon 's initial path length RMT
+double s_total; // photon 's initial path length
 double z_max; // photon 's initial depth reached
 int Ndetectors; // Number of source/detector pairs to represent conducting A-scans
 int Pick_det; // index of randomly picked source/detector pair
@@ -141,14 +141,14 @@ double i_cont;
 double W_cont;
 double x_cont, y_cont, z_cont;
 double ux_cont, uy_cont, uz_cont;
-//double s_total_cont; RMT
+double s_total_cont;
 double z_max_cont;
 double p; // used in biased forward-scattering
 double det_z;
 double f_HG, f_B;
 long c_photon; // count collected photons
 int *DetID;
-float *DetW, *DetL, *DetS, *DetZ, *DetE; // RMT: I added DetE as a debugging variable for DetS
+float *DetW, *DetL, *DetS, *DetS2, *DetZ, *DetE; // RMT: I added DetE as a debugging variable for DetS
 /**** KE end : Declaration of variables ****/
 
 
@@ -241,8 +241,8 @@ int main(int argc, const char * argv[])
 	sscanf(buf, "%d", &Nt);				// # of tissue types in tissue list
     printf("Nt = %d\n",Nt); // KE: check
 
-	double s_total[Nt]; // RMT : Create s_total here
-	double s_total_cont[Nt]; // RMT : Create s_total here
+	double s_total2[Nt]; // RMT : Create s_total here
+	double s_total2_cont[Nt]; // RMT : Create s_total here
 
 	for (i=1; i<=Nt; i++)
     {
@@ -318,6 +318,7 @@ int main(int argc, const char * argv[])
 
     DetID  = malloc(sizeof(int));	// KE: photon ID at det_num
     DetS = malloc(sizeof(float)); // KE: photon path length
+	DetS2 = malloc(sizeof(float)); // KE: photon path length
 	DetE = malloc(sizeof(float)); // RMT: Debugging variable. Plays no role.
     DetW  = malloc(sizeof(float));	// KE: photon weight
     DetL  = malloc(sizeof(float));	// KE: likelihood ratio
@@ -378,10 +379,10 @@ int main(int argc, const char * argv[])
         first_bias_done = 0; /* photon not biased back - scattered yet */
         cont_exist = 0; /* no split generated yet */
         L_current = 1; /* photon 's initial likelihood */
-        //s_total = 0; /* photon 's initial path length */
+        s_total = 0; /* photon 's initial path length */
 		for (m=0; m<Nt; m++)
 		{
-			s_total[m] = 0;
+			s_total2[m] = 0;
 		}
         z_max = 0; /* photon 's initial depth reached */
         Ndetectors = 512; // KE: number of detectors RMT: Changed to one for debugging
@@ -561,11 +562,12 @@ int main(int argc, const char * argv[])
                  uy = uy_cont;
                  uz = uz_cont;
                  i = i_cont;
+				 s_total = s_total_cont;
 				 for (m=0; m<Nt; m++)
 				{
-					s_total[m] = s_total_cont[m];
+					s_total2[m] = s_total_cont2[m];
 				}
-                 //s_total = s_total_cont; RMT
+                 
                  z_max = z_max_cont;
                  type = v[i];
                  mua = muav[type];
@@ -615,7 +617,8 @@ int main(int argc, const char * argv[])
 					sleft = 0;		/* dimensionless step remaining */
 
 				    /* Update total path length */ // RMT
-				    s_total[type-1] += s; // RMT Update the total distance here.
+					s_total += s;
+				    s_total2[type-1] += s; // RMT Update the total distance here.
 				}
 				else /* photon has crossed voxel boundary */
 				{
@@ -636,20 +639,21 @@ int main(int argc, const char * argv[])
                         // KE: det_num changes in FindVoxelFace2 function when photon gets detected
 
                       /* Update total path length */
-                      s_total[type-1] += s;
+                      s_total += s;
+					  s_total2[type-1] += s;
 
                          /* Save properties of interest */
                          if (L_current > 0 &&  det_num == Pick_det)
                          { // avoid NAN and zero likelihood, and avoid cross - detection
                              // Def: float *DetW, *DetL, *DetS, *DetZ;
                              // DetS  = malloc(sizeof(float));
-                             //DetS = realloc(DetS,(c_photon+2)* sizeof(float)); RMT
-							 DetS = realloc(DetS,((c_photon+2)*Nt)* sizeof(float));
+                             DetS = realloc(DetS,(c_photon+2)* sizeof(float)); RMT
+							 DetS2 = realloc(DetS2,((c_photon+2)*Nt)* sizeof(float));
 							 DetE = realloc(DetE,(c_photon+2)* sizeof(float)); // RMT
-                             //DetS[c_photon]=s_total; RMT
+                             DetS[c_photon]=s_total; RMT
 							 for (m=0; m<Nt; m++)
 							 {
-								 DetS[Nt*c_photon+m] = s_total[m];
+								 DetS2[Nt*c_photon+m] = s_total2[m];
 							 }
 							 DetE[c_photon]=p; // RMT, redone
                              DetID = realloc(DetID,(c_photon+2)* sizeof(int));
@@ -679,7 +683,8 @@ int main(int argc, const char * argv[])
                         z += s*uz;
 
 						/* Update total path length */ // RMT
-						s_total[type-1] += s; //RMT
+						s_total += s; //RM
+						s_total2[type-1] += s; //RMT
 
                         // pointers to voxel containing optical properties
                         ix = (int)(Nx/2 + x/dx);
@@ -881,10 +886,10 @@ int main(int argc, const char * argv[])
                          y_cont = y;
                          z_cont = z;
                          W_cont = W;
-                         //s_total_cont = s_total;
+                         s_total_cont = s_total;
 						 for (m=0; m<Nt; m++)
 						 {
-						 	s_total_cont[m] = s_total[m];
+						 	s_total_cont2[m] = s_total2[m];
 						 }
                          z_max_cont = z_max;
                          L_current *= L_temp;
@@ -1072,7 +1077,14 @@ int main(int argc, const char * argv[])
     strcat(filename,"_DetS.bin");
     printf("saving %s\n",filename);
     fid = fopen(filename, "wb");   /* 3D voxel output */
-    fwrite(DetS, sizeof(float), c_photon*Nt, fid);
+    fwrite(DetS, sizeof(float), c_photon, fid);
+    fclose(fid);
+	
+    strcpy(filename,myname);
+    strcat(filename,"_DetS2.bin");
+    printf("saving %s\n",filename);
+    fid = fopen(filename, "wb");   /* 3D voxel output */
+    fwrite(DetS2, sizeof(float), c_photon*Nt, fid);
     fclose(fid);
 
 	strcpy(filename,myname); // RMT extra saved data. Whole paragraph was added.
@@ -1159,6 +1171,7 @@ int main(int argc, const char * argv[])
     free(DetID);
     free(DetW);
     free(DetS);
+	free(DetS2);
 	free(DetE); // RMT, added probe
     free(DetL);
     free(DetZ);
