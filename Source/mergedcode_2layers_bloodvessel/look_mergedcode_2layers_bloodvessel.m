@@ -19,30 +19,30 @@ A = fscanf(fid,'%f',[1 Inf])';
 fclose(fid);
 
 %% parameters
-time_min = A(1);
-Nx = A(2);
-Ny = A(3);
-Nz = A(4);
-dx = A(5);
-dy = A(6);
-dz = A(7);
-mcflag = A(8);
-launchflag = A(9);
-boundaryflag = A(10);
-xs = A(11);
-ys = A(12);
-zs = A(13);
-xfocus = A(14);
-yfocus = A(15);
-zfocus = A(16);
-ux0 = A(17);
-uy0 = A(18);
-uz0 = A(19);
-radius = A(20);
-waist = A(21);
-zsurf = A(22);
-Nt = A(23);
-j = 23;
+Nphoton = A(1);
+Nx = A(4);
+Ny = A(5);
+Nz = A(6);
+dx = A(7);
+dy = A(8);
+dz = A(9);
+mcflag = A(10);
+launchflag = A(11);
+boundaryflag = A(12);
+xs = A(13);
+ys = A(14);
+zs = A(15);
+xfocus = A(16);
+yfocus = A(17);
+zfocus = A(18);
+ux0 = A(19);
+uy0 = A(20);
+uz0 = A(21);
+radius = A(22);
+waist = A(23);
+zsurf = A(24);
+Nt = A(25);
+j = 25;
 for i=1:Nt
     j=j+1;
     muav(i,1) = A(j);
@@ -60,6 +60,15 @@ disp(['loading ' filename])
 tic
     fid = fopen(filename, 'rb');
     DetS = fread(fid, 'float');
+    fclose(fid);
+toc
+
+%% Load path lengths of detected photons DetS
+filename = sprintf('%s_DetS2.bin',myname);
+disp(['loading ' filename])
+tic
+    fid = fopen(filename, 'rb');
+    DetS2 = fread(fid, 'float');
     fclose(fid);
 toc
 
@@ -238,8 +247,8 @@ colormap(makec2f)
 %specified by map
 axis equal image
 %axis([min(x) max(x) min(z) max(z)])
-text(min(x)-0.2*max(x),min(z)-0.08*max(z),sprintf('runtime = %0.1f min',time_min),...
-    'fontsize',fz2)
+%text(min(x)-0.2*max(x),min(z)-0.08*max(z),sprintf('runtime = %0.1f min',time_min),...
+%    'fontsize',fz2)
 
 if SAVEPICSON
     name = sprintf('%s_Fzx.fig',myname);
@@ -265,8 +274,8 @@ ylabel('z [cm]')
 title('Fluence \phi [W/cm^2/W.delivered] ','fontweight','normal','fontsize',fz)
 colormap(makec2f)
 axis equal image
-text(min(x)-0.2*max(x),min(z)-0.08*max(z),sprintf('runtime = %0.1f min',time_min),...
-    'fontsize',fz2)
+%text(min(x)-0.2*max(x),min(z)-0.08*max(z),sprintf('runtime = %0.1f min',time_min),...
+%    'fontsize',fz2)
 
 if SAVEPICSON
     name = sprintf('%s_Fzy',myname);
@@ -290,8 +299,8 @@ title('Deposition A [W/cm^3/W.delivered] ','fontweight','normal','fontsize',fz)
 colormap(makec2f)
 axis equal image
 %axis([min(x) max(x) min(z) max(z)])
-text(min(x)-0.2*max(x),min(z)-0.08*max(z),sprintf('runtime = %0.1f min',time_min),...
-    'fontsize',fz2)
+%text(min(x)-0.2*max(x),min(z)-0.08*max(z),sprintf('runtime = %0.1f min',time_min),...
+%    'fontsize',fz2)
 
 if SAVEPICSON
     name = sprintf('%s_Azx',myname);

@@ -1,5 +1,5 @@
 /********************************************
- * 
+ *
  * This code is the merge of mcxyz.c and the Appendix from the thesis of Zhao
  *
  * myname = 'skinvessel_mergedcode_2layers';
@@ -17,7 +17,7 @@
  *  myname_DetZ.bin = maximal depth of detected photons
  *  myname_F.bin    = fluence rate output F[i] [W/cm^2 per W delivered]
  *  myname_Ryx.bin = reflectance/escaping flux R[i] [W/cm^2 per W delivered]
- *  myname_Rd.dat = 
+ *  myname_Rd.dat =
  *
  **********/
 
@@ -38,18 +38,18 @@
 #define THRESHOLD   0.01		/* used in roulette */
 #define CHANCE      0.1  		/* used in roulette */
 #define Boolean     char
-#define SQR(x)		(x*x) 
+#define SQR(x)		(x*x)
 #define SIGN(x)     ((x)>=0 ? 1:-1)
 #define RandomNum   (double) RandomGen(1, 0, NULL) /* Calls for a random number. */
 #define COS90D      1.0E-6      /* If cos(theta) <= COS90D, theta >= PI/2 - 1e-6 rad. */
-#define ONE_MINUS_COSZERO 1.0E-12   
+#define ONE_MINUS_COSZERO 1.0E-12
 /* If 1-cos(theta) <= ONE_MINUS_COSZERO, fabs(theta) <= 1e-6 rad. */
 /* If 1+cos(theta) <= ONE_MINUS_COSZERO, fabs(PI-theta) <= 1e-6 rad. */
 
 /* DECLARE FUNCTIONS */
-double RandomGen(char Type, long Seed, long *Status);  
+double RandomGen(char Type, long Seed, long *Status);
 /* Random number generator */
-Boolean SameVoxel(double x1,double y1,double z1, double x2, double y2, double z2, 
+Boolean SameVoxel(double x1,double y1,double z1, double x2, double y2, double z2,
 				double dx,double dy,double dz);
 /* Asks,"In the same voxel?" */
 double max2(double a, double b);
@@ -57,7 +57,7 @@ double min2(double a, double b);
 double min3(double a, double b, double c);
 double FindVoxelFace(double x1,double y1,double z1, double x2, double y2, double z2,
 					double dx,double dy,double dz, double ux, double uy, double uz);
-double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_det, 
+double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_det,
         double detx, double det_radius, double det_z, double cos_accept,
         int Ndetectors, double dx, double dy, double dz, double ux, double uy, double uz) ;
 
@@ -83,22 +83,22 @@ double	mua;            /* absorption coefficient [cm^-1] */
 double	mus;            /* scattering coefficient [cm^-1] */
 double	g;              /* anisotropy [-] */
 double	Nphotons;       /* number of photons in simulation */
-	
+
 /* launch parameters */
 int		mcflag, launchflag, boundaryflag;
 float	xfocus, yfocus, zfocus;
 float	ux0, uy0, uz0;
 float	radius;
 float	waist;
-	
+
 /* dummy variables */
 double  rnd;            /* assigned random value 0-1 */
 double	r, phi;			/* dummy values */
-long	i,j,NN,Nyx;         /* dummy indices */
+long	i,j,NN,Nyx,m;         /* dummy indices */
 double	tempx, tempy, tempz; /* temporary variables, used during photon step. */
 int 	ix, iy, iz;     /* Added. Used to track photons */
 double 	temp;           /* dummy variable */
-int     bflag;  // boundary flag; KE: 1 = photon inside volume ; 0 = outside                   
+int     bflag;  // boundary flag; KE: 1 = photon inside volume ; 0 = outside
 int 	surfflag; /* surface flag: 0 = photon inside tissue, 1 = escaped outside tissue */
 
 /* mcxyz bin variables */
@@ -106,25 +106,25 @@ float	dx, dy, dz;     /* bin size [cm] */
 int		Nx, Ny, Nz, Nt; /* # of bins */
 float	xs, ys, zs;		/* launch position */
 float 	zsurf, Rd;
-    
+
 /* time */
 float	time_min;               // Requested time duration of computation.
 time_t	now;
 double	start_time, finish_time, temp_time; /* for clock() */
-	
+
 /* tissue parameters */
 char	tissuename[50][32];
 float 	muav[Ntiss];    // muav[0:Ntiss-1], absorption coefficient of ith tissue type
-float 	musv[Ntiss];    // scattering coeff. 
+float 	musv[Ntiss];    // scattering coeff.
 float 	gv[Ntiss];      // anisotropy of scattering
- 
+
 /**** KE start: Declaration of variables ****/
 int det_num; // photon not detected yet/
-double first_bias_done ; // photon not biased back - scattered yet 
+double first_bias_done ; // photon not biased back - scattered yet
 double cont_exist; // no split generated yet // check if a continuing photon packet exists
-double L_current; // photon 's initial likelihood 
-double s_total; // photon 's initial path length 
-double z_max; // photon 's initial depth reached 
+double L_current; // photon 's initial likelihood
+double s_total; // photon 's initial path length
+double z_max; // photon 's initial depth reached
 int Ndetectors; // Number of source/detector pairs to represent conducting A-scans
 int Pick_det; // index of randomly picked source/detector pair
 double detx, dety, detz; // position of detector
@@ -134,9 +134,9 @@ double a;
 double costheta_S;
 double costheta_B;
 double sintheta_B;
-double vx, vy, vz;  
+double vx, vy, vz;
 double upx, upy, upz;
-double L_cont; 
+double L_cont;
 double i_cont;
 double W_cont;
 double x_cont, y_cont, z_cont;
@@ -148,14 +148,14 @@ double det_z;
 double f_HG, f_B;
 long c_photon; // count collected photons
 int *DetID;
-float *DetW, *DetL, *DetS, *DetZ, *DetE; // RMT: I added DetE as a debugging variable for DetS
-/**** KE end : Declaration of variables ****/  
-        
-        
-int main(int argc, const char * argv[]) 
+float *DetW, *DetL, *DetS, *DetS2, *DetZ, *DetE; // RMT: I added DetE as a debugging variable for DetS
+/**** KE end : Declaration of variables ****/
+
+
+int main(int argc, const char * argv[])
 {
     printf("argc = %d\n",argc);
-    if (argc==0) 
+    if (argc==0)
     {
 		printf("which will load the files name_H.mci and name_T.bin\n");
 		printf("and run the Monte Carlo program.\n");
@@ -165,12 +165,12 @@ int main(int argc, const char * argv[])
 
 	/* Input/Output */
 	//KE: char 	dirname[STRLEN];  // holds "../sims/"
-	char   	myname[STRLEN];	  
-	// Holds the user's choice of myname, used in input and output files. 
+	char   	myname[STRLEN];
+	// Holds the user's choice of myname, used in input and output files.
 	char	filename[STRLEN];     // temporary filename for writing output.
-    FILE*	fid=NULL;             // file ID pointer 
+    FILE*	fid=NULL;             // file ID pointer
     char    buf[32];              // buffer for reading header.dat
-    
+
     strcpy(myname, argv[1]);      // acquire name from argument of function call by user
     printf("name = %s\n",myname);
 
@@ -181,21 +181,25 @@ int main(int argc, const char * argv[])
 	fid = fopen(filename,"r");
 	fgets(buf, 32, fid);
 	// run parameters
-	sscanf(buf, "%f", &time_min); // desired time duration of run [min]
+	sscanf(buf, "%lf", &Nphotons); // desired time duration of run [min] RMT now photons isntead
 	fgets(buf, 32, fid);
-	sscanf(buf, "%d", &Nx);  // # of bins  
+	sscanf(buf, "%lf", &p); // RMT chance of a foward photon doing a bias scattering.
+	fgets(buf, 32, fid);
+	sscanf(buf, "%d", &Ndetectors); // RMT chance of a foward photon doing a bias scattering.
+	fgets(buf, 32, fid);
+	sscanf(buf, "%d", &Nx);  // # of bins
 	fgets(buf, 32,fid);
 	sscanf(buf, "%d", &Ny);  // # of bins
 	fgets(buf, 32,fid);
-	sscanf(buf, "%d", &Nz);  // # of bins   
-	
+	sscanf(buf, "%d", &Nz);  // # of bins
+
 	fgets(buf, 32,fid);
 	sscanf(buf, "%f", &dx);	 // size of bins [cm]
 	fgets(buf, 32,fid);
-	sscanf(buf, "%f", &dy);	 // size of bins [cm] 
+	sscanf(buf, "%f", &dy);	 // size of bins [cm]
 	fgets(buf, 32,fid);
-	sscanf(buf, "%f", &dz);	 // size of bins [cm] 
-	
+	sscanf(buf, "%f", &dz);	 // size of bins [cm]
+
 	// launch parameters
 	fgets(buf, 32,fid);
 	sscanf(buf, "%d", &mcflag);  // mcflag, 0 = uniform, 1 = Gaussian, 2 = iso-pt
@@ -204,14 +208,14 @@ int main(int argc, const char * argv[])
 	sscanf(buf, "%d", &launchflag);  // launchflag, 0 = ignore, 1 = manually set
     fgets(buf, 32,fid);
     sscanf(buf, "%d", &boundaryflag);  // 0 = no boundaries, 1 = escape at all boundaries, 2 = escape at surface only
-	
+
 	fgets(buf, 32,fid);
     sscanf(buf, "%f", &xs);  // initial launch point
 	fgets(buf, 32,fid);
-	sscanf(buf, "%f", &ys);  // initial launch point 
+	sscanf(buf, "%f", &ys);  // initial launch point
 	fgets(buf, 32,fid);
 	sscanf(buf, "%f", &zs);  // initial launch point
-	
+
 	fgets(buf, 32,fid);
 	sscanf(buf, "%f", &xfocus);  // xfocus
 	fgets(buf, 32,fid);
@@ -230,16 +234,19 @@ int main(int argc, const char * argv[])
 	sscanf(buf, "%f", &radius);  // radius
 	fgets(buf, 32,fid);
 	sscanf(buf, "%f", &waist);  // waist
-    
+
 	fgets(buf, 32,fid);
 	sscanf(buf, "%f", &zsurf);  // z_surface
-	
+
 	// tissue optical properties
 	fgets(buf, 32,fid);
 	sscanf(buf, "%d", &Nt);				// # of tissue types in tissue list
-    printf("Nt = %d\n",Nt); // KE: check 
-    
-	for (i=1; i<=Nt; i++) 
+    printf("Nt = %d\n",Nt); // KE: check
+
+	double s_total2[Nt]; // RMT : Create s_total here
+	double s_total_cont2[Nt]; // RMT : Create s_total here
+
+	for (i=1; i<=Nt; i++)
     {
         fgets(buf, 32, fid);
 		sscanf(buf, "%f", &muav[i]);	// absorption coeff [cm^-1]
@@ -247,10 +254,10 @@ int main(int argc, const char * argv[])
 		sscanf(buf, "%f", &musv[i]);	// scattering coeff [cm^-1]
 		fgets(buf, 32, fid);
 		sscanf(buf, "%f", &gv[i]);		// anisotropy of scatter [dimensionless]
-	}    
+	}
     fclose(fid);
-    
-    printf("time_min = %0.2f min\n",time_min);
+
+    printf("Number of photons = %0.4f \n",Nphotons);
     printf("Nx = %d, dx = %0.4f [cm]\n",Nx,dx);
     printf("Ny = %d, dy = %0.4f [cm]\n",Ny,dy);
     printf("Nz = %d, dz = %0.4f [cm]\n",Nz,dz);
@@ -266,40 +273,40 @@ int main(int argc, const char * argv[])
     printf("xfocus = %0.4f [cm]\n",xfocus);
     printf("yfocus = %0.4f [cm]\n",yfocus);
     printf("zfocus = %0.2e [cm]\n",zfocus);
-	if (launchflag==1) 
+	if (launchflag==1)
 	{
 		printf("Launchflag ON, so launch the following:\n");
 		printf("ux0 = %0.4f [cm]\n",ux0);
 		printf("uy0 = %0.4f [cm]\n",uy0);
 		printf("uz0 = %0.4f [cm]\n",uz0);
 	}
-	else 
+	else
 	{
 		printf("Launchflag OFF, so program calculates launch angles.\n");
 		printf("radius = %0.4f [cm]\n",radius);
 		printf("waist  = %0.4f [cm]\n",waist);
 	}
     printf("zsurf = %0.4f [cm]\n",zsurf);
-	
+
     if (boundaryflag==0)
 		printf("boundaryflag = 0, so no boundaries.\n");
     else if (boundaryflag==1)
-		printf("boundaryflag = 1, so escape at all boundaries.\n");    
+		printf("boundaryflag = 1, so escape at all boundaries.\n");
 	else if (boundaryflag==2)
-		printf("boundaryflag = 2, so escape at surface only.\n");    
+		printf("boundaryflag = 2, so escape at surface only.\n");
 	else
 	{
         printf("improper boundaryflag. quit.\n");
         return 0;
     }
     printf("# of tissues available, Nt = %d\n",Nt);
-    for (i=1; i<=Nt; i++) 
+    for (i=1; i<=Nt; i++)
     {
         printf("muav[%ld] = %0.4f [cm^-1]\n",i,muav[i]);
         printf("musv[%ld] = %0.4f [cm^-1]\n",i,musv[i]);
         printf("  gv[%ld] = %0.4f [--]\n\n",i,gv[i]);
     }
-    
+
     /* IMPORT BINARY TISSUE FILE */
 	char 	*v=NULL;
 	float 	*F=NULL;
@@ -310,9 +317,10 @@ int main(int argc, const char * argv[])
 	v  = ( char *)malloc(NN*sizeof(char));  /* tissue structure */
 	F  = (float *)malloc(NN*sizeof(float));	/* relative fluence rate [W/cm^2/W.delivered] */
 	R  = (float *)malloc(Nyx*sizeof(float));	/* escaping flux [W/cm^2/W.delivered] */
-    
+
     DetID  = malloc(sizeof(int));	// KE: photon ID at det_num
     DetS = malloc(sizeof(float)); // KE: photon path length
+	DetS2 = malloc(sizeof(float)); // KE: photon path length
 	DetE = malloc(sizeof(float)); // RMT: Debugging variable. Plays no role.
     DetW  = malloc(sizeof(float));	// KE: photon weight
     DetL  = malloc(sizeof(float));	// KE: likelihood ratio
@@ -323,88 +331,92 @@ int main(int argc, const char * argv[])
     fid = fopen(filename, "rb");
     fread(v, sizeof(char), NN, fid);
     fclose(fid);
-    
+
     // Show tissue on screen, along central z-axis, by listing tissue type #'s.
     iy = Ny/2;
     ix = Nx/2;
     printf("central axial profile of tissue types:\n");
-    for (iz=0; iz<Nz; iz++) 
+    for (iz=0; iz<Nz; iz++)
     {
         i = (long)(iz*Ny*Nx + ix*Ny + iy);
         printf("%d",v[i]);
     }
     printf("\n\n");
-    
+
 	/**************************
 	 * ============================ MAJOR CYCLE ========================
 	 **********/
 	start_time = clock();
 	now = time(NULL);
-	printf("%s\n", ctime(&now));	
-	
-	/**** INITIALIZATIONS 
+	printf("%s\n", ctime(&now));
+
+	/**** INITIALIZATIONS
 	 *****/
-	RandomGen(0, -(int)time(NULL)%(1<<15), NULL); 
+	RandomGen(0, -(int)time(NULL)%(1<<15), NULL);
 	/* initiate with seed = 1, or any long integer. */
 	for(j=0; j<NN;j++) 	F[j] = 0.0; // ensure F[] starts empty.
 	for(j=0; j<Nyx;j++) R[j] = 0.0;  // RMT ensure R[] starts empty.
 	Rd = 0.0;
-	
+
 	/**** RUN
 	 Launch N photons, initializing each one before progation.
 	 *****/
 	printf("------------- Begin Monte Carlo -------------\n");
     printf("%s\n",myname);
-    printf("requesting %0.1f min\n",time_min);
-	Nphotons = 200; // will be updated to achieve desired run time, time_min.
+    printf("requesting unknown time\n");
+	//Nphotons = 200; // will be updated to achieve desired run time, time_min.
 	i_photon = 0;
     c_photon = 0;
     //a = 0.925; //KE: Lima et al 2012
-	do { 
-        // KE: while (i_photon < Nphotons) RMT: Main loop simulated all photons.
+	do {
+        // KE: while (i_photon < Nphotons) RMT: Main loop simulating all photons.
 		/**** LAUNCH: Initialize photon position and trajectory *****/
 		i_photon += 1;				/* increment photon count */
 		W = 1.0;                    /* set photon weight to one */
         //printf("W = %f\n",W); // KE: check W
 		photon_status = ALIVE;      /* Launch an ALIVE photon */
-		
+
         /*** KE start: this part is from the A.3 of Zhao's thesis ***/
         det_num = -1; /* photon not detected yet */
         first_bias_done = 0; /* photon not biased back - scattered yet */
         cont_exist = 0; /* no split generated yet */
         L_current = 1; /* photon 's initial likelihood */
         s_total = 0; /* photon 's initial path length */
+		for (m=0; m<Nt; m++)
+		{
+			s_total2[m] = 0;
+		}
         z_max = 0; /* photon 's initial depth reached */
-        Ndetectors = 512; // KE: number of detectors RMT: Changed to one for debugging
-        det_radius = 0.001; //KE: Zhao's thesis chapter 3.3.4 10micro m 
+        //Ndetectors = 512; // KE: number of detectors RMT: Changed to one for debugging
+        det_radius = 0.001; //KE: Zhao's thesis chapter 3.3.4 10micro m
         cos_accept = cos(5); //KE: Zhao's thesis chapter 3.3.4
-        
+
         //a = (double) RandomGen(1, 0, NULL); //KE
-        
-        
+
+
         /* pick the fiber that the current photon packet is biased towards to: [1, Ndetectors ] */
         // KE: array of source/detector pairs
-        while ((rnd = RandomGen(1, 0, NULL)) >= 1.0) ; // avoids rnd = 1       
+        while ((rnd = RandomGen(1, 0, NULL)) >= 1.0) ; // avoids rnd = 1
         Pick_det = floor(rnd * Ndetectors) + 1; // KE: randomly pick one source/detector pair
         //printf("Pick_det = %d\n",Pick_det); //KE: check Pick_det
-        
+
         /* Set trajectory to mimic A- scan */
-        // KE: each A-scan launches and collects photon packets at a different lateral position.  
+        // KE: each A-scan launches and collects photon packets at a different lateral position.
         // KE: That is the only difference among A-scans
-        if (Ndetectors == 1) 
+        if (Ndetectors == 1)
         {
             detx = 0;
         }
-        else 
+        else
         {
             detx = 2 * radius * (Pick_det - 1) / (Ndetectors - 1) - radius;
         }
         //printf("detx = %f\n",detx); //KE: check detx
-        
+
         /*** KE end : this part is from the A.3 of Zhao's thesis ***/
-         
+
 		// Print out message about progress.
-		if ((i_photon>200) & (fmod(i_photon, (int)(Nphotons/20))  == 0)) 
+		if ((i_photon>200) & (fmod(i_photon, (int)(Nphotons/20))  == 0))
 		{
             temp = i_photon/Nphotons*100;
             //printf("%0.1f%% \t\tfmod = %0.3f\n", temp,fmod(temp, 10.0));
@@ -415,29 +427,29 @@ int main(int argc, const char * argv[])
             else if(fmod(temp, 10.0)>9)
                 printf("%0.0f%% done\n", i_photon/Nphotons*100);
         }
-        
+
 		// At 1000th photon, update Nphotons to achieve desired runtime (time_min)
 		if (i_photon==1)
 			temp_time = clock();
-		if (i_photon==200) 
-		{    
+		if (i_photon==200)
+		{
 			finish_time = clock();
-			Nphotons = (long)( time_min*60*999*CLOCKS_PER_SEC/(finish_time-temp_time) );
-			printf("Nphotons = %0.0f for simulation time = %0.2f min\n",Nphotons,time_min)
+			//Nphotons = (long)( time_min*60*999*CLOCKS_PER_SEC/(finish_time-temp_time) );
+			printf("Nphotons = %0.0f for unkown time\n",Nphotons)
 			;
 		}
-		
-		/**** SET SOURCE 
+
+		/**** SET SOURCE
 		 * Launch collimated beam at x,y center.
 		 ****/
-        
+
 		/****************************/
-		/* Initial position. */		
-		
-		/* trajectory */ // 
+		/* Initial position. */
+
+		/* trajectory */ //
 		if (launchflag==1) // manually set launch
 		{
-            x	= xs + detx; 
+            x	= xs + detx;
 			y	= ys;
 			z	= zs;
 			ux	= 0;
@@ -445,8 +457,8 @@ int main(int argc, const char * argv[])
 			uz	= 1;
 		}
 		else // use mcflag
-		{ 
-			if (mcflag==0) 
+		{
+			if (mcflag==0)
 			{ // uniform beam
                 // set launch point and width of beam
 				while ((rnd = RandomGen(1,0,NULL)) <= 0.0); // avoids rnd = 0
@@ -463,20 +475,20 @@ int main(int argc, const char * argv[])
 				phi		= rnd*2.0*PI;
 				xfocus	= r*cos(phi);
 				yfocus	= r*sin(phi);
-				temp	= sqrt((x - xfocus)*(x - xfocus) + (y - yfocus)*(y - yfocus) 
+				temp	= sqrt((x - xfocus)*(x - xfocus) + (y - yfocus)*(y - yfocus)
 					            + zfocus*zfocus);
 				ux		= -(x - xfocus)/temp;
 				uy		= -(y - yfocus)/temp;
 				uz		= sqrt(1 - ux*ux - uy*uy);
 			}
-			else if (mcflag==2) 
+			else if (mcflag==2)
 			{ // isotropic pt source
 				costheta = 1.0 - 2.0*RandomGen(1,0,NULL);
 				sintheta = sqrt(1.0 - costheta*costheta);
 				psi = 2.0*PI*RandomGen(1,0,NULL);
 				cospsi = cos(psi);
 				if (psi < PI)
-					sinpsi = sqrt(1.0 - cospsi*cospsi); 
+					sinpsi = sqrt(1.0 - cospsi*cospsi);
 				else
 					sinpsi = -sqrt(1.0 - cospsi*cospsi);
 				x = xs;
@@ -486,7 +498,7 @@ int main(int argc, const char * argv[])
 				uy = sintheta*sinpsi;
 				uz = costheta;
 			}
-			else if (mcflag==3) 
+			else if (mcflag==3)
 			{ // rectangular source collimated
 				while ((rnd = RandomGen(1,0,NULL)) <= 0.0); // avoids rnd = 0
 				x = radius*(rnd*2-1); // use radius to specify x-halfwidth of rectangle
@@ -499,34 +511,34 @@ int main(int argc, const char * argv[])
 			}
 		} // end  use mcflag
 		/****************************/
-		
+
 		/* Get tissue voxel properties of launchpoint.
-		 * If photon beyond outer edge of defined voxels, 
+		 * If photon beyond outer edge of defined voxels,
 		 * the tissue equals properties of outermost voxels.
 		 * Therefore, set outermost voxels to infinite background value.
 		 */
 		ix = (int)(Nx/2 + x/dx);
 		iy = (int)(Ny/2 + y/dy);
-		iz = (int)(z/dz);        
+		iz = (int)(z/dz);
 		if (ix>=Nx) ix=Nx-1;
 		if (iy>=Ny) iy=Ny-1;
 		if (iz>=Nz) iz=Nz-1;
 		if (ix<0)   ix=0;
 		if (iy<0)   iy=0;
-		if (iz<0)   iz=0;		
+		if (iz<0)   iz=0;
 		/* Get the tissue type of located voxel */
 		i		= (long)(iz*Ny*Nx + ix*Ny + iy);
 		type	= v[i];
 		mua 	= muav[type];
 		mus 	= musv[type];
 		g 		= gv[type];
-		
-        bflag = 1; 
+
+        bflag = 1;
         // initialize as 1 = inside volume, but later check as photon propagates.
         surfflag = 1; // initially inside tissue
         // NOTE: must launch photons at tissue surface, or surfflag will go to 0.
         det_z = z; //KE
-		
+
 		/* HOP_DROP_SPIN_CHECK
 		 Propagate one photon until it dies as determined by ROULETTE.
 		 *******/
@@ -538,11 +550,11 @@ int main(int argc, const char * argv[])
 			 *****/
 			while ((rnd = RandomNum) <= 0.0);   /* yields 0 < rnd <= 1 */
 			sleft	= -log(rnd);				/* dimensionless step */
-			//KE CNT += 1; 
+			//KE CNT += 1;
 			// printf("sleft = %f\n",sleft); // KE: check sleft
-            
-             
-			if (photon_status == DEAD) // RMT error here. what continuing photon?
+
+
+			if (photon_status == DEAD) //
             { // load the continuing photon and update the flags
 
                  x = x_cont;
@@ -552,7 +564,12 @@ int main(int argc, const char * argv[])
                  uy = uy_cont;
                  uz = uz_cont;
                  i = i_cont;
-                 s_total = s_total_cont;
+				 s_total = s_total_cont;
+				 for (m=0; m<Nt; m++)
+				{
+					s_total2[m] = s_total_cont2[m];
+				}
+                 
                  z_max = z_max_cont;
                  type = v[i];
                  mua = muav[type];
@@ -565,75 +582,82 @@ int main(int argc, const char * argv[])
                  first_bias_done = 0;
                  det_num = -1;
             }
-             
-          
-			do{  // while sleft>0   
+
+
+			do{  // while sleft>0
 			// RMT: in this loop, we are looking at the different medium the photon is
 			//      going through. Where it is absorbed, detected or escape the simulation
                 s     = sleft/mus;				/* Step size [cm].*/
                 // printf("mus = %f\n",mus); // KE: check mus
-                
+
 				tempx = x + s*ux;				/* Update positions. [cm] */
-				tempy = y + s*uy;	
+				tempy = y + s*uy;
 				tempz = z + s*uz;
-				
+
 				sv = SameVoxel(x,y,z, tempx, tempy, tempz, dx,dy,dz);
 				if (sv) /* photon in same voxel */
-				{  
+				{
                     //printf("photon in same voxel\n");
 					x=tempx;					/* Update positions. */
 					y=tempy;
 					z=tempz;
-					
+
 					/**** DROP
 					 Drop photon weight (W) into local bin.
 					 *****/
-                    absorb = W*(1 - exp(-mua*s));	
+                    absorb = W*(1 - exp(-mua*s));
                     /* photon weight absorbed at this step */
-                    W -= absorb;	
+                    W -= absorb;
                     //printf("W = %f\n",W); // KE: check W
                     /* decrement WEIGHT by amount absorbed */
-					// If photon within volume of heterogeneity, deposit energy in F[]. 
-					// Normalize F[] later, when save output. 
-                    if (bflag) F[i] += absorb;	
+					// If photon within volume of heterogeneity, deposit energy in F[].
+					// Normalize F[] later, when save output.
+                    if (bflag) F[i] += absorb;
                     // only save data if blag==1, i.e., photon inside simulation cube
-					
+
 					/* Update sleft */
 					sleft = 0;		/* dimensionless step remaining */
-                   
+
 				    /* Update total path length */ // RMT
-				    s_total += s; // RMT Update the total distance here.
+					s_total += s;
+				    s_total2[type-1] += s; // RMT Update the total distance here.
 				}
 				else /* photon has crossed voxel boundary */
 				{
-					/* step to voxel face + "littlest step" so just inside new voxel. */         
+					/* step to voxel face + "littlest step" so just inside new voxel. */
                     s = ls + FindVoxelFace2(x, y, z, &det_num, Pick_det, detx, det_radius, det_z, cos_accept, Ndetectors, dx, dy, dz, ux, uy, uz);
-                    s_total += s; // RMT Update the total distance here.
-				   
+                    //s_total += s; // RMT Update the total distance here. Not suppose to be here
+
 					/*** DROP: Drop photon weight (W) into local bin  ***/
 					absorb = W*(1-exp(-mua*s));  /* photon weight absorbed at this step */
 					W -= absorb;                 /* decrement WEIGHT by amount absorbed */
-                    
-					// If photon within volume of heterogeneity, deposit energy in F[]. 
-					// Normalize F[] later, when save output. 
-                    if (bflag) F[i] += absorb;	
-					
-                    if (det_num != -1) 
+
+					// If photon within volume of heterogeneity, deposit energy in F[].
+					// Normalize F[] later, when save output.
+                    if (bflag) F[i] += absorb;
+
+                    if (det_num != -1)
                     { /* check if the photon is detected . */
                         // KE: det_num changes in FindVoxelFace2 function when photon gets detected
 
                       /* Update total path length */
                       s_total += s;
+					  s_total2[type-1] += s;
 
                          /* Save properties of interest */
-                         if (L_current > 0 &&  det_num == Pick_det) 
+                         if (L_current > 0 &&  det_num == Pick_det)
                          { // avoid NAN and zero likelihood, and avoid cross - detection
                              // Def: float *DetW, *DetL, *DetS, *DetZ;
-                             // DetS  = malloc(sizeof(float));                           
-                             DetS = realloc(DetS,(c_photon+2)* sizeof(float));
+                             // DetS  = malloc(sizeof(float));
+                             DetS = realloc(DetS,(c_photon+2)* sizeof(float)); //RMT
+							 DetS2 = realloc(DetS2,((c_photon+2)*Nt)* sizeof(float));
 							 DetE = realloc(DetE,(c_photon+2)* sizeof(float)); // RMT
-                             DetS[c_photon]=s_total;
-							 DetE[c_photon]=s; // RMT, redone
+                             DetS[c_photon]=s_total; //RMT
+							 for (m=0; m<Nt; m++)
+							 {
+								 DetS2[Nt*c_photon+m] = s_total2[m];
+							 }
+							 DetE[c_photon]=p; // RMT, redone
                              DetID = realloc(DetID,(c_photon+2)* sizeof(int));
                              DetID[c_photon] = det_num;
                              DetW = realloc(DetW,(c_photon+2)* sizeof(float));
@@ -643,7 +667,7 @@ int main(int argc, const char * argv[])
                              DetZ = realloc(DetZ,(c_photon+2)* sizeof(float));
                              DetZ[c_photon] = z_max;
                              /* increment collected photon count */
-                             c_photon += 1;  
+                             c_photon += 1;
                          }
                          // if( c_photon ==1) { printf (" OK at 590;\ n") ;}
                          photon_status = DEAD; // RMT This might need to be "dead"
@@ -654,15 +678,16 @@ int main(int argc, const char * argv[])
                         /* Update sleft */
                         sleft -= s*mus;  /* dimensionless step remaining */
                         if (sleft<=ls) sleft = 0;
-					
+
                         /* Update positions. */
                         x += s*ux;
                         y += s*uy;
                         z += s*uz;
-					    
+
 						/* Update total path length */ // RMT
-						s_total += s; //RMT
-						
+						s_total += s; //RM
+						s_total2[type-1] += s; //RMT
+
                         // pointers to voxel containing optical properties
                         ix = (int)(Nx/2 + x/dx);
                         iy = (int)(Ny/2 + y/dy);
@@ -671,26 +696,26 @@ int main(int argc, const char * argv[])
                         if (iy>Ny) iy=Ny;
                         if (ix<0)  ix=0;
                         if (iy<0)  iy=0;
-                    
+
                         //*** ESCAPE or not
                         if((surfflag==1) & (z<=zsurf)) // escape at surface
-                        { 
+                        {
                             Rd += W;
                             i = (long)(Nx*ix + iy);
-                            R[i] += W;	
+                            R[i] += W;
                             surfflag = 0;  // disable repeated assignments to Rd, R[i]
                         }
                         if (z<0) // escape cube
-                        { 
+                        {
                             photon_status = DEAD; // RMT: as in really dead this time
                             sleft = 0;
-                        }                    
+                        }
                         else // No escape
-                        { 
-                            bflag = 1;  
+                        {
+                            bflag = 1;
                             // Boundary flag. Initialize as 1 = inside volume, then check.
                             if (boundaryflag==0) // Infinite medium
-                            { 
+                            {
                             // Check if photon has wandered outside volume.
                             // If so, set tissue type to boundary value, but let photon wander
                             // Set blag to zero, so DROP does not deposit energy.
@@ -702,7 +727,7 @@ int main(int argc, const char * argv[])
                                 if (iy<0)   {iy=0;    bflag = 0;}
                             }
                             else if (boundaryflag==1) // Escape at boundaries
-                            { 
+                            {
                                 if (iz>=Nz) {iz=Nz-1; photon_status = DEAD; sleft=0;}
                                 if (ix>=Nx) {ix=Nx-1; photon_status = DEAD; sleft=0;}
                                 if (iy>=Ny) {iy=Ny-1; photon_status = DEAD; sleft=0;}
@@ -710,7 +735,7 @@ int main(int argc, const char * argv[])
                                 if (ix<0)   {ix=0;    photon_status = DEAD; sleft=0;}
                                 if (iy<0)   {iy=0;    photon_status = DEAD; sleft=0;}
                             }
-                            else if (boundaryflag==2) 
+                            else if (boundaryflag==2)
                             { // Escape at top surface, no x,y bottom z boundaries
                                 if (iz>=Nz) {iz=Nz-1; bflag = 0;}
                                 if (ix>=Nx) {ix=Nx-1; bflag = 0;}
@@ -718,43 +743,43 @@ int main(int argc, const char * argv[])
                                 if (iz<0)   {iz=0;    photon_status = DEAD; sleft=0;}
                                 if (ix<0)   {ix=0;    bflag = 0;}
                                 if (iy<0)   {iy=0;    bflag = 0;}
-                            }                     
+                            }
                             // update pointer to tissue type
                             i    = (long)(iz*Ny*Nx + ix*Ny + iy);
                             type = v[i];
                             mua  = muav[type];
                             mus  = musv[type];
                             g    = gv[type];
-                            
+
                         }
-                    } 
+                    }
 				} //(sv) /* same voxel */
-				
+
 			} while(sleft>0); //do...while
-			
-             
-            
+
+
+
             /***
-            * KE start: this part is from the A.4 of Zhao's thesis 
+            * KE start: this part is from the A.4 of Zhao's thesis
             ***/
-            /**** SPIN AND SPLIT // RMT: Spin referers to scattering the photon
+            /**** SPIN AND SPLIT
             * The Spin process is to scatter photon into new
             trajectory defined by theta and psi. Theta is specied by cos(theta) , which is determined based
             on the Henyey-Greenstein scattering function, and then convert theta and psi into
             cosines ux, uy, uz. Split follows exactly the procedure described in Section 4.3,
             where we apply biased backward-scatterings and biased forward-scattering, as well
-            as unbiased scatterings. Once the rst biased backward-scattering takes place, we
+            as unbiased scatterings. Once therst biased backward-scattering takes place, we
             split the photon packet into two if the likelihood ratio of the biased back-scattering
             is less than 1. We save the information of the continuing photon and continue to
             track the current photon, by applying biased and unbiased forward-scatterings*/
-        
-            if (photon_status == ALIVE) 
+
+            if (photon_status == ALIVE)
             {
                  /* check whether the first biased back - scattering has been applied : 0 = not ...
                   applied , 1 = applied */
-                
-              
-                 if (first_bias_done == 0) 
+
+
+                 if (first_bias_done == 0)
                 { /* apply the first biased scattering */
                      /* Sample for costheta_B */
                      rnd = RandomNum;
@@ -771,13 +796,13 @@ int main(int argc, const char * argv[])
                          sinpsi = -sqrt(1.0 - cospsi * cospsi);
                      /* Compute the unit vector v towards the actual position of the detector , ...
                       where detx is chosen uniformly along the centers of the collecting fiber ...
-                      array . */ 
+                      array . */
                      // KE: biased direction; direction of the actual position  of the collecting optics
-                     if (Ndetectors == 1) 
+                     if (Ndetectors == 1)
                      {
                          detx = 0;
                      }
-                     else 
+                     else
                      {
                          detx = 2 * radius * (Pick_det - 1) / (Ndetectors - 1) - radius;
                      }
@@ -787,16 +812,16 @@ int main(int argc, const char * argv[])
                      vx = -(x - detx) / temp;
                      vy = -(y - dety) / temp;
                      vz = -(z - detz) / temp;
-                     
+
                      /* New trajectory u' = (upx , upy , upz) */
                      // KE: equal to equation 3.21 in the mcmcl manualn of Steves Jacques
-                     if (1 - fabs(vz) <= ONE_MINUS_COSZERO) 
+                     if (1 - fabs(vz) <= ONE_MINUS_COSZERO)
                      { /* close to perpendicular . */
                          upx = sintheta_B * cospsi;
                          upy = sintheta_B * sinpsi;
                          upz = costheta_B * SIGN(vz); /* SIGN () is faster than division . */
                      }
-                     else 
+                     else
                      {                      /* usually use this option */
                          // KE: equal to equation 3.22 in the mcmcl manualn of Steves Jacques
                          temp = sqrt(1.0 - vz * vz);
@@ -807,14 +832,14 @@ int main(int argc, const char * argv[])
                      /* Compute the likelihood ratio for this particular biased ...
                       back - scattering */
                      // KE: henyey greenstein probability; equal to equation 4.3 in Zhao's thesis
-                     
+
                      costheta_S = upx * ux + upy * uy + upz * uz;
                      temp = (1 + a * a - 2 * a * costheta_B) / (1 + g * g - 2 * g * costheta_S);
                      double L_temp = (1 - g * g) / (2 * a * (1 - a)) * (1 - (1 - a) / sqrt(1 + a * a)) * sqrt(temp * temp * temp);
-                     
+
                      /* Check do we have a continuing photon packet or not ? */
                      // KE: this part is explained in section 4.3.3 in Zhao's thesis
-                     if (L_temp < (1 - ls)) 
+                     if (L_temp < (1 - ls))
                      { // yes , do the unbiased spin and save the trajectory for the continuing photon packet
                          L_cont = L_current * (1 - L_temp);
                          i_cont = i;
@@ -824,14 +849,14 @@ int main(int argc, const char * argv[])
                          rnd = RandomNum;
                          if (g == 0.0)
                          costheta = 2.0 * rnd - 1.0;
-                         else 
+                         else
                          {
                            double temp = (1.0 - g * g) / (1.0 - g + 2 * g * rnd);
                            costheta = (1.0 + g * g - temp * temp) / (2.0 * g);
                          }
                          sintheta = sqrt(1.0 - costheta * costheta); /* sqrt () is faster than sin (). */
                          /* Sample psi . */
-                         // KE: equal to equation 3.22 in the manual
+                         // KE: equal to equation 3.22 in the manual RMT: From the original code
                          psi = 2.0 * PI * RandomNum;
                          cospsi = cos(psi);
                          if (psi < PI)
@@ -839,16 +864,16 @@ int main(int argc, const char * argv[])
                          else
                                 sinpsi = -sqrt(1.0 - cospsi * cospsi);
                          /* New trajectory . */
-                         // KE: equal to equation 3.22 in the manual
-                         if (1 - fabs(uz) <= ONE_MINUS_COSZERO) 
+                         // KE: equal to equation 3.22 in the manual RMT: From the original code
+                         if (1 - fabs(uz) <= ONE_MINUS_COSZERO)
                          { /* close to perpendicular . */
                            uxx = sintheta * cospsi;
                            uyy = sintheta * sinpsi;
                            uzz = costheta * SIGN(uz); /* SIGN () is faster than division . */
                          }
-                         else 
+                         else
                          { /* usually use this option */
-                           // KE: equal to equation 3.21 in the manual
+                           // KE: equal to equation 3.21 in the manual RMT: From the original code
                            temp = sqrt(1.0 - uz * uz);
                            uxx = sintheta * (ux * uz * cospsi - uy * sinpsi) / temp + ux * costheta;
                            uyy = sintheta * (uy * uz * cospsi + ux * sinpsi) / temp + uy * costheta;
@@ -864,13 +889,17 @@ int main(int argc, const char * argv[])
                          z_cont = z;
                          W_cont = W;
                          s_total_cont = s_total;
+						 for (m=0; m<Nt; m++)
+						 {
+						 	s_total_cont2[m] = s_total2[m];
+						 }
                          z_max_cont = z_max;
                          L_current *= L_temp;
                          cont_exist = 1;
                     }
-                    else 
+                    else
                      { // no continuing photon packet
-                       // KE: no unbiased spin after first biased scattering 
+                       // KE: no unbiased spin after first biased scattering
                          L_current *= L_temp;
                          cont_exist = 0;
                      }
@@ -882,10 +911,10 @@ int main(int argc, const char * argv[])
                      first_bias_done = 1;
                 }
           // KE: chapter 4.3.3 in Zhao's thesis
-				else 
+				else
 				{/* first biased back - scattering already done , apply additional biased ...
               forward - scattering */
-					if (RandomNum <= p) 
+					if (RandomNum <= p)
 					{ // apply biased forward - scattering
                   /* Sample for costheta_B */
                   rnd = RandomNum;
@@ -894,7 +923,7 @@ int main(int argc, const char * argv[])
                   sintheta_B = sqrt(1.0 - costheta_B * costheta_B);
                   /* Sample psi . */
                   psi = 2.0 * PI * RandomNum;
-                  cospsi = cos(psi);        
+                  cospsi = cos(psi);
                   if (psi < PI)
                       sinpsi = sqrt(1.0 - cospsi * cospsi); /* sqrt () is faster than sin (). */
                   else
@@ -902,10 +931,10 @@ int main(int argc, const char * argv[])
                   /* Compute the unit vector v towards the actual position of the ...
                   detector , where detx is chosen uniformly along the centers of the ...
                   collecting fiber array . */
-                  if (Ndetectors == 1) 
+                  if (Ndetectors == 1)
                       detx = 0;
-                  else 
-                      detx = 2 * radius * (Pick_det - 1) / (Ndetectors - 1) - radius;
+                  else
+                      detx = 2 * radius * (Pick_det - 1) / (Ndetectors - 1) - radius; // RMT: a;ready calculated
                   dety = 0;
                   detz = det_z;
                   temp = sqrt((x - detx) * (x - detx) + (y - dety) * (y - dety) + (z - detz) * (z - detz));
@@ -913,13 +942,13 @@ int main(int argc, const char * argv[])
                   vy = -(y - dety) / temp;
                   vz = -(z - detz) / temp;
                   /* New trajectory u' = (upx , upy , upz) */
-                  if (1 - fabs(vz) <= ONE_MINUS_COSZERO) 
+                  if (1 - fabs(vz) <= ONE_MINUS_COSZERO)
                   {/* close to perpendicular . */
                       upx = sintheta_B * cospsi;
                       upy = sintheta_B * sinpsi;
                       upz = costheta_B * SIGN(vz); /* SIGN () is faster than division . */
                   }
-                  else 
+                  else
                   { /* usually use this option */
                       temp = sqrt(1.0 - vz * vz);
                       upx = sintheta_B * (vx * vz * cospsi - vy * sinpsi) / temp + vx * costheta_B;
@@ -941,13 +970,13 @@ int main(int argc, const char * argv[])
                   uy = upy;
                   uz = upz;
 					}
-					else 
+					else
 					{// apply unbiased scattering
               /* Sample for costheta */
                   rnd = RandomNum;
-                  if (g == 0.0) 
+                  if (g == 0.0)
                       costheta = 2.0 * rnd - 1.0;
-                  else 
+                  else
                   {
                       double temp = (1.0 - g * g) / (1.0 - g + 2 * g * rnd);
                       costheta = (1.0 + g * g - temp * temp) / (2.0 * g);
@@ -956,18 +985,18 @@ int main(int argc, const char * argv[])
                   /* Sample psi . */
                   psi = 2.0 * PI * RandomNum;
                   cospsi = cos(psi);
-                  if (psi < PI) 
+                  if (psi < PI)
                       sinpsi = sqrt(1.0 - cospsi * cospsi); /* sqrt () is faster than sin (). */
-                  else 
+                  else
                       sinpsi = -sqrt(1.0 - cospsi * cospsi);
                   /* New trajectory . */
-                  if (1 - fabs(uz) <= ONE_MINUS_COSZERO) 
+                  if (1 - fabs(uz) <= ONE_MINUS_COSZERO)
                   { /* close to perpendicular . */
                       uxx = sintheta * cospsi;
                       uyy = sintheta * sinpsi;
                       uzz = costheta * SIGN(uz); /* SIGN () is faster than division . */
                   }
-                  else 
+                  else
                   { /* usually use this option */
                       temp = sqrt(1.0 - uz * uz);
                       uxx = sintheta * (ux * uz * cospsi - uy * sinpsi) / temp + ux * costheta;
@@ -977,9 +1006,10 @@ int main(int argc, const char * argv[])
                   /* Compute the unit vector v towards the actual position of the ...
                   detector , where detx is chosen uniformly along the centers of the ...
                   collecting fiber array . */
-                  if (Ndetectors == 1) 
+				  // RMT: I don't think calculating detx is necessary here. It was already done before.
+                  if (Ndetectors == 1)
                       detx = 0;
-                  else 
+                  else
                       detx = 2 * radius * (Pick_det - 1) / (Ndetectors - 1) - radius;
                   dety = 0;
                   detz = det_z;
@@ -1003,48 +1033,48 @@ int main(int argc, const char * argv[])
                   uz = uzz;
 					}
 				}
-				
+
 			/***
 			* KE end : this part is from the A.4 of Zhao's thesis
-			***/  
-			/**** CHECK ROULETTE 
-	   If photon weight below THRESHOLD, then terminate photon using Roulette 
-	   technique. Photon has CHANCE probability of having its weight increased 
+			***/
+			/**** CHECK ROULETTE
+	   If photon weight below THRESHOLD, then terminate photon using Roulette
+	   technique. Photon has CHANCE probability of having its weight increased
 	   by factor of 1/CHANCE, and 1-CHANCE probability of terminating.
 	   *****/
 
-				if (W < THRESHOLD) 
+				if (W < THRESHOLD)
 				{
 					if (RandomNum <= CHANCE)
 						W /= CHANCE;
-					else 
+					else
 						photon_status = DEAD;
 				}
-			}	
+			}
 		}	 while (photon_status == ALIVE || cont_exist == 1 );  /* end STEP_CHECK_HOP_SPIN */
         /* if ALIVE, continue propagating */
-		/* If photon DEAD, then launch new photon. */	
-        
+		/* If photon DEAD, then launch new photon. */
+
 	} while (i_photon < Nphotons);  /* end RUN */
 	//RMT: End of the monte carlo simulation. All photons were simulated.
-	
-	
+
+
 	printf("collected photons = %ld\n",c_photon);
-    
+
 	printf("------------------------------------------------------\n");
 	finish_time = clock();
 	time_min = (double)(finish_time-start_time)/CLOCKS_PER_SEC/60;
 	printf("Elapsed Time for %0.3e photons = %5.3f min\n",Nphotons,time_min);
 	printf("%0.2e photons per minute\n", Nphotons/time_min);
-	
+
     /**** SAVE
      Convert data to relative fluence rate [cm^-2] and save.
      *****/
-   
+
      // Save the binary file
 
-   
-            
+
+
     strcpy(filename,myname);
     strcat(filename,"_DetS.bin");
     printf("saving %s\n",filename);
@@ -1052,13 +1082,20 @@ int main(int argc, const char * argv[])
     fwrite(DetS, sizeof(float), c_photon, fid);
     fclose(fid);
 	
+    strcpy(filename,myname);
+    strcat(filename,"_DetS2.bin");
+    printf("saving %s\n",filename);
+    fid = fopen(filename, "wb");   /* 3D voxel output */
+    fwrite(DetS2, sizeof(float), c_photon*Nt, fid);
+    fclose(fid);
+
 	strcpy(filename,myname); // RMT extra saved data. Whole paragraph was added.
     strcat(filename,"_DetE.bin");
     printf("saving %s\n",filename);
     fid = fopen(filename, "wb");   /* 3D voxel output */
     fwrite(DetE, sizeof(float), c_photon, fid);
     fclose(fid);
-    
+
      // Save the binary file
     strcpy(filename,myname);
     strcat(filename,"_DetW.bin");
@@ -1066,7 +1103,7 @@ int main(int argc, const char * argv[])
     fid = fopen(filename, "wb");   /* 3D voxel output */
     fwrite(DetW, sizeof(float), c_photon, fid);
     fclose(fid);
-    
+
      // Save the binary file
     strcpy(filename,myname);
     strcat(filename,"_DetL.bin");
@@ -1074,7 +1111,7 @@ int main(int argc, const char * argv[])
     fid = fopen(filename, "wb");   /* 3D voxel output */
     fwrite(DetL, sizeof(float), c_photon, fid);
     fclose(fid);
-    
+
      // Save the binary file
     strcpy(filename,myname);
     strcat(filename,"_DetZ.bin");
@@ -1082,7 +1119,7 @@ int main(int argc, const char * argv[])
     fid = fopen(filename, "wb");   /* 3D voxel output */
     fwrite(DetZ, sizeof(float), c_photon, fid);
     fclose(fid);
-    
+
     // Save the binary file
     strcpy(filename,myname);
     strcat(filename,"_DetID.bin");
@@ -1090,7 +1127,7 @@ int main(int argc, const char * argv[])
     fid = fopen(filename, "wb");   /* 3D voxel output */
     fwrite(DetID, sizeof(int), c_photon, fid);
     fclose(fid);
-    
+
     // Normalize deposition (A) to yield fluence rate (F).
     temp = dx*dy*dz*Nphotons;
     for (i=0; i<NN;i++) F[i] /= (temp*muav[v[i]]);
@@ -1101,8 +1138,8 @@ int main(int argc, const char * argv[])
     fid = fopen(filename, "wb");   /* 3D voxel output */
     fwrite(F, sizeof(float), NN, fid);
     fclose(fid);
-    
-    /* save reflectance */
+
+    /* save reflectance */ // RMT: Not fully implemented. I don't think it is useful to implement it.
     temp = dx*dy*Nphotons;
 	for (i=0; i<Nyx; i++) R[i] /= temp;
 	strcpy(filename,myname);
@@ -1112,30 +1149,31 @@ int main(int argc, const char * argv[])
 	fwrite(R, sizeof(float), Nyx, fid);
 	fclose(fid);
 
-	printf("WRd = %0.0f\n",Rd);	
-	printf("Nphotons = %0.2e\n",Nphotons);		
+	printf("WRd = %0.0f\n",Rd);
+	printf("Nphotons = %0.2e\n",Nphotons);
 	Rd /= Nphotons;
-	printf("Rd = %0.3e\n",Rd);		
+	printf("Rd = %0.3e\n",Rd);
 	strcpy(filename,myname);
 	strcat(filename,"_Rd.dat");
 	printf("saving %s\n",filename);
 	fid = fopen(filename, "w");
 	fprintf(fid,"%0.4f\n",Rd);
 	fclose(fid);
-	
+
 	printf("%s is done.\n",myname);
-	
+
     printf("------------------------------------------------------\n");
     now = time(NULL);
     printf("%s\n", ctime(&now));
-    
-    
+
+
     free(v);
     free(F);
     free(R);
     free(DetID);
     free(DetW);
     free(DetS);
+	free(DetS2);
 	free(DetE); // RMT, added probe
     free(DetL);
     free(DetZ);
@@ -1173,12 +1211,12 @@ int main(int argc, const char * argv[])
 #define MZ 0
 #define FAC 1.0E-9
 
-// KE: RandomGen(1,0,NULL): generates a random number between 0 and 1 
+// KE: RandomGen(1,0,NULL): generates a random number between 0 and 1
 double RandomGen(char Type, long Seed, long *Status){
     static long i1, i2, ma[56];   /* ma[0] is not used. */
     long        mj, mk;
     short       i, ii;
-    
+
     if (Type == 0) {              /* set seed. */
         mj = MSEED - (Seed < 0 ? -Seed : Seed);
         mj %= MBIG;
@@ -1233,8 +1271,8 @@ double RandomGen(char Type, long Seed, long *Status){
 /***********************************************************
  *  Determine if the two position are located in the same voxel
  *	Returns 1 if same voxel, 0 if not same voxel.
- ****/				
-Boolean SameVoxel(double x1,double y1,double z1, double x2, double y2, double z2, 
+ ****/
+Boolean SameVoxel(double x1,double y1,double z1, double x2, double y2, double z2,
 				double dx,double dy,double dz)
 {
     double xmin=min2((floor)(x1/dx),(floor)(x2/dx))*dx;
@@ -1244,7 +1282,7 @@ Boolean SameVoxel(double x1,double y1,double z1, double x2, double y2, double z2
     double ymax = ymin+dy;
     double zmax = zmin+dz;
     Boolean sv=0;
-    
+
     sv=(x1<=xmax && x2<=xmax && y1<=ymax && y2<=ymax && z1<zmax && z2<=zmax);
     return (sv);
 }
@@ -1287,65 +1325,8 @@ double min3(double a, double b, double c) {
 }
 
 /***********************************************************
- * KE: samplepsi
- ****/
-/*
- void samplepsi()
- {
-     double psi;//, cospsi, sinpsi;
-     double ret[] = {0, 0};
-     psi = 2.0 * PI * RandomNum;
-     // cospsi = cos(psi);
-     ret[0] = cos(psi); // return cospsi
-     if (psi < PI)
-     ret[1] = sqrt(1.0 - ret[0] * ret[0]); //sinpsi  sqrt () is faster than sin (). 
-     else
-     ret[1] = -sqrt(1.0 - ret[0] * ret[0]); // sinpsi
-     return ret;
- }
- */
-/********************
- * my version of FindVoxelFace for no scattering.
- * s = ls + FindVoxelFace2(x,y,z, tempx, tempy, tempz, dx, dy, dz, ux, uy, uz);
- ****/
-// KE: version of Zaho is used
-/*
-double FindVoxelFace2(double x1,double y1,double z1, double x2, double y2, double z2,
-					double dx,double dy,double dz, double ux, double uy, double uz)
-{	
-    int ix1 = floor(x1/dx);
-    int iy1 = floor(y1/dy);
-    int iz1 = floor(z1/dz);
-    
-    int ix2,iy2,iz2;
-    if (ux>=0)
-        ix2=ix1+1;
-    else
-        ix2 = ix1;
-    
-    if (uy>=0)
-        iy2=iy1+1;
-    else
-        iy2 = iy1;
-    
-    if (uz>=0)
-        iz2=iz1+1;
-    else
-        iz2 = iz1;
-    
-    double xs = fabs( (ix2*dx - x1)/ux);
-    double ys = fabs( (iy2*dy - y1)/uy);
-    double zs = fabs( (iz2*dz - z1)/uz);
-    
-    double s = min3(xs,ys,zs);
-    
-    return (s);
-}
-
-*/
-/***********************************************************
  *	FRESNEL REFLECTANCE
- * Computes reflectance as photon passes from medium 1 to 
+ * Computes reflectance as photon passes from medium 1 to
  * medium 2 with refractive indices n1,n2. Incident
  * angle a1 is specified by cosine value ca1 = cos(a1).
  * Program returns value of transmitted angle a1 as
@@ -1360,7 +1341,7 @@ double RFresnel(double n1,		/* incident refractive index.*/
 /* angle a2, a2>0. */
 {
     double r;
-    
+
     if(n1==n2) { /** matched boundary. **/
         *ca2_Ptr = ca1;
         r = 0.0;
@@ -1379,7 +1360,7 @@ double RFresnel(double n1,		/* incident refractive index.*/
         double ca2;      /* cosine of transmission angle. */
         sa1 = sqrt(1-ca1*ca1);
         sa2 = n1*sa1/n2;
-        if(sa2>=1.0) {	
+        if(sa2>=1.0) {
             /* double check for total internal reflection. */
             *ca2_Ptr = 0.0;
             r = 1.0;
@@ -1393,7 +1374,7 @@ double RFresnel(double n1,		/* incident refractive index.*/
             cam = ca1*ca2 + sa1*sa2; /* c- = cc + ss. */
             sap = sa1*ca2 + ca1*sa2; /* s+ = sc + cs. */
             sam = sa1*ca2 - ca1*sa2; /* s- = sc - cs. */
-            r = 0.5*sam*sam*(cam*cam+cap*cap)/(sap*sap*cam*cam); 
+            r = 0.5*sam*sam*(cam*cam+cap*cap)/(sap*sap*cam*cam);
             /* rearranged for speed. */
 		}
 	}
@@ -1404,7 +1385,7 @@ double RFresnel(double n1,		/* incident refractive index.*/
 
 /***********************************************************
  * the boundary is the face of some voxel
- * find the the photon's hitting position on the nearest face of the voxel 
+ * find the the photon's hitting position on the nearest face of the voxel
  * and update the step size.
 ****/
 double FindVoxelFace(double x1,double y1,double z1, double x2, double y2, double z2,
@@ -1423,12 +1404,12 @@ double FindVoxelFace(double x1,double y1,double z1, double x2, double y2, double
     double fy_2 = floor(y_2) ;
     double fz_2 = floor(z_2) ;
     double x=0, y=0, z=0, x0=0, y0=0, z0=0, s=0;
-    
+
     if ((fx_1 != fx_2) && (fy_1 != fy_2) && (fz_1 != fz_2) ) { //#10
         fx_2=fx_1+SIGN(fx_2-fx_1);//added
         fy_2=fy_1+SIGN(fy_2-fy_1);//added
         fz_2=fz_1+SIGN(fz_2-fz_1);//added
-        
+
         x = (max2(fx_1,fx_2)-x_1)/ux;
         y = (max2(fy_1,fy_2)-y_1)/uy;
         z = (max2(fz_1,fz_2)-z_1)/uz;
@@ -1508,7 +1489,7 @@ double FindVoxelFace(double x1,double y1,double z1, double x2, double y2, double
         x0 = (y0-y_1)/uy*ux+x_1;
         z0 = (y0-y_1)/uy*uz+z_1;
     }
-    else { //#7 
+    else { //#7
         z0 = max2(fz_1, fz_2);
         fz_2=fz_1+SIGN(fz_2-fz_1);//added
         x0 = (z0-z_1)/uz*ux+x_1;
@@ -1524,18 +1505,18 @@ double FindVoxelFace(double x1,double y1,double z1, double x2, double y2, double
 // KE: the FindVoxelFace2 function is in Listing A4 in Zhao's thesis
 // KE: Compute the step size the photon will take to get the first voxel crossing in one single long step.
 // KE: We also check whether the photon packet is detected by the assigned detector
-/* How much step size will the photon take to get the first voxel crossing in one single 
-	long step? */ // 
-double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_det, double detx, double det_radius, double det_z, double cos_accept, int Ndetectors, double dx, double dy, double dz, double ux, double uy, double uz) 
+/* How much step size will the photon take to get the first voxel crossing in one single
+	long step? */ //
+double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_det, double detx, double det_radius, double det_z, double cos_accept, int Ndetectors, double dx, double dy, double dz, double ux, double uy, double uz)
 {
-		
+
     // KE: ix1, iy1, iz1: indices of the voxel where the photon is currently in
         int ix1 = floor(x1 / dx);
 		int iy1 = floor(y1 / dy);
-		int iz1 = floor(z1 / dz);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+		int iz1 = floor(z1 / dz);
 		int izd = floor(det_z / dz);
-        
-        // KE: ix2, iy2, iz2: indices of the voxel faces lying ahead of the photon's propagation path 
+
+        // KE: ix2, iy2, iz2: indices of the voxel faces lying ahead of the photon's propagation path
         int ix2, iy2, iz2;
         // KE: equal to equation 4.12 in Zhao's thesis
 		if (ux >= 0) ix2 = ix1 + 1;
@@ -1550,12 +1531,12 @@ double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_de
         double xs = fabs((ix2 * dx - x1) / ux); // KE: equal to equations 4.15 in Zhao's thesis
 		double ys = fabs((iy2 * dy - y1) / uy); // KE: equal to equations 4.16 in Zhao's thesis
 		double zs = fabs((iz2 * dz - z1) / uz); // KE: equal to equations 4.17 in Zhao's thesis
-        // KE: s: desired distance of the photon to its closest voxel face 
+        // KE: s: desired distance of the photon to its closest voxel face
         double s = min3(xs, ys, zs);
 		// check detection
-		if (-uz >= cos_accept && izd == iz1 && s == zs && fabs(y1 + s * uy) <= det_radius) 
+		if (-uz >= cos_accept && izd == iz1 && s == zs && fabs(y1 + s * uy) <= det_radius)
         {
-			if (fabs(x1 + s * ux - detx) <= det_radius) 
+			if (fabs(x1 + s * ux - detx) <= det_radius)
                 *det_num = Pick_det;
 		}
         return (s);
