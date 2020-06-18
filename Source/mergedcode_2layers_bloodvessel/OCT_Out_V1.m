@@ -115,7 +115,7 @@ OCT(2:end-1) = 2*OCT(2:end-1);
 
 %% Displaying image
 
-z = 1/(k(1)-k(2))*(0:(length(k)/2))/length(k);
+z = 2*pi/(k(1)-k(2))*(0:(length(k)/2))/length(k);
 x = linspace(-radius,radius,Ndetector);
 
 imagesc(x,z,db(OCT))
