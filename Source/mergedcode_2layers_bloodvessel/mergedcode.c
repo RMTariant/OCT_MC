@@ -123,7 +123,7 @@ int det_num; // photon not detected yet/
 double first_bias_done ; // photon not biased back - scattered yet
 double cont_exist; // no split generated yet // check if a continuing photon packet exists
 double L_current; // photon 's initial likelihood
-double s_total; // photon 's initial path length
+//double s_total; // photon 's initial path length RMT
 double z_max; // photon 's initial depth reached
 int Ndetectors; // Number of source/detector pairs to represent conducting A-scans
 int Pick_det; // index of randomly picked source/detector pair
@@ -141,7 +141,7 @@ double i_cont;
 double W_cont;
 double x_cont, y_cont, z_cont;
 double ux_cont, uy_cont, uz_cont;
-double s_total_cont;
+//double s_total_cont; RMT
 double z_max_cont;
 double p; // used in biased forward-scattering
 double det_z;
@@ -240,6 +240,9 @@ int main(int argc, const char * argv[])
 	fgets(buf, 32,fid);
 	sscanf(buf, "%d", &Nt);				// # of tissue types in tissue list
     printf("Nt = %d\n",Nt); // KE: check
+
+	double s_total[Nt]; // RMT : Create s_total here
+	double s_total_cont[Nt]; // RMT : Create s_total here
 
 	for (i=1; i<=Nt; i++)
     {
@@ -375,7 +378,11 @@ int main(int argc, const char * argv[])
         first_bias_done = 0; /* photon not biased back - scattered yet */
         cont_exist = 0; /* no split generated yet */
         L_current = 1; /* photon 's initial likelihood */
-        s_total = 0; /* photon 's initial path length */
+        //s_total = 0; /* photon 's initial path length */
+		for (i=1; i<=Nt; i++)
+		{
+			s_total[i] = 0;
+		}
         z_max = 0; /* photon 's initial depth reached */
         Ndetectors = 512; // KE: number of detectors RMT: Changed to one for debugging
         det_radius = 0.001; //KE: Zhao's thesis chapter 3.3.4 10micro m
@@ -554,7 +561,11 @@ int main(int argc, const char * argv[])
                  uy = uy_cont;
                  uz = uz_cont;
                  i = i_cont;
-                 s_total = s_total_cont;
+				 for (i=1; i<=Nt; i++)
+				{
+					s_total[i] = s_total_cont[i];
+				}
+                 //s_total = s_total_cont; RMT
                  z_max = z_max_cont;
                  type = v[i];
                  mua = muav[type];
@@ -604,13 +615,13 @@ int main(int argc, const char * argv[])
 					sleft = 0;		/* dimensionless step remaining */
 
 				    /* Update total path length */ // RMT
-				    s_total += s; // RMT Update the total distance here.
+				    s_total[type] += s; // RMT Update the total distance here.
 				}
 				else /* photon has crossed voxel boundary */
 				{
 					/* step to voxel face + "littlest step" so just inside new voxel. */
                     s = ls + FindVoxelFace2(x, y, z, &det_num, Pick_det, detx, det_radius, det_z, cos_accept, Ndetectors, dx, dy, dz, ux, uy, uz);
-                    s_total += s; // RMT Update the total distance here.
+                    //s_total += s; // RMT Update the total distance here. Not suppose to be here
 
 					/*** DROP: Drop photon weight (W) into local bin  ***/
 					absorb = W*(1-exp(-mua*s));  /* photon weight absorbed at this step */
@@ -625,16 +636,21 @@ int main(int argc, const char * argv[])
                         // KE: det_num changes in FindVoxelFace2 function when photon gets detected
 
                       /* Update total path length */
-                      s_total += s;
+                      s_total[type] += s;
 
                          /* Save properties of interest */
                          if (L_current > 0 &&  det_num == Pick_det)
                          { // avoid NAN and zero likelihood, and avoid cross - detection
                              // Def: float *DetW, *DetL, *DetS, *DetZ;
                              // DetS  = malloc(sizeof(float));
-                             DetS = realloc(DetS,(c_photon+2)* sizeof(float));
+                             //DetS = realloc(DetS,(c_photon+2)* sizeof(float)); RMT
+							 DetS = realloc(DetS,((c_photon+2)*Nt)* sizeof(float));
 							 DetE = realloc(DetE,(c_photon+2)* sizeof(float)); // RMT
-                             DetS[c_photon]=s_total;
+                             //DetS[c_photon]=s_total; RMT
+							 for (i=1; i<=Nt; i++)
+							 {
+								 DetS[Nt*c_photon+i] = s_total[i];
+							 }
 							 DetE[c_photon]=p; // RMT, redone
                              DetID = realloc(DetID,(c_photon+2)* sizeof(int));
                              DetID[c_photon] = det_num;
@@ -663,7 +679,7 @@ int main(int argc, const char * argv[])
                         z += s*uz;
 
 						/* Update total path length */ // RMT
-						s_total += s; //RMT
+						s_total[type] += s; //RMT
 
                         // pointers to voxel containing optical properties
                         ix = (int)(Nx/2 + x/dx);
@@ -865,7 +881,11 @@ int main(int argc, const char * argv[])
                          y_cont = y;
                          z_cont = z;
                          W_cont = W;
-                         s_total_cont = s_total;
+                         //s_total_cont = s_total;
+						 for (i=1; i<=Nt; i++)
+						 {
+						 	s_total_cont[i] = s_total[i];
+						 }
                          z_max_cont = z_max;
                          L_current *= L_temp;
                          cont_exist = 1;
