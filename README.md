@@ -5,6 +5,7 @@ Description
 
 ===Missing Features (to be implemented)===
 -Add the number of detector selection in matlab script
+-Need to change how the BScan width is controlled
 -Making a map of the code
 -Testing the functions
 -Removing the extra code
@@ -14,7 +15,6 @@ Description
 -Refraction
 -Noise
 -Gaussian beam source
--Dispersion?
 -Wavelength width on the detection
 -Focusing/diverging beams instead of perfectly foccus
 -Check cone of acceptance in the fiber
@@ -116,7 +116,7 @@ psi: Random psi angle determining the lateral direction
 cospsi: cos(psi)
 sinpsi: sin(psi)
 costheta_S: Random result of cos(theta_B). theta_S is the random bias axial angle between the previous photon direction and scattered direction
-L_temp: Likelihood ratio of the current scattering event
+L_temp: 1 minus the Likelihood ratio of the current scattering event
 ONE_MINUS_COSZERO: One very small value. I think it used to avoid bugs when a value is too close to 0.
 p: Parameter determining the probability of the photon doing more bias scattering after the first one. It was equal to 0.
 f_HG: Result of the Henyey Greenstein function
