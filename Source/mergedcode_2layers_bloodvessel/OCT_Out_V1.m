@@ -99,6 +99,7 @@ for n = 1:max(ID)
     s_sample(:,n) = sum(s(:,find(ID == n)),2);
     nphoton_dec(n) = sum(ID == n);
 end
+clear s
 
 %Calculate the average amplitude of the sample arm signal to calibrate
 %reference arm signal amplitude
