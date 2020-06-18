@@ -4,11 +4,10 @@ Monte-Carlo simulation of an FD-OCT B-Scan.
 Description
 
 ===Missing Features (to be implemented)===
+-Add the number of detector selection in matlab script
 -Making a map of the code
 -Testing the functions
 -Removing the extra code
--Parameter p is not determined.
--Select the number of photons for the simulation
 -Fresnel reflection
 -Mirror reflection
 -Photon pathlength dependent on the refractive index
@@ -123,13 +122,15 @@ p: Parameter determining the probability of the photon doing more bias scatterin
 f_HG: Result of the Henyey Greenstein function
 f_B: Result of the bias function
 CHANCE: Chance of the photon dying when under the weigth. Defined as 0.1
-
+Ntiss: Maximum number of tissue types. (Can be edited to be bigger)
 DetS: Path Length of the detected photons
 DetW: Weigth of the detected photons
 DetL: Likelihood ratios of detected photons
 DetID: IDs of detected photons (range from 1 to 512 for 512 detectors/emittors)
 c_photon: Current photon packet itteration?
+m: Indices used in for loops.
 
-
-
+===Path notes===
+-Added the p parameters that was missing in both the matlab script and c code.
+-Change from an time input to a number of photons input
 
