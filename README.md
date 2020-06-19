@@ -141,4 +141,7 @@ m: Indices used in for loops.
 ===Path notes===
 -Added the p parameters that was missing in both the matlab script and c code.
 -Change from an time input to a number of photons input
+-Photon path length is now by medium
+-Flat noise is now added to OCT image.
+-OCT process script is now updated
 
