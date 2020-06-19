@@ -11,7 +11,7 @@ samplePoints= 512; %%%%CHOOSE VALUE%%%%
 rn = ones(samplePoints,2); %%%%CHOOSE VALUE%%%%
 rn(1:samplePoints,1) = 1; %%%%CHOOSE VALUE%%%%
 rn(1:samplePoints,2) = 1; %%%%CHOOSE VALUE%%%%
-noise_amp = 1e-9; %%%Choose amplitude of noise%%%
+noise_amp = 0; %%%Choose amplitude of noise%%%
 
 %% Load data
 
