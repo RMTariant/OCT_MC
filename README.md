@@ -4,22 +4,27 @@ Monte-Carlo simulation of an FD-OCT B-Scan.
 Description
 
 ===Missing Features (to be implemented)===
--Add the number of detector selection in matlab script
 -Need to change how the BScan width is controlled
 -Making a map of the code
 -Testing the functions
 -Removing the extra code
 -Fresnel reflection
 -Mirror reflection
--Photon pathlength dependent on the refractive index
 -Refraction
--Noise
+-Check if Noise is good
 -Gaussian beam source
 -Wavelength width on the detection
 -Focusing/diverging beams instead of perfectly foccus
 -Check cone of acceptance in the fiber
 -DetZ, the photon maximum reached depth, is not fully implemented
 
+===Added Features===
+-Selecting the number of simulating photons as oppose to time-min.
+-Selecting the number of A-line in the matlab script.
+-Selecting the parameter p
+-Photon path length are now counted in each individual medium.
+-OCT matlab script now allows for taking into account the refractive index impact on the OCT image.
+-Flat noise was added
 
 MergedCode.c
 
