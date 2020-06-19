@@ -3,8 +3,9 @@ Monte-Carlo simulation of an FD-OCT B-Scan.
 
 Description
 
-===Missing Features (to be implemented)===
+===Missing Features / Bugs (to be implemented)===
 -Fix the progress bar
+-Find the bug about the difference between input and output size.
 -Check if photon mesh intersection was properly implemented
 -Need to change how the BScan width is controlled
 -Making a map of the code
