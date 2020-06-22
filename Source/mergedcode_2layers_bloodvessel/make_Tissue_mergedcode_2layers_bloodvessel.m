@@ -34,8 +34,8 @@ SAVEON      = 1;        % 1 = save myname_T.bin, myname_H.mci
 
 myname      = 'skinvessel2layersb';%_2layers_bloodvessel';% name for files: myname_T.bin, myname_H.mci  
 time_min    = 1;      	% RMT No longuer used time duration of the simulation [min] <----- run time -----
-Nphotons    = 10000;    % RMT Number of photons used in the simulation.
-p           = 0.5;      % RMT Probability that the foward photon has bias scattering.
+Nphotons    = 1e5;    % RMT Number of photons used in the simulation.
+p           = 0;      % RMT Probability that the foward photon has bias scattering.
 Ndetectors  = 512;      % RMT Number of detector in the simulation
 nm          = 532;   	% desired wavelength of simulation
 Nbins       = 200;    	% # of bins in each dimension of cube  Nbins     
@@ -213,7 +213,7 @@ Txzy = shiftdim(T,1);   % Tyxz --> Txzy
 Tzx  = Txzy(:,:,Ny/2)'; % Tzx
 
 %%
-figure(1); clf
+figure(2); clf
 sz = 12;  fz = 10; 
 imagesc(x,z,Tzx,[1 Nt])
 hold on
