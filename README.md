@@ -4,7 +4,6 @@ Monte-Carlo simulation of an FD-OCT B-Scan.
 Description
 
 ===Missing Features / Bugs (to be implemented)===
--Check if photon mesh intersection was properly implemented
 -Need to change how the BScan width is controlled
 -Making a map of the code
 -Testing the functions
@@ -20,6 +19,7 @@ Description
 -DetZ, the photon maximum reached depth, is not fully implemented
 
 ===Added Features===
+-The thesis proposed mesh intersection is the same as in St-Jacques code.
 -Corrected the bug in the difference in size from output and input. It was due to the input file not saving all decimals on the dx/dy/dz parameters. 0.00045 became 0.0004.
 -Selecting a_coef as a parameter
 -Fix progress bar of the .c simulation
