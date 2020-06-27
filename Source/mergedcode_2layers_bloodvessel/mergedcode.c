@@ -111,6 +111,15 @@ float 	zsurf, Rd;
 float	time_min;               // Requested time duration of computation.
 time_t	now;
 double	start_time, finish_time, temp_time; /* for clock() */
+float   tsave; //RMT
+float   tsaves; //RMT
+float   t0; //RMT
+float   t1s; //RMT
+float   t1; //RMT
+float   t2s; //RMT
+float   t2; //RMT
+float   t3s; //RMT
+float   t3; //RMT
 
 /* tissue parameters */
 char	tissuename[50][32];
@@ -130,7 +139,7 @@ int Pick_det; // index of randomly picked source/detector pair
 double detx, dety, detz; // position of detector
 double det_radius; // radius of detector
 double cos_accept; // acceptance angle
-double a;
+//double a; //RMT no longuer useful
 double costheta_S;
 double costheta_B;
 double sintheta_B;
@@ -143,7 +152,8 @@ double x_cont, y_cont, z_cont;
 double ux_cont, uy_cont, uz_cont;
 double s_total_cont;
 double z_max_cont;
-double p; // used in biased forward-scattering
+double a_coef; // RMT
+double p; // RMT
 double det_z;
 double f_HG, f_B;
 long c_photon; // count collected photons
@@ -182,6 +192,8 @@ int main(int argc, const char * argv[])
 	fgets(buf, 32, fid);
 	// run parameters
 	sscanf(buf, "%lf", &Nphotons); // desired time duration of run [min] RMT now photons isntead
+	fgets(buf, 32, fid);
+	sscanf(buf, "%lf", &a_coef); // RMT chance of a foward photon doing a bias scattering.
 	fgets(buf, 32, fid);
 	sscanf(buf, "%lf", &p); // RMT chance of a foward photon doing a bias scattering.
 	fgets(buf, 32, fid);
@@ -369,6 +381,7 @@ int main(int argc, const char * argv[])
     c_photon = 0;
     //a = 0.925; //KE: Lima et al 2012
 	do {
+		t0 = clock(); //RMT
         // KE: while (i_photon < Nphotons) RMT: Main loop simulating all photons.
 		/**** LAUNCH: Initialize photon position and trajectory *****/
 		i_photon += 1;				/* increment photon count */
@@ -418,14 +431,15 @@ int main(int argc, const char * argv[])
 		// Print out message about progress.
 		if ((i_photon>200) & (fmod(i_photon, (int)(Nphotons/20))  == 0))
 		{
-            temp = i_photon/Nphotons*100;
+            printf("%0.0f%% done\n", i_photon/Nphotons*100); //RMT
+			//temp = i_photon/Nphotons*100;
             //printf("%0.1f%% \t\tfmod = %0.3f\n", temp,fmod(temp, 10.0));
-            if ((temp<10) | (temp>90))
-            {
-                printf("%0.0f%% done\n", i_photon/Nphotons*100);
-            }
-            else if(fmod(temp, 10.0)>9)
-                printf("%0.0f%% done\n", i_photon/Nphotons*100);
+            //if ((temp<10) | (temp>90))
+            //{
+            //    printf("%0.0f%% done\n", i_photon/Nphotons*100);
+            //}
+            //else if(fmod(temp, 10.0)>9) //RMT
+            //    printf("%0.0f%% done\n", i_photon/Nphotons*100);
         }
 
 		// At 1000th photon, update Nphotons to achieve desired runtime (time_min)
@@ -438,7 +452,6 @@ int main(int argc, const char * argv[])
 			printf("Nphotons = %0.0f for unkown time\n",Nphotons)
 			;
 		}
-
 		/**** SET SOURCE
 		 * Launch collimated beam at x,y center.
 		 ****/
@@ -538,6 +551,9 @@ int main(int argc, const char * argv[])
         surfflag = 1; // initially inside tissue
         // NOTE: must launch photons at tissue surface, or surfflag will go to 0.
         det_z = z; //KE
+		
+		t1 = clock()-t0; //RMT
+		t1s += t1; //RMT
 
 		/* HOP_DROP_SPIN_CHECK
 		 Propagate one photon until it dies as determined by ROULETTE.
@@ -644,6 +660,7 @@ int main(int argc, const char * argv[])
                       s_total += s;
 					  s_total2[type-1] += s;
 
+							tsave = clock();
                          /* Save properties of interest */
                          if (L_current > 0 &&  det_num == Pick_det)
                          { // avoid NAN and zero likelihood, and avoid cross - detection
@@ -657,7 +674,7 @@ int main(int argc, const char * argv[])
 							 {
 								 DetS2[Nt*c_photon+m] = s_total2[m];
 							 }
-							 DetE[c_photon]=p; // RMT, redone
+							 DetE[c_photon]=a_coef; // RMT, redone
                              DetID = realloc(DetID,(c_photon+2)* sizeof(int));
                              DetID[c_photon] = det_num;
                              DetW = realloc(DetW,(c_photon+2)* sizeof(float));
@@ -669,6 +686,8 @@ int main(int argc, const char * argv[])
                              /* increment collected photon count */
                              c_photon += 1;
                          }
+							tsave -= clock(); //RMT
+							tsaves += tsave; //RMT
                          // if( c_photon ==1) { printf (" OK at 590;\ n") ;}
                          photon_status = DEAD; // RMT This might need to be "dead"
                          sleft = 0;
@@ -757,7 +776,8 @@ int main(int argc, const char * argv[])
 
 			} while(sleft>0); //do...while
 
-
+			t2 = clock() - t1; //RMT
+			t2s += t2; //RMT
 
             /***
             * KE start: this part is from the A.4 of Zhao's thesis
@@ -783,9 +803,9 @@ int main(int argc, const char * argv[])
                 { /* apply the first biased scattering */
                      /* Sample for costheta_B */
                      rnd = RandomNum;
-                     a = RandomNum; // KE: added
-                     double temp = 1 / sqrt(1 + a*a) + rnd * (1 / (1 - a) - 1 / sqrt(1 + a*a));
-                     costheta_B = 0.5 / a*(a*a + 1 - 1 / (temp*temp));
+                     //a = RandomNum; // KE: added RMT WRONG! IT IS A PARAMETER!
+                     double temp = 1 / sqrt(1 + a_coef*a_coef) + rnd * (1 / (1 - a_coef) - 1 / sqrt(1 + a_coef*a_coef));
+                     costheta_B = 0.5 / a_coef*(a_coef*a_coef + 1 - 1 / (temp*temp));
                      sintheta_B = sqrt(1.0 - costheta_B * costheta_B);
                      /* Sample psi . */
                      psi = 2.0 * PI * RandomNum;
@@ -834,8 +854,8 @@ int main(int argc, const char * argv[])
                      // KE: henyey greenstein probability; equal to equation 4.3 in Zhao's thesis
 
                      costheta_S = upx * ux + upy * uy + upz * uz;
-                     temp = (1 + a * a - 2 * a * costheta_B) / (1 + g * g - 2 * g * costheta_S);
-                     double L_temp = (1 - g * g) / (2 * a * (1 - a)) * (1 - (1 - a) / sqrt(1 + a * a)) * sqrt(temp * temp * temp);
+                     temp = (1 + a_coef * a_coef - 2 * a_coef * costheta_B) / (1 + g * g - 2 * g * costheta_S);
+                     double L_temp = (1 - g * g) / (2 * a_coef * (1 - a_coef)) * (1 - (1 - a_coef) / sqrt(1 + a_coef * a_coef)) * sqrt(temp * temp * temp);
 
                      /* Check do we have a continuing photon packet or not ? */
                      // KE: this part is explained in section 4.3.3 in Zhao's thesis
@@ -918,8 +938,8 @@ int main(int argc, const char * argv[])
 					{ // apply biased forward - scattering
                   /* Sample for costheta_B */
                   rnd = RandomNum;
-                  double temp = 1 / sqrt(1 + a * a) + rnd * (1 / (1 - a) - 1 / sqrt(1 + a * a));
-                  costheta_B = 0.5 / a * (a * a + 1 - 1 / (temp * temp));
+                  double temp = 1 / sqrt(1 + a_coef * a_coef) + rnd * (1 / (1 - a_coef) - 1 / sqrt(1 + a_coef * a_coef));
+                  costheta_B = 0.5 / a_coef * (a_coef * a_coef + 1 - 1 / (temp * temp));
                   sintheta_B = sqrt(1.0 - costheta_B * costheta_B);
                   /* Sample psi . */
                   psi = 2.0 * PI * RandomNum;
@@ -934,7 +954,7 @@ int main(int argc, const char * argv[])
                   if (Ndetectors == 1)
                       detx = 0;
                   else
-                      detx = 2 * radius * (Pick_det - 1) / (Ndetectors - 1) - radius; // RMT: a;ready calculated
+                      detx = 2 * radius * (Pick_det - 1) / (Ndetectors - 1) - radius; // RMT: detx ready calculated
                   dety = 0;
                   detz = det_z;
                   temp = sqrt((x - detx) * (x - detx) + (y - dety) * (y - dety) + (z - detz) * (z - detz));
@@ -961,8 +981,8 @@ int main(int argc, const char * argv[])
                   costheta_S = upx * ux + upy * uy + upz * uz;
                   temp = 1 + g * g - 2 * g * costheta_S;
                   f_HG = (1 - g * g) * 0.5 / sqrt(temp * temp * temp);
-                  temp = 1 + a * a - 2 * a * costheta_B;
-                  f_B = a * (1 - a) / ((sqrt(temp * temp * temp)) * (1 - (1 - a) / sqrt(1 + a * a)));
+                  temp = 1 + a_coef * a_coef - 2 * a_coef * costheta_B;
+                  f_B = a_coef * (1 - a_coef) / ((sqrt(temp * temp * temp)) * (1 - (1 - a_coef) / sqrt(1 + a_coef * a_coef)));
                   double L_temp = f_HG / (p * f_B + (1 - p) * f_HG); // KE: equal to equation 4.4 in Zhao's thesis
                   L_current *= L_temp;
                   /* Update trajectory */
@@ -1023,8 +1043,8 @@ int main(int argc, const char * argv[])
                   costheta_B = uxx * vx + uyy * vy + uzz * vz;
                   temp = 1 + g * g - 2 * g * costheta_S;
                   f_HG = (1 - g * g) * 0.5 / sqrt(temp * temp * temp);
-                  temp = 1 + a * a - 2 * a * costheta_B;
-                  f_B = a * (1 - a) / ((sqrt(temp * temp * temp)) * (1 - (1 - a) / sqrt(1 + a * a)));
+                  temp = 1 + a_coef * a_coef - 2 * a_coef * costheta_B;
+                  f_B = a_coef * (1 - a_coef) / ((sqrt(temp * temp * temp)) * (1 - (1 - a_coef) / sqrt(1 + a_coef * a_coef)));
                   double L_temp = f_HG / (p * f_B + (1 - p) * f_HG);
                   L_current *= L_temp;
                   /* Update trajectory */
@@ -1033,7 +1053,8 @@ int main(int argc, const char * argv[])
                   uz = uzz;
 					}
 				}
-
+				t3 = clock()-t2;
+				t3s += t3;
 			/***
 			* KE end : this part is from the A.4 of Zhao's thesis
 			***/
@@ -1066,7 +1087,10 @@ int main(int argc, const char * argv[])
 	time_min = (double)(finish_time-start_time)/CLOCKS_PER_SEC/60;
 	printf("Elapsed Time for %0.3e photons = %5.3f min\n",Nphotons,time_min);
 	printf("%0.2e photons per minute\n", Nphotons/time_min);
-
+	printf("%0.2e saving files\n", tsaves/CLOCKS_PER_SEC/60);
+	printf("%0.2e set photon start\n", t1s/CLOCKS_PER_SEC/60);
+	printf("%0.2e propagate\n", t2s/CLOCKS_PER_SEC/60);
+	printf("%0.2e spin and split\n", t3s/CLOCKS_PER_SEC/60);
     /**** SAVE
      Convert data to relative fluence rate [cm^-2] and save.
      *****/
