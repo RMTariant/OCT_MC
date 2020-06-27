@@ -1,7 +1,7 @@
 %% Parameters
 
 %File name
-myname = 'skinvessel3layers_3'; %%%%CHOOSE VALUE%%%%
+myname = 'skinvessel2layersb'; %%%%CHOOSE VALUE%%%%
 %Number of photon loaded at the same time
 nph = 40000; %%%%CHOOSE VALUE%%%%
 %OCT wavelengths IN CENTIMETERS
@@ -27,15 +27,15 @@ disp(['loading ' filename])
 fid = fopen(filename, 'r');
 A = fscanf(fid,'%f',[1 Inf])';
 fclose(fid);
-Ndetectors = A(3);
-Nx = A(4);
-Ny = A(5);
-Nz = A(6);
-dx = A(7);
-dy = A(8);
-dz = A(9);
-radius = A(22);
-Nt = A(25);
+Ndetectors = A(4);
+Nx = A(5);
+Ny = A(6);
+Nz = A(7);
+dx = A(8);
+dy = A(9);
+dz = A(10);
+radius = A(23);
+Nt = A(26);
 
 % Load path lengths of detected photons DetS
 % filename = sprintf('%s_DetS.bin',myname);
@@ -129,9 +129,14 @@ end
 % clear s
 
 sig = zeros(samplePoints,Ndetectors);
-p = floor(length(W)/nph);
+if length(W)> nph
+    p = floor(length(W)/nph);
+else
+    p = 1;
+    nph = length(W);
+end
 qn = length(W) - nph*p;
-if qn > 0
+if qn >= 0
     q = 1;
 end
 

@@ -34,8 +34,9 @@ SAVEON      = 1;        % 1 = save myname_T.bin, myname_H.mci
 
 myname      = 'skinvessel2layersb';%_2layers_bloodvessel';% name for files: myname_T.bin, myname_H.mci  
 time_min    = 1;      	% RMT No longuer used time duration of the simulation [min] <----- run time -----
-Nphotons    = 1e5;    % RMT Number of photons used in the simulation.
-p           = 0;      % RMT Probability that the foward photon has bias scattering.
+Nphotons    = 1e5;      % RMT Number of photons used in the simulation.
+a_coef      = 0.925;    % RMT Biasing coefficient of the importance sampling
+p           = 0.5;      % RMT Probability of additional bias scattering.
 Ndetectors  = 512;      % RMT Number of detector in the simulation
 nm          = 532;   	% desired wavelength of simulation
 Nbins       = 200;    	% # of bins in each dimension of cube  Nbins     
@@ -61,8 +62,8 @@ yfocus      = 0;        % set y,position of focus
 zfocus      = inf;    	% set z,position of focus (=inf for collimated beam)
 
 % only used if mcflag == 0 or 1 or 3 (not 2=isotropic pt.)
-radius      = 0.0300;   % 1/e radius of beam at tissue surface
-waist       = 0.0300;  	% 1/e radius of beam at focus
+radius      = 0.0400;   % 1/e radius of beam at tissue surface
+waist       = 0.0400;  	% 1/e radius of beam at focus
 
 % only used if launchflag == 1 (manually set launch trajectory):
 ux0         = 0.7;      % trajectory projected onto x axis
@@ -164,14 +165,15 @@ if SAVEON
     fid = fopen(filename,'w');
         % run parameters
         fprintf(fid,'%0.0f\n',Nphotons);
+        fprintf(fid,'%0.4f\n',a_coef);
         fprintf(fid,'%0.4f\n',p);
         fprintf(fid,'%0.0f\n',Ndetectors);
         fprintf(fid,'%d\n'   ,Nx);
         fprintf(fid,'%d\n'   ,Ny);
         fprintf(fid,'%d\n'   ,Nz);
-        fprintf(fid,'%0.4f\n',dx);
-        fprintf(fid,'%0.4f\n',dy);
-        fprintf(fid,'%0.4f\n',dz);
+        fprintf(fid,'%0.6f\n',dx);
+        fprintf(fid,'%0.6f\n',dy);
+        fprintf(fid,'%0.6f\n',dz);
         % launch parameters
         fprintf(fid,'%d\n'   ,mcflag);
         fprintf(fid,'%d\n'   ,launchflag);
