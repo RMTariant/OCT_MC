@@ -3,19 +3,19 @@ Monte-Carlo simulation of an FD-OCT B-Scan.
 
 Description
 
-===Missing Features / Bugs (to be implemented)===
--Check why a low value of mua and g (maybe mus) slows the simulation a lot
--Need to change how the BScan width is controlled
--Making a map of the code
--Testing the functions
--Removing the extra code
--Fresnel reflection
--Mirror reflection
--Refraction
--Check if Noise is good
--Gaussian beam source
--Wavelength width on the detection
--Focusing/diverging beams instead of perfectly foccus
+===Missing Features / Bugs (to be implemented)===  
+-Check why a low value of mua and g (maybe mus) slows the simulation a lot  
+-Need to change how the BScan width is controlled  
+-Making a map of the code  
+-Testing the functions  
+-Removing the extra code  
+-Fresnel reflection  
+-Mirror reflection  
+-Refraction  
+-Check if Noise is good  
+-Gaussian beam source  
+-Wavelength width on the detection  
+-Focusing/diverging beams instead of perfectly foccus  
 
 ===Added Features===
 -The thesis proposed mesh intersection is the same as in St-Jacques code.
