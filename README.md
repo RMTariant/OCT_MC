@@ -4,9 +4,6 @@ Monte-Carlo simulation of an FD-OCT B-Scan.
 Description
 
 ===Missing Features / Bugs (to be implemented)===
--Fix the progress bar
--Find the bug about the difference between input and output size.
--Check if photon mesh intersection was properly implemented
 -Need to change how the BScan width is controlled
 -Making a map of the code
 -Testing the functions
@@ -22,6 +19,10 @@ Description
 -DetZ, the photon maximum reached depth, is not fully implemented
 
 ===Added Features===
+-The thesis proposed mesh intersection is the same as in St-Jacques code.
+-Corrected the bug in the difference in size from output and input. It was due to the input file not saving all decimals on the dx/dy/dz parameters. 0.00045 became 0.0004.
+-Selecting a_coef as a parameter
+-Fix progress bar of the .c simulation
 -Selecting the number of simulating photons as oppose to time-min.
 -Selecting the number of A-line in the matlab script.
 -Selecting the parameter p
@@ -32,7 +33,8 @@ Description
 MergedCode.c
 
 ===Parameters===
-p: Parameter determining the probability of the photon doing more bias scattering after the first one. It was equal to 0
+a_coef: Biasing coefficient of the importance sampling. Default = 0.5
+p: Probability of additional bias scattering. Default = 0.925
 
 
 ===Functions===
@@ -126,7 +128,8 @@ sinpsi: sin(psi)
 costheta_S: Random result of cos(theta_B). theta_S is the random bias axial angle between the previous photon direction and scattered direction
 L_temp: 1 minus the Likelihood ratio of the current scattering event
 ONE_MINUS_COSZERO: One very small value. I think it used to avoid bugs when a value is too close to 0.
-p: Parameter determining the probability of the photon doing more bias scattering after the first one. It was equal to 0.
+a_coef: Biasing coefficient of the importance sampling
+p: Probability of additional bias scattering.
 f_HG: Result of the Henyey Greenstein function
 f_B: Result of the bias function
 CHANCE: Chance of the photon dying when under the weigth. Defined as 0.1
