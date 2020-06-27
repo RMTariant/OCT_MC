@@ -4,6 +4,7 @@ Monte-Carlo simulation of an FD-OCT B-Scan.
 Description
 
 ===Missing Features / Bugs (to be implemented)===
+-Check why a low value of mua and g (maybe mus) slows the simulation a lot
 -Need to change how the BScan width is controlled
 -Making a map of the code
 -Testing the functions
@@ -15,8 +16,6 @@ Description
 -Gaussian beam source
 -Wavelength width on the detection
 -Focusing/diverging beams instead of perfectly foccus
--Check cone of acceptance in the fiber
--DetZ, the photon maximum reached depth, is not fully implemented
 
 ===Added Features===
 -The thesis proposed mesh intersection is the same as in St-Jacques code.
