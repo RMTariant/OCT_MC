@@ -9,12 +9,14 @@ lambda_start = 1100e-7; %%%%CHOOSE VALUE%%%%
 lambda_stop = 1400e-7; %%%%CHOOSE VALUE%%%%
 %Number of sample point of the OCT wavelength width
 samplePoints= 1024; %%%%CHOOSE VALUE%%%%
+%Compress image for refractive index
+n_cor = 1.37;
 %Chosse refractive of the different mediums. Index. Can be a function of the wavelength
 rn = ones(samplePoints,5); %%%%CHOOSE VALUE%%%%
-rn(1:samplePoints,1) = 1.3; %%%%CHOOSE VALUE%%%%
-rn(1:samplePoints,2) = 1.3; %%%%CHOOSE VALUE%%%%
-rn(1:samplePoints,3) = 1.3; %%%%CHOOSE VALUE%%%%
-rn(1:samplePoints,4) = 1.3; %%%%CHOOSE VALUE%%%%
+rn(1:samplePoints,1) = 1.37; %%%%CHOOSE VALUE%%%%
+rn(1:samplePoints,2) = 1.37; %%%%CHOOSE VALUE%%%%
+rn(1:samplePoints,3) = 1.37; %%%%CHOOSE VALUE%%%%
+rn(1:samplePoints,4) = 1.37; %%%%CHOOSE VALUE%%%%
 noise_amp = 0; %%%Choose amplitude of noise%%%
 
 
@@ -201,7 +203,7 @@ OCT(2:end-1) = 2*OCT(2:end-1);
 
 %% Displaying image
 
-z = pi/(k(1)-k(2))*(0:(length(k)/2))/length(k);
+z = pi/(k(1)-k(2))*(0:(length(k)/2))/length(k)./n_cor;
 x = linspace(-radius,radius,Ndetectors);
 
 % figure
