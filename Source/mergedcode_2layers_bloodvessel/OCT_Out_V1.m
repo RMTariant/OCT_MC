@@ -9,6 +9,8 @@ lambda_start = 1100e-7; %%%%CHOOSE VALUE%%%%
 lambda_stop = 1400e-7; %%%%CHOOSE VALUE%%%%
 %Number of sample point of the OCT wavelength width
 samplePoints= 1024; %%%%CHOOSE VALUE%%%%
+%Choose to apply electric filter. Put a high value if none
+maxDepth = 0.07; %%%%CHOOSE VALUE%%%%
 %Compress image for refractive index
 n_cor = 1.37;
 %Chosse refractive of the different mediums. Index. Can be a function of the wavelength
@@ -95,7 +97,7 @@ toc
 
 %% Remove the outliers using .9 quantile of L 
 
-L_threshold = quantile(DetL,0.9);
+L_threshold = quantile(DetL,1);
 ix = find(DetL < L_threshold );
 
 % end of removing outliers
@@ -197,7 +199,11 @@ I = (abs(sig + ref_amp + noise1)).^2 - (abs(sig - ref_amp + noise2) ).^2;
 % OCT = OCT(1:floor(length(OCT(:,1))/2)+1,:);
 % OCT(2:end-1) = 2*OCT(2:end-1);
 
-OCT = abs(fft(I.*hann(length(k)))).^2;
+ksampling = 2*pi/(k(1)-k(2));
+rawAline = lowpass(I.*hann(length(k)),maxDepth*2*n_cor,ksampling);
+OCT = abs(fft(rawAline)).^2;
+%OCT = abs(fft(I.*hann(length(k)))).^2;
+
 OCT = OCT(1:floor(length(OCT(:,1))/2)+1,:);
 OCT(2:end-1) = 2*OCT(2:end-1);
 
