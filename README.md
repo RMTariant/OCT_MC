@@ -18,6 +18,7 @@ Description
 -Focusing/diverging beams instead of perfectly foccus  
   
 ===Added Features===  
+-Electric filter on the OCT raw A-line
 -The thesis proposed mesh intersection is the same as in St-Jacques code.  
 -Corrected the bug in the difference in size from output and input. It was due to the input file not saving all decimals on the dx/dy/dz parameters. 0.00045 became 0.0004.  
 -Selecting a_coef as a parameter  
