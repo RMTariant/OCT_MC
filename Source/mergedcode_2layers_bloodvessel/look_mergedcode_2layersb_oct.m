@@ -21,7 +21,7 @@ A = fscanf(fid,'%f',[1 Inf])';
 fclose(fid);
 
 %% parameters
-time_min = A(1);
+nphoton = A(1);
 Nx = A(2);
 Ny = A(3);
 Nz = A(4);
@@ -52,6 +52,8 @@ for i=1:Nt
     musv(i,1) = A(j);
     j=j+1;
     gv(i,1) = A(j);
+    j=j+1;
+    nr(i,1) = A(j);
 end
 
 reportHmci(myname)

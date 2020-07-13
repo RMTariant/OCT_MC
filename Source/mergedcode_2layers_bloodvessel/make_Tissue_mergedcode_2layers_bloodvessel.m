@@ -34,7 +34,7 @@ SAVEON      = 1;        % 1 = save myname_T.bin, myname_H.mci
 
 myname      = 'skinvessel2layersb';%_2layers_bloodvessel';% name for files: myname_T.bin, myname_H.mci  
 time_min    = 1;      	% RMT No longuer used time duration of the simulation [min] <----- run time -----
-Nphotons    = 4e3;      % RMT Number of photons used in the simulation.
+Nphotons    = 1e6;      % RMT Number of photons used in the simulation.
 a_coef      = 0.925;    % RMT Biasing coefficient of the importance sampling
 p           = 0.5;      % RMT Probability of additional bias scattering.
 Ndetectors  = 512;      % RMT Number of detector in the simulation
@@ -84,6 +84,10 @@ for i=1:Nt
     musv(i)  = tissue(i).mus;
     gv(i)    = tissue(i).g;
 end
+
+% Adding refractive index
+nr(1) = 1.3;
+nr(2) = 1.4;
 
 % Specify Monte Carlo parameters    
 Nx = Nbins;
@@ -196,6 +200,7 @@ if SAVEON
             fprintf(fid,'%0.4f\n',muav(i));
             fprintf(fid,'%0.4f\n',musv(i));
             fprintf(fid,'%0.4f\n',gv(i));
+            fprintf(fid,'%0.4f\n',nr(i));
         end
     fclose(fid);
 

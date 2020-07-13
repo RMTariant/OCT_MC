@@ -82,6 +82,7 @@ Boolean sv;             /* Are they in the same voxel? */
 double	mua;            /* absorption coefficient [cm^-1] */
 double	mus;            /* scattering coefficient [cm^-1] */
 double	g;              /* anisotropy [-] */
+double	nr;              /* refractive index [-] RMT */
 double	Nphotons;       /* number of photons in simulation */
 	
 /* launch parameters */
@@ -116,6 +117,7 @@ double	start_time, finish_time, temp_time; /* for clock() */
 char	tissuename[50][32];
 float 	muav[Ntiss];    // muav[0:Ntiss-1], absorption coefficient of ith tissue type
 float 	musv[Ntiss];    // scattering coeff. 
+float 	nrv[Ntiss];    // refractive index 
 float 	gv[Ntiss];      // anisotropy of scattering
  
 /**** KE start: Declaration of variables ****/
@@ -247,6 +249,8 @@ int main(int argc, const char * argv[])
 		sscanf(buf, "%f", &musv[i]);	// scattering coeff [cm^-1]
 		fgets(buf, 32, fid);
 		sscanf(buf, "%f", &gv[i]);		// anisotropy of scatter [dimensionless]
+		fgets(buf, 32, fid);
+		sscanf(buf, "%f", &nrv[i]);		// refractive index [dimensionless]
 	}    
     fclose(fid);
     
@@ -298,6 +302,7 @@ int main(int argc, const char * argv[])
         printf("muav[%ld] = %0.4f [cm^-1]\n",i,muav[i]);
         printf("musv[%ld] = %0.4f [cm^-1]\n",i,musv[i]);
         printf("  gv[%ld] = %0.4f [--]\n\n",i,gv[i]);
+		printf("  nrv[%ld] = %0.4f [--]\n\n",i,nrv[i]);
     }
     
     /* IMPORT BINARY TISSUE FILE */
@@ -519,6 +524,7 @@ int main(int argc, const char * argv[])
 		mua 	= muav[type];
 		mus 	= musv[type];
 		g 		= gv[type];
+		nr      = nrv[type];
 		
         bflag = 1; 
         // initialize as 1 = inside volume, but later check as photon propagates.
@@ -557,6 +563,7 @@ int main(int argc, const char * argv[])
                  mua = muav[type];
                  mus = musv[type];
                  g = gv[type];
+				 nr = nrv[type];
                  W = W_cont;
                  L_current = L_cont;
                  cont_exist = 0;
@@ -714,7 +721,9 @@ int main(int argc, const char * argv[])
                             mua  = muav[type];
                             mus  = musv[type];
                             g    = gv[type];
-                            
+                            nr   = nrv[type];
+							// wakka add reflection here
+							
                         }
                     } 
 				} //(sv) /* same voxel */
