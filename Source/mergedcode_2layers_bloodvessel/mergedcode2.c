@@ -694,7 +694,8 @@ int main(int argc, const char * argv[])
 					
 					
 					/* step to voxel face + "littlest step" so just inside new voxel. */
-                    s = ls + FindVoxelFace2(x, y, z, &det_num, Pick_det, detx, det_radius, det_z, cos_accept, Ndetectors, dx, dy, dz, ux, uy, uz);
+					result = FindVoxelFace3(x, y, z, &det_num, Pick_det, detx, det_radius, det_z, cos_accept, Ndetectors, dx, dy, dz, ux, uy, uz);
+                    s = ls + result.sRMT;
                     //s_total += s; // RMT Update the total distance here. Not suppose to be here
 
 					/*** DROP: Drop photon weight (W) into local bin  ***/
