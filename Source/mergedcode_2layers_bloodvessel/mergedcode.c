@@ -1354,65 +1354,6 @@ double min3(double a, double b, double c) {
 
 
 /***********************************************************
- *	FRESNEL REFLECTANCE - RMT
- * 
- * 
- * 
- * 
- * 
- ****/
-double RFresnel(double n1,		/* incident refractive index.*/
-                double n2,		/* transmit refractive index.*/
-                double ca1,		/* cosine of the incident */
-                /* angle a1, 0<a1<90 degrees. */
-                double *ca2_Ptr) 	/* pointer to the cosine */
-/* of the transmission */
-/* angle a2, a2>0. */
-{
-    double r;
-
-    if(n1==n2) { /** matched boundary. **/
-        *ca2_Ptr = ca1;
-        r = 0.0;
-	}
-    else if(ca1>(1.0 - 1.0e-12)) { /** normal incidence. **/
-        *ca2_Ptr = ca1;
-        r = (n2-n1)/(n2+n1);
-        r *= r;
-	}
-    else if(ca1< 1.0e-6)  {	/** very slanted. **/
-        *ca2_Ptr = 0.0;
-        r = 1.0;
-	}
-    else  {			  		/** general. **/
-        double sa1, sa2; /* sine of incident and transmission angles. */
-        double ca2;      /* cosine of transmission angle. */
-        sa1 = sqrt(1-ca1*ca1);
-        sa2 = n1*sa1/n2;
-        if(sa2>=1.0) {
-            /* double check for total internal reflection. */
-            *ca2_Ptr = 0.0;
-            r = 1.0;
-		}
-        else {
-            double cap, cam;	/* cosines of sum ap or diff am of the two */
-            /* angles: ap = a1 + a2, am = a1 - a2. */
-            double sap, sam;	/* sines. */
-            *ca2_Ptr = ca2 = sqrt(1-sa2*sa2);
-            cap = ca1*ca2 - sa1*sa2; /* c+ = cc - ss. */
-            cam = ca1*ca2 + sa1*sa2; /* c- = cc + ss. */
-            sap = sa1*ca2 + ca1*sa2; /* s+ = sc + cs. */
-            sam = sa1*ca2 - ca1*sa2; /* s- = sc - cs. */
-            r = 0.5*sam*sam*(cam*cam+cap*cap)/(sap*sap*cam*cam);
-            /* rearranged for speed. */
-		}
-	}
-    return(r);
-} /******** END SUBROUTINE **********/
-
-
-
-/***********************************************************
  *	FRESNEL REFLECTANCE
  * Computes reflectance as photon passes from medium 1 to
  * medium 2 with refractive indices n1,n2. Incident
