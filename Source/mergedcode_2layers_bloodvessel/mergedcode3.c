@@ -321,7 +321,7 @@ int main(int argc, const char * argv[])
     {
         printf("muav[%ld] = %0.4f [cm^-1]\n",i,muav[i]);
         printf("musv[%ld] = %0.4f [cm^-1]\n",i,musv[i]);
-        printf("  gv[%ld] = %0.4f [--]\n\n",i,gv[i]);
+        printf("  gv[%ld] = %0.4f [--]\n",i,gv[i]);
 		printf("  nrv[%ld] = %0.4f [--]\n\n",i,nrv[i]);
     }
 
@@ -1586,9 +1586,9 @@ double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_de
 			if (fabs(x1 + s * ux - detx) <= det_radius)
                 *det_num = Pick_det;
 		}
-		if (s == xs) face_dir = 1;		
-		else if (s == ys) face_dir = 2;
-		else if (s == zs) face_dir = 3;
+		if (s == xs) *face_dir = 1;		
+		else if (s == ys) *face_dir = 2;
+		else if (s == zs) *face_dir = 3;
         return (s);
 }
 double RFresnel(double n1, double n2, double ca1, double *ca2_Ptr);
