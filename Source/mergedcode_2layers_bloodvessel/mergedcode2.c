@@ -160,7 +160,9 @@ long c_photon; // count collected photons
 int *DetID;
 float *DetW, *DetL, *DetS, *DetS2, *DetZ, *DetE; // RMT: I added DetE as a debugging variable for DetS
 /**** KE end : Declaration of variables ****/
-
+/**** RMT one more vairable ****/
+StructFindVoxel faceRMT
+/**** RMT end : Declaration of variables ****/
 
 int main(int argc, const char * argv[])
 {
