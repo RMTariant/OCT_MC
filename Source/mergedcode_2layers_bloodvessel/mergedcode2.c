@@ -160,12 +160,60 @@ long c_photon; // count collected photons
 int *DetID;
 float *DetW, *DetL, *DetS, *DetS2, *DetZ, *DetE; // RMT: I added DetE as a debugging variable for DetS
 /**** KE end : Declaration of variables ****/
-/**** RMT one more vairable ****/
-StructFindVoxel faceRMT
-/**** RMT end : Declaration of variables ****/
+
+
+/**** RMT Trying to define a structure with a function ****/
+
+typedef struct StructFindVoxel {
+	double sRMT;
+	int dirRMT;
+} StructFindVoxel;
+
+StructFindVoxel FindVoxelFace3(double x1, double y1, double z1, int* det_num, int Pick_det, double detx, double det_radius, double det_z, double cos_accept, int Ndetectors, double dx, double dy, double dz, double ux, double uy, double uz) {
+	StructFindVoxel val;
+	// KE: ix1, iy1, iz1: indices of the voxel where the photon is currently in
+        int ix1 = floor(x1 / dx);
+		int iy1 = floor(y1 / dy);
+		int iz1 = floor(z1 / dz);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+		int izd = floor(det_z / dz);
+        
+        // KE: ix2, iy2, iz2: indices of the voxel faces lying ahead of the photon's propagation path 
+        int ix2, iy2, iz2;
+        // KE: equal to equation 4.12 in Zhao's thesis
+		if (ux >= 0) ix2 = ix1 + 1;
+		else ix2 = ix1;
+        // KE: equal to equation 4.13 in Zhao's thesis
+		if (uy >= 0) iy2 = iy1 + 1;
+		else iy2 = iy1;
+        // KE: equal to equation 4.14 in Zhao's thesis
+		if (uz >= 0) iz2 = iz1 + 1;
+		else iz2 = iz1;
+        // KE: xs, ys, zs: distances from these voxel faces to the current position of the photon utilizing its propagation directions
+        double xs = fabs((ix2 * dx - x1) / ux); // KE: equal to equations 4.15 in Zhao's thesis
+		double ys = fabs((iy2 * dy - y1) / uy); // KE: equal to equations 4.16 in Zhao's thesis
+		double zs = fabs((iz2 * dz - z1) / uz); // KE: equal to equations 4.17 in Zhao's thesis
+        // KE: s: desired distance of the photon to its closest voxel face 
+        double s = min3(xs, ys, zs);
+		// check detection
+		if (-uz >= cos_accept && izd == iz1 && s == zs && fabs(y1 + s * uy) <= det_radius) 
+        {
+			if (fabs(x1 + s * ux - detx) <= det_radius) 
+                *det_num = Pick_det;
+		}
+		val.sRMT = s;
+		if (s == xs) val.dirRMT = 1;		
+		else if (s == ys) val.dirRMT = 2;
+		else if (s == zs) val.dirRMT = 3;
+
+        return val;
+}
+
+/**** RMT End of Trying to define a structure with a function ****/
 
 int main(int argc, const char * argv[])
 {
+	StructFindVoxel result; //RMT
+	
     printf("argc = %d\n",argc);
     if (argc==0)
     {
@@ -1573,51 +1621,3 @@ double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_de
         return (s);
 }
 double RFresnel(double n1, double n2, double ca1, double *ca2_Ptr);
-
-/**** RMT Trying to define a structure with a function ****/
-
-typedef struct StructFindVoxel {
-	double sRMT;
-	int dirRMT;
-} StructFindVoxel;
-
-StructFindVoxel FindVoxelFace3(double x1, double y1, double z1, int* det_num, int Pick_det, double detx, double det_radius, double det_z, double cos_accept, int Ndetectors, double dx, double dy, double dz, double ux, double uy, double uz) {
-	StructFindVoxel val;
-	// KE: ix1, iy1, iz1: indices of the voxel where the photon is currently in
-        int ix1 = floor(x1 / dx);
-		int iy1 = floor(y1 / dy);
-		int iz1 = floor(z1 / dz);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
-		int izd = floor(det_z / dz);
-        
-        // KE: ix2, iy2, iz2: indices of the voxel faces lying ahead of the photon's propagation path 
-        int ix2, iy2, iz2;
-        // KE: equal to equation 4.12 in Zhao's thesis
-		if (ux >= 0) ix2 = ix1 + 1;
-		else ix2 = ix1;
-        // KE: equal to equation 4.13 in Zhao's thesis
-		if (uy >= 0) iy2 = iy1 + 1;
-		else iy2 = iy1;
-        // KE: equal to equation 4.14 in Zhao's thesis
-		if (uz >= 0) iz2 = iz1 + 1;
-		else iz2 = iz1;
-        // KE: xs, ys, zs: distances from these voxel faces to the current position of the photon utilizing its propagation directions
-        double xs = fabs((ix2 * dx - x1) / ux); // KE: equal to equations 4.15 in Zhao's thesis
-		double ys = fabs((iy2 * dy - y1) / uy); // KE: equal to equations 4.16 in Zhao's thesis
-		double zs = fabs((iz2 * dz - z1) / uz); // KE: equal to equations 4.17 in Zhao's thesis
-        // KE: s: desired distance of the photon to its closest voxel face 
-        double s = min3(xs, ys, zs);
-		// check detection
-		if (-uz >= cos_accept && izd == iz1 && s == zs && fabs(y1 + s * uy) <= det_radius) 
-        {
-			if (fabs(x1 + s * ux - detx) <= det_radius) 
-                *det_num = Pick_det;
-		}
-		val.sRMT = s;
-		if (s == xs) val.dirRMT = 1;		
-		else if (s == ys) val.dirRMT = 2;
-		else if (s == zs) val.dirRMT = 3;
-
-        return val;
-}
-
-/**** RMT End of Trying to define a structure with a function ****/
