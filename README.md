@@ -49,6 +49,7 @@ FindVoxelFace: (not used) the boundary is the face of some voxel. Find the the p
 FindVoxelFace2: Modified version of Jacques code.  
   
 ===Variables===  
+face_dir: direction from which the photon has exited the voxel. 1 = ux, 2 = uy and 3 = uz.  
 a: Variable used in the original code to determine if two positions are in the same voxel  
 b: Variable used in the original code to determine if two positions are in the same voxel  
 c: Variable used in the original code to determine if two positions are in the same voxel  
@@ -111,12 +112,15 @@ i_cont: i of the continuing photon that splited? The contuing photon is the one 
 ls: A tiny step value to ensure that the photon is not exactly between two voxels. In cm.  
 v: Related to the tissue type  
 type: Current tissue type where the photon is located  
+temptype: Temporary value of type
 mua: Current absorption coeficient in cm  
 muav: Possible absorption coeficients in the simulation in cm  
 mus: Current scattering coeficient in cm  
 musv: Possible scattering coeficients in the simulation in cm  
 g: Current anisotropy  
 gv: Possible anisotropy in the simulation  
+nr: Refractive index
+nrv: Possible refractive index in the simulation  
 cont_exist: Determines if a photon will split and continue moving? 0=no and 1=yes  
 first_bias_done: Determines if a scaterred bias has occured yet =1 or not =0  
 temp: Temporary variable used to calculate part of an equation in order tos shorten it.  
