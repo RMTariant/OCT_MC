@@ -1368,7 +1368,59 @@ double min3(double a, double b, double c) {
     return m;
 }
 
-
+/***********************************************************
+ *	FRESNEL REFLECTANCE & Refraction - RMT
+ * Computes reflectance as photon passes from medium 1 to
+ * medium 2 with refractive indices n1,n2. Incident
+ * angle a1 is specified by cosine value ca1 = cos(a1).
+ * Program returns value of transmitted angle a1 as
+ * value in *ca2_Ptr = cos(a2).
+ ****/
+double ReflectRefraction(double n1,		/* incident refractive index.*/
+                double n2,		/* transmit refractive index.*/
+                double ca1,		/* cosine of the incident */
+                /* angle a1, 0<a1<90 degrees. */
+                double *ca2_Ptr) 	/* pointer to the cosine */
+/* of the transmission */
+/* angle a2, a2>0. */
+{
+	//Determining which axis is the axial one
+	if(face_dir == 1) {ur1 = ux;} 
+	else if(face_dir == 2) {us1 = uy;}
+	else if(face_dir == 3) {ut1 = uz;}
+	
+	utot2 = n2/n1; // Not normalize 
+	us2 = us1/utot2; // First lateral direction
+	ut2 = ut1/utot2; // Second lateral direction
+	ur22 = 1-us2*us2-ut2*ut2; //Square of the axial direction
+	
+	if(ur1 < 0) // In this case, we have a total inter reflection
+	{
+		R_state = 1;
+		ur2 = -ur1; // The light is reflected in the opposite direction
+	}
+	else
+	{
+		ur2 = sqrt(ur22); // Axial direction
+		cos1 = ur1; // Cosine of the incident angle
+		cos2 = ur2; // Cosine of the transmited angle
+		if(ur1 < 0) // Make sure to have the proper direction that was lost in the squarre
+		{
+			ur2 = -ur2; 
+		}
+		rs = (n1*cos1-n2*cos2)/(n1*cos1+n2*cos2); // Calculating s polarized reflection
+		rp = (n1*cos2-n2*cos1)/(n1*cos2+n2*cos1); // Calculating p polarized reflection
+		Rtot = 0.5*(rs*rs+rp*rp); // Total reflection
+		if(RandomNum < Rtot) 
+		{
+			R_state = 1;
+			ur2 = -ur1; // The light is reflected in the opposite direction
+		}
+		else {R_state = 0;}
+	}
+	
+    return(r);
+} /******** END SUBROUTINE **********/
 
 /***********************************************************
  *	FRESNEL REFLECTANCE
