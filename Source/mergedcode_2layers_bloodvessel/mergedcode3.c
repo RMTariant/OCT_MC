@@ -55,6 +55,8 @@ Boolean SameVoxel(double x1,double y1,double z1, double x2, double y2, double z2
 double max2(double a, double b);
 double min2(double a, double b);
 double min3(double a, double b, double c);
+double ReflectRefraction(double n1, double n2, double* x, double* y, double* z, double* ux, double* uy,
+					double* uz, double ls);
 double FindVoxelFace(double x1,double y1,double z1, double x2, double y2, double z2,
 					double dx,double dy,double dz, double ux, double uy, double uz);
 double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_det,
@@ -1376,50 +1378,81 @@ double min3(double a, double b, double c) {
  * Program returns value of transmitted angle a1 as
  * value in *ca2_Ptr = cos(a2).
  ****/
-double ReflectRefraction(double n1,		/* incident refractive index.*/
-                double n2,		/* transmit refractive index.*/
-                double ca1,		/* cosine of the incident */
-                /* angle a1, 0<a1<90 degrees. */
-                double *ca2_Ptr) 	/* pointer to the cosine */
-/* of the transmission */
-/* angle a2, a2>0. */
+double ReflectRefraction(double n1, double n2, double* x, double* y, double* z, double* ux, double* uy, double* uz, double ls)
 {
 	//Determining which axis is the axial one
-	if(face_dir == 1) {ur1 = ux;} 
-	else if(face_dir == 2) {us1 = uy;}
-	else if(face_dir == 3) {ut1 = uz;}
+	double tempux = ux;
+	double tempuy = uy;
+	double tempuz = uz;
+	if(face_dir == 1) {
+		double ur1 = ux;
+		double us1 = uy;
+		double ut1 = uz;
+	} 
+	else if(face_dir == 2) {
+		double ur1 = uy;
+		double us1 = ux;
+		double ut1 = uz;
+	} 
+	else if(face_dir == 3) {
+		double ur1 = uz;
+		double us1 = ux;
+		double ut1 = uy;
+	}
 	
-	utot2 = n2/n1; // Not normalize 
-	us2 = us1/utot2; // First lateral direction
-	ut2 = ut1/utot2; // Second lateral direction
-	ur22 = 1-us2*us2-ut2*ut2; //Square of the axial direction
+	double utot2 = n2/n1; // Not normalize 
+	double us2 = us1/utot2; // First lateral direction
+	double ut2 = ut1/utot2; // Second lateral direction
+	double ur22 = 1-us2*us2-ut2*ut2; //Square of the axial direction
 	
 	if(ur1 < 0) // In this case, we have a total inter reflection
 	{
-		R_state = 1;
-		ur2 = -ur1; // The light is reflected in the opposite direction
+		double ur2 = -ur1; // The light is reflected in the opposite direction
+		us2 = us1; // The lateral trajectory doesn't change during reflection
+		ut2 = ut1; // The lateral trajectory doesn't change during reflection
 	}
 	else
 	{
-		ur2 = sqrt(ur22); // Axial direction
-		cos1 = ur1; // Cosine of the incident angle
-		cos2 = ur2; // Cosine of the transmited angle
+		double ur2 = sqrt(ur22); // Axial direction
+		double cos1 = ur1; // Cosine of the incident angle
+		double cos2 = ur2; // Cosine of the transmited angle
 		if(ur1 < 0) // Make sure to have the proper direction that was lost in the squarre
 		{
 			ur2 = -ur2; 
 		}
-		rs = (n1*cos1-n2*cos2)/(n1*cos1+n2*cos2); // Calculating s polarized reflection
-		rp = (n1*cos2-n2*cos1)/(n1*cos2+n2*cos1); // Calculating p polarized reflection
-		Rtot = 0.5*(rs*rs+rp*rp); // Total reflection
+		double rs = (n1*cos1-n2*cos2)/(n1*cos1+n2*cos2); // Calculating s polarized reflection
+		double rp = (n1*cos2-n2*cos1)/(n1*cos2+n2*cos1); // Calculating p polarized reflection
+		double Rtot = 0.5*(rs*rs+rp*rp); // Total reflection, no polarisation implemented yet
 		if(RandomNum < Rtot) 
 		{
-			R_state = 1;
-			ur2 = -ur1; // The light is reflected in the opposite direction
+			double ur2 = -ur1; // The light is reflected in the opposite direction
+			us2 = us1; // The lateral trajectory doesn't change during reflection
+			ut2 = ut1; // The lateral trajectory doesn't change during reflection
 		}
-		else {R_state = 0;}
 	}
 	
-    return(r);
+	// Calculate the new photon directions
+	if(face_dir == 1) {
+		*ux = ur2;
+		*uy = us2;
+		*uz = ut2;
+	} 
+	else if(face_dir == 2) {
+		*ux = us2;
+		*uy = ur2;
+		*uz = ut2;
+	} 
+	else if(face_dir == 3) {
+		*ux = us2;
+		*uy = ut2;
+		*uz = ur2;
+	}
+	
+	// Calculate the new photon position
+	*x += (-tempux + ux) * ls; // Take a ls step back to be at the frontiere and take a ls step in the right direction
+	*y += (-tempuy + uy) * ls;
+	*z += (-tempuz + uz) * ls;
+	
 } /******** END SUBROUTINE **********/
 
 /***********************************************************
