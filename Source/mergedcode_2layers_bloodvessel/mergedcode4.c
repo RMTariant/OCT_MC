@@ -61,7 +61,7 @@ double FindVoxelFace(double x1,double y1,double z1, double x2, double y2, double
 					double dx,double dy,double dz, double ux, double uy, double uz);
 double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_det,
         double detx, double det_radius, double det_z, double cos_accept,
-        int Ndetectors, double dx, double dy, double dz, double ux, double uy, double uz, int* face_dir) ;
+        int Ndetectors, double dx, double dy, double dz, double ux, double uy, double uz) ;
 
 /* Propagation parameters */
 double	x, y, z;        /* photon position */
@@ -84,7 +84,6 @@ Boolean sv;             /* Are they in the same voxel? */
 double	mua;            /* absorption coefficient [cm^-1] */
 double	mus;            /* scattering coefficient [cm^-1] */
 double	g;              /* anisotropy [-] */
-double	nr;              /* refractive index [-] */
 double	Nphotons;       /* number of photons in simulation */
 
 /* launch parameters */
@@ -129,11 +128,9 @@ char	tissuename[50][32];
 float 	muav[Ntiss];    // muav[0:Ntiss-1], absorption coefficient of ith tissue type
 float 	musv[Ntiss];    // scattering coeff.
 float 	gv[Ntiss];      // anisotropy of scattering
-float 	nrv[Ntiss];      // refractive index
 
 /**** KE start: Declaration of variables ****/
 int det_num; // photon not detected yet/
-int face_dir; // voxel face the photon existed from/
 double first_bias_done ; // photon not biased back - scattered yet
 double cont_exist; // no split generated yet // check if a continuing photon packet exists
 double L_current; // photon 's initial likelihood
@@ -271,8 +268,6 @@ int main(int argc, const char * argv[])
 		sscanf(buf, "%f", &musv[i]);	// scattering coeff [cm^-1]
 		fgets(buf, 32, fid);
 		sscanf(buf, "%f", &gv[i]);		// anisotropy of scatter [dimensionless]
-		fgets(buf, 32, fid);
-		sscanf(buf, "%f", &nrv[i]);		// refractive index
 	}
     fclose(fid);
 
@@ -323,8 +318,7 @@ int main(int argc, const char * argv[])
     {
         printf("muav[%ld] = %0.4f [cm^-1]\n",i,muav[i]);
         printf("musv[%ld] = %0.4f [cm^-1]\n",i,musv[i]);
-        printf("  gv[%ld] = %0.4f [--]\n",i,gv[i]);
-		printf("  nrv[%ld] = %0.4f [--]\n\n",i,nrv[i]);
+        printf("  gv[%ld] = %0.4f [--]\n\n",i,gv[i]);
     }
 
     /* IMPORT BINARY TISSUE FILE */
@@ -332,7 +326,6 @@ int main(int argc, const char * argv[])
 	float 	*F=NULL;
 	float	*R=NULL;
 	int 	type;
-	int 	temptype;
 	NN = Nx*Ny*Nz;
 	Nyx = Nx*Ny;
 	v  = ( char *)malloc(NN*sizeof(char));  /* tissue structure */
@@ -554,7 +547,6 @@ int main(int argc, const char * argv[])
 		mua 	= muav[type];
 		mus 	= musv[type];
 		g 		= gv[type];
-		nr 		= nrv[type];
 
         bflag = 1;
         // initialize as 1 = inside volume, but later check as photon propagates.
@@ -601,7 +593,6 @@ int main(int argc, const char * argv[])
                  mua = muav[type];
                  mus = musv[type];
                  g = gv[type];
-				 nr = nrv[type];
                  W = W_cont;
                  L_current = L_cont;
                  cont_exist = 0;
@@ -655,7 +646,7 @@ int main(int argc, const char * argv[])
 					
 					
 					/* step to voxel face + "littlest step" so just inside new voxel. */
-                    s = ls + FindVoxelFace2(x, y, z, &det_num, Pick_det, detx, det_radius, det_z, cos_accept, Ndetectors, dx, dy, dz, ux, uy, uz, &face_dir);
+                    s = ls + FindVoxelFace2(x, y, z, &det_num, Pick_det, detx, det_radius, det_z, cos_accept, Ndetectors, dx, dy, dz, ux, uy, uz);
                     //s_total += s; // RMT Update the total distance here. Not suppose to be here
 
 					/*** DROP: Drop photon weight (W) into local bin  ***/
@@ -779,18 +770,10 @@ int main(int argc, const char * argv[])
                             }
                             // update pointer to tissue type
                             i    = (long)(iz*Ny*Nx + ix*Ny + iy);
-							//* RMT Check if there is a refraction or reflection *//
-							temptype = v[i];
-							if (type != temptype) // We are changing tissue type
-							{
-								type = temptype;
-								mua  = muav[type];
-								mus  = musv[type];
-								g    = gv[type];
-								nr	 = nrv[type];
-							}
-							// Otherwise, we are in the same tissue type and we don<t need to update the tissue type
-
+                            type = v[i];
+                            mua  = muav[type];
+                            mus  = musv[type];
+                            g    = gv[type];
 
                         }
                     }
@@ -1469,6 +1452,7 @@ double ReflectRefraction(double n1, double n2, double* x, double* y, double* z, 
 	
 } /******** END SUBROUTINE **********/
 
+
 /***********************************************************
  *	FRESNEL REFLECTANCE
  * Computes reflectance as photon passes from medium 1 to
@@ -1652,8 +1636,7 @@ double FindVoxelFace(double x1,double y1,double z1, double x2, double y2, double
 // KE: We also check whether the photon packet is detected by the assigned detector
 /* How much step size will the photon take to get the first voxel crossing in one single
 	long step? */ //
-
-double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_det, double detx, double det_radius, double det_z, double cos_accept, int Ndetectors, double dx, double dy, double dz, double ux, double uy, double uz, int* face_dir)
+double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_det, double detx, double det_radius, double det_z, double cos_accept, int Ndetectors, double dx, double dy, double dz, double ux, double uy, double uz)
 {
 
     // KE: ix1, iy1, iz1: indices of the voxel where the photon is currently in
@@ -1685,9 +1668,6 @@ double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_de
 			if (fabs(x1 + s * ux - detx) <= det_radius)
                 *det_num = Pick_det;
 		}
-		if (s == xs) *face_dir = 1;		
-		else if (s == ys) *face_dir = 2;
-		else if (s == zs) *face_dir = 3;
         return (s);
 }
 double RFresnel(double n1, double n2, double ca1, double *ca2_Ptr);
