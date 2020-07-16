@@ -130,6 +130,7 @@ float 	musv[Ntiss];    // scattering coeff.
 float 	gv[Ntiss];      // anisotropy of scattering
 
 /**** KE start: Declaration of variables ****/
+double face_dir; // exited voxel direction of the photon
 int det_num; // photon not detected yet/
 double first_bias_done ; // photon not biased back - scattered yet
 double cont_exist; // no split generated yet // check if a continuing photon packet exists
@@ -1361,7 +1362,7 @@ double min3(double a, double b, double c) {
  * Program returns value of transmitted angle a1 as
  * value in *ca2_Ptr = cos(a2).
  ****/
-double ReflectRefraction(double n1, double n2, double* x, double* y, double* z, double* ux, double* uy, double* uz)
+double ReflectRefraction(double n1, double n2, double* x, double* y, double* z, double* ux, double* uy, double* uz, double face_dir)
 {
 	//Determining which axis is the axial one
 	double tempux = *ux;
