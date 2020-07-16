@@ -56,12 +56,12 @@ double max2(double a, double b);
 double min2(double a, double b);
 double min3(double a, double b, double c);
 double ReflectRefraction(double n1, double n2, double* x, double* y, double* z, double* ux, double* uy,
-					double* uz);
+					double* uz, int* face_dir, int* reflected);
 double FindVoxelFace(double x1,double y1,double z1, double x2, double y2, double z2,
 					double dx,double dy,double dz, double ux, double uy, double uz);
 double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_det,
         double detx, double det_radius, double det_z, double cos_accept,
-        int Ndetectors, double dx, double dy, double dz, double ux, double uy, double uz) ;
+        int Ndetectors, double dx, double dy, double dz, double ux, double uy, double uz, int* face_dir) ;
 
 /* Propagation parameters */
 double	x, y, z;        /* photon position */
@@ -84,6 +84,9 @@ Boolean sv;             /* Are they in the same voxel? */
 double	mua;            /* absorption coefficient [cm^-1] */
 double	mus;            /* scattering coefficient [cm^-1] */
 double	g;              /* anisotropy [-] */
+double	nr;              /* refractive index [-] */
+double	n1;              /* refractive index previous layer [-] */
+double	n2;              /* refractive index next layer [-] */
 double	Nphotons;       /* number of photons in simulation */
 
 /* launch parameters */
@@ -96,7 +99,7 @@ float	waist;
 /* dummy variables */
 double  rnd;            /* assigned random value 0-1 */
 double	r, phi;			/* dummy values */
-long	i,j,NN,Nyx,m;         /* dummy indices */
+long	i,tempi,j,NN,Nyx,m;         /* dummy indices */
 double	tempx, tempy, tempz; /* temporary variables, used during photon step. */
 int 	ix, iy, iz;     /* Added. Used to track photons */
 double 	temp;           /* dummy variable */
@@ -128,9 +131,11 @@ char	tissuename[50][32];
 float 	muav[Ntiss];    // muav[0:Ntiss-1], absorption coefficient of ith tissue type
 float 	musv[Ntiss];    // scattering coeff.
 float 	gv[Ntiss];      // anisotropy of scattering
+float 	nrv[Ntiss];      // refractive index
 
 /**** KE start: Declaration of variables ****/
-double face_dir; // exited voxel direction of the photon
+int face_dir; // exited voxel direction of the photon
+int reflected; // check if the photon has been reflected
 int det_num; // photon not detected yet/
 double first_bias_done ; // photon not biased back - scattered yet
 double cont_exist; // no split generated yet // check if a continuing photon packet exists
@@ -269,6 +274,8 @@ int main(int argc, const char * argv[])
 		sscanf(buf, "%f", &musv[i]);	// scattering coeff [cm^-1]
 		fgets(buf, 32, fid);
 		sscanf(buf, "%f", &gv[i]);		// anisotropy of scatter [dimensionless]
+		fgets(buf, 32, fid);
+		sscanf(buf, "%f", &nrv[i]);		// refractive index
 	}
     fclose(fid);
 
@@ -319,7 +326,8 @@ int main(int argc, const char * argv[])
     {
         printf("muav[%ld] = %0.4f [cm^-1]\n",i,muav[i]);
         printf("musv[%ld] = %0.4f [cm^-1]\n",i,musv[i]);
-        printf("  gv[%ld] = %0.4f [--]\n\n",i,gv[i]);
+        printf("  gv[%ld] = %0.4f [--]\n",i,gv[i]);
+		printf("  nrv[%ld] = %0.4f [--]\n\n",i,nrv[i]);
     }
 
     /* IMPORT BINARY TISSUE FILE */
@@ -548,6 +556,7 @@ int main(int argc, const char * argv[])
 		mua 	= muav[type];
 		mus 	= musv[type];
 		g 		= gv[type];
+		nr 		= nrv[type];
 
         bflag = 1;
         // initialize as 1 = inside volume, but later check as photon propagates.
@@ -594,6 +603,7 @@ int main(int argc, const char * argv[])
                  mua = muav[type];
                  mus = musv[type];
                  g = gv[type];
+				 nr = nrv[type];
                  W = W_cont;
                  L_current = L_cont;
                  cont_exist = 0;
@@ -647,7 +657,7 @@ int main(int argc, const char * argv[])
 					
 					
 					/* step to voxel face + "littlest step" so just inside new voxel. */
-                    s = ls + FindVoxelFace2(x, y, z, &det_num, Pick_det, detx, det_radius, det_z, cos_accept, Ndetectors, dx, dy, dz, ux, uy, uz);
+                    s = ls + FindVoxelFace2(x, y, z, &det_num, Pick_det, detx, det_radius, det_z, cos_accept, Ndetectors, dx, dy, dz, ux, uy, uz, &face_dir);
                     //s_total += s; // RMT Update the total distance here. Not suppose to be here
 
 					/*** DROP: Drop photon weight (W) into local bin  ***/
@@ -722,6 +732,7 @@ int main(int argc, const char * argv[])
                         if (ix<0)  ix=0;
                         if (iy<0)  iy=0;
 
+
                         //*** ESCAPE or not
                         if((surfflag==1) & (z<=zsurf)) // escape at surface
                         {
@@ -770,11 +781,33 @@ int main(int argc, const char * argv[])
                                 if (iy<0)   {iy=0;    bflag = 0;}
                             }
                             // update pointer to tissue type
+							tempi = i;
                             i    = (long)(iz*Ny*Nx + ix*Ny + iy);
-                            type = v[i];
-                            mua  = muav[type];
-                            mus  = musv[type];
-                            g    = gv[type];
+							n1 = nr;
+							type = v[i];
+							n2 = nrv[type];
+							reflected = 0;
+							// RMT check if change in index of refraction and apply reflection/refraction
+							if(n1 != n2) {
+								ReflectRefraction(n1, n2, &x, &y, &z, &ux, &uy, &uz, &face_dir, &reflected);
+							}
+							// Update the optical properties depending if in next or same voxel
+							if(reflected == 0)
+							{
+								type = v[i];
+								mua  = muav[type];
+								mus  = musv[type];
+								g    = gv[type];
+								nr	 = nrv[type];
+							}
+							else
+							{
+								type = v[tempi];
+								mua  = muav[type];
+								mus  = musv[type];
+								g    = gv[type];
+								nr	 = nrv[type];
+							}
 
                         }
                     }
@@ -1362,7 +1395,7 @@ double min3(double a, double b, double c) {
  * Program returns value of transmitted angle a1 as
  * value in *ca2_Ptr = cos(a2).
  ****/
-double ReflectRefraction(double n1, double n2, double* x, double* y, double* z, double* ux, double* uy, double* uz, double face_dir)
+double ReflectRefraction(double n1, double n2, double* x, double* y, double* z, double* ux, double* uy, double* uz, int* face_dir, int* reflected)
 {
 	//Determining which axis is the axial one
 	double tempux = *ux;
@@ -1382,17 +1415,17 @@ double ReflectRefraction(double n1, double n2, double* x, double* y, double* z, 
 	double rp;
 	double Rtot;
 	
-	if(face_dir == 1) {
+	if(*face_dir == 1) {
 		ur1 = *ux;
 		us1 = *uy;
 		ut1 = *uz;
 	} 
-	else if(face_dir == 2) {
+	else if(*face_dir == 2) {
 		ur1 = *uy;
 		us1 = *ux;
 		ut1 = *uz;
 	} 
-	else if(face_dir == 3) {
+	else if(*face_dir == 3) {
 		ur1 = *uz;
 		us1 = *ux;
 		ut1 = *uy;
@@ -1403,11 +1436,12 @@ double ReflectRefraction(double n1, double n2, double* x, double* y, double* z, 
 	ut2 = ut1/utot2; // Second lateral direction
 	ur22 = 1-us2*us2-ut2*ut2; //Square of the axial direction
 	
-	if(ur1 < 0) // In this case, we have a total inter reflection
+	if(ur22 < 0) // In this case, we have a total inter reflection
 	{
 		ur2 = -ur1; // The light is reflected in the opposite direction
 		us2 = us1; // The lateral trajectory doesn't change during reflection
 		ut2 = ut1; // The lateral trajectory doesn't change during reflection
+		*reflected = 1;
 	}
 	else
 	{
@@ -1426,21 +1460,26 @@ double ReflectRefraction(double n1, double n2, double* x, double* y, double* z, 
 			ur2 = -ur1; // The light is reflected in the opposite direction
 			us2 = us1; // The lateral trajectory doesn't change during reflection
 			ut2 = ut1; // The lateral trajectory doesn't change during reflection
+			*reflected = 1;
+		}
+		else
+		{
+			*reflected = 0;
 		}
 	}
 	
 	// Calculate the new photon directions
-	if(face_dir == 1) {
+	if(*face_dir == 1) {
 		*ux = ur2;
 		*uy = us2;
 		*uz = ut2;
 	} 
-	else if(face_dir == 2) {
+	else if(*face_dir == 2) {
 		*ux = us2;
 		*uy = ur2;
 		*uz = ut2;
 	} 
-	else if(face_dir == 3) {
+	else if(*face_dir == 3) {
 		*ux = us2;
 		*uy = ut2;
 		*uz = ur2;
@@ -1637,7 +1676,7 @@ double FindVoxelFace(double x1,double y1,double z1, double x2, double y2, double
 // KE: We also check whether the photon packet is detected by the assigned detector
 /* How much step size will the photon take to get the first voxel crossing in one single
 	long step? */ //
-double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_det, double detx, double det_radius, double det_z, double cos_accept, int Ndetectors, double dx, double dy, double dz, double ux, double uy, double uz)
+double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_det, double detx, double det_radius, double det_z, double cos_accept, int Ndetectors, double dx, double dy, double dz, double ux, double uy, double uz, int* face_dir)
 {
 
     // KE: ix1, iy1, iz1: indices of the voxel where the photon is currently in
@@ -1669,6 +1708,9 @@ double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_de
 			if (fabs(x1 + s * ux - detx) <= det_radius)
                 *det_num = Pick_det;
 		}
+		if (s == xs) *face_dir = 1;		
+		else if (s == ys) *face_dir = 2;
+		else if (s == zs) *face_dir = 3;
         return (s);
 }
 double RFresnel(double n1, double n2, double ca1, double *ca2_Ptr);
