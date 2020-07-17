@@ -8,15 +8,14 @@ Description
 -Need to change how the BScan width is controlled  
 -Testing the functions  
 -Removing the extra code  
--Fresnel reflection  
 -Mirror reflection  
--Refraction  
 -Check if Noise is good  
 -Gaussian beam source  
 -Wavelength width on the detection  
 -Focusing/diverging beams instead of perfectly foccus  
   
 ===Added Features===  
+-Reflection and refraction were added to the code  
 -Making a map of the code  
 -Electric filter on the OCT raw A-line  
 -The thesis proposed mesh intersection is the same as in St-Jacques code.  
