@@ -617,7 +617,7 @@ int main(int argc, const char * argv[])
 			// RMT: in this loop, we are looking at the different medium the photon is
 			//      going through. Where it is absorbed, detected or escape the simulation
                 s     = sleft/mus;				/* Step size [cm].*/
-                // printf("mus = %f\n",mus); // KE: check mus
+                // printf("s = %f\n",s); // KE: check mus
 
 				tempx = x + s*ux;				/* Update positions. [cm] */
 				tempy = y + s*uy;
@@ -1446,12 +1446,12 @@ double ReflectRefraction(double n1, double n2, double* x, double* y, double* z, 
 	else
 	{
 		ur2 = sqrt(ur22); // Axial direction
-		cos1 = ur1; // Cosine of the incident angle
-		cos2 = ur2; // Cosine of the transmited angle
 		if(ur1 < 0) // Make sure to have the proper direction that was lost in the squarre
 		{
 			ur2 = -ur2; 
 		}
+		cos1 = ur1; // Cosine of the incident angle
+		cos2 = ur2; // Cosine of the transmited angle
 		rs = (n1*cos1-n2*cos2)/(n1*cos1+n2*cos2); // Calculating s polarized reflection
 		rp = (n1*cos2-n2*cos1)/(n1*cos2+n2*cos1); // Calculating p polarized reflection
 		Rtot = 0.5*(rs*rs+rp*rp); // Total reflection, no polarisation implemented yet

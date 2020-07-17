@@ -12,7 +12,7 @@ samplePoints= 1024; %%%%CHOOSE VALUE%%%%
 %Choose to apply electric filter. Put a high value if none
 maxDepth = 1; %%%%CHOOSE VALUE%%%%
 %Remove the photon with very high likelihood
-L_filter = 0.9; %%%%CHOOSE VALUE%%%%
+L_filter = 1; %%%%CHOOSE VALUE%%%%
 %Compress image for refractive index
 n_cor = 1.37;
 %Chosse refractive of the different mediums. Index. Can be a function of the wavelength
