@@ -392,7 +392,7 @@ int main(int argc, const char * argv[])
     c_photon = 0;
     //a = 0.925; //KE: Lima et al 2012
 	do {
-		t0 = clock(); //RMT
+		//t0 = clock(); //RMT
         // KE: while (i_photon < Nphotons) RMT: Main loop simulating all photons.
 		/**** LAUNCH: Initialize photon position and trajectory *****/
 		i_photon += 1;				/* increment photon count */
@@ -564,8 +564,8 @@ int main(int argc, const char * argv[])
         // NOTE: must launch photons at tissue surface, or surfflag will go to 0.
         det_z = z; //KE
 		
-		t1 = clock()-t0; //RMT
-		t1s += t1; //RMT
+		//t1 = clock()-t0; //RMT
+		//t1s += t1; //RMT
 
 		/* HOP_DROP_SPIN_CHECK
 		 Propagate one photon until it dies as determined by ROULETTE.
@@ -641,7 +641,7 @@ int main(int argc, const char * argv[])
                     /* decrement WEIGHT by amount absorbed */
 					// If photon within volume of heterogeneity, deposit energy in F[].
 					// Normalize F[] later, when save output.
-                    if (bflag) F[i] += absorb;
+                    if (bflag) F[i] += absorb*L_current;
                     // only save data if blag==1, i.e., photon inside simulation cube
 
 					/* Update sleft */
@@ -666,7 +666,7 @@ int main(int argc, const char * argv[])
 
 					// If photon within volume of heterogeneity, deposit energy in F[].
 					// Normalize F[] later, when save output.
-                    if (bflag) F[i] += absorb;
+                    if (bflag) F[i] += absorb*L_current;
 
                     if (det_num != -1)
                     { /* check if the photon is detected . */
@@ -676,7 +676,7 @@ int main(int argc, const char * argv[])
                       s_total += s;
 					  s_total2[type-1] += s;
 
-							tsave = clock();
+							//tsave = clock();
                          /* Save properties of interest */
                          if (L_current > 0 &&  det_num == Pick_det)
                          { // avoid NAN and zero likelihood, and avoid cross - detection
@@ -702,8 +702,8 @@ int main(int argc, const char * argv[])
                              /* increment collected photon count */
                              c_photon += 1;
                          }
-							tsave -= clock(); //RMT
-							tsaves += tsave; //RMT
+							//tsave -= clock(); //RMT
+							//tsaves += tsave; //RMT
                          // if( c_photon ==1) { printf (" OK at 590;\ n") ;}
                          photon_status = DEAD; // RMT This might need to be "dead"
                          sleft = 0;
@@ -815,8 +815,8 @@ int main(int argc, const char * argv[])
 
 			} while(sleft>0); //do...while
 
-			t2 = clock() - t1; //RMT
-			t2s += t2; //RMT
+			//t2 = clock() - t1; //RMT
+			//t2s += t2; //RMT
 
             /***
             * KE start: this part is from the A.4 of Zhao's thesis
@@ -1092,8 +1092,8 @@ int main(int argc, const char * argv[])
                   uz = uzz;
 					}
 				}
-				t3 = clock()-t2;
-				t3s += t3;
+				//t3 = clock()-t2;
+				//t3s += t3;
 			/***
 			* KE end : this part is from the A.4 of Zhao's thesis
 			***/

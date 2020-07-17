@@ -17,8 +17,8 @@ L_filter = 1; %%%%CHOOSE VALUE%%%%
 n_cor = 1.37;
 %Chosse refractive of the different mediums. Index. Can be a function of the wavelength
 rn = ones(samplePoints,5); %%%%CHOOSE VALUE%%%%
-rn(1:samplePoints,1) = 1.37; %%%%CHOOSE VALUE%%%%
-rn(1:samplePoints,2) = 1.37; %%%%CHOOSE VALUE%%%%
+rn(1:samplePoints,1) = 1.3; %%%%CHOOSE VALUE%%%%
+rn(1:samplePoints,2) = 1.4; %%%%CHOOSE VALUE%%%%
 rn(1:samplePoints,3) = 1.37; %%%%CHOOSE VALUE%%%%
 rn(1:samplePoints,4) = 1.37; %%%%CHOOSE VALUE%%%%
 noise_amp = 0; %%%Choose amplitude of noise%%%
