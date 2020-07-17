@@ -1126,10 +1126,10 @@ int main(int argc, const char * argv[])
 	time_min = (double)(finish_time-start_time)/CLOCKS_PER_SEC/60;
 	printf("Elapsed Time for %0.3e photons = %5.3f min\n",Nphotons,time_min);
 	printf("%0.2e photons per minute\n", Nphotons/time_min);
-	printf("%0.2e saving files\n", tsaves/CLOCKS_PER_SEC/60);
-	printf("%0.2e set photon start\n", t1s/CLOCKS_PER_SEC/60);
-	printf("%0.2e propagate\n", t2s/CLOCKS_PER_SEC/60);
-	printf("%0.2e spin and split\n", t3s/CLOCKS_PER_SEC/60);
+	//printf("%0.2e saving files\n", tsaves/CLOCKS_PER_SEC/60);
+	//printf("%0.2e set photon start\n", t1s/CLOCKS_PER_SEC/60);
+	//printf("%0.2e propagate\n", t2s/CLOCKS_PER_SEC/60);
+	//printf("%0.2e spin and split\n", t3s/CLOCKS_PER_SEC/60);
     /**** SAVE
      Convert data to relative fluence rate [cm^-2] and save.
      *****/
