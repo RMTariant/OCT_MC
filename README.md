@@ -15,6 +15,7 @@ Description
 -Focusing/diverging beams instead of perfectly foccus  
   
 ===Added Features===  
+-Added the effect of the likelihood on flux to have a realistic flux with bias scattering  
 -Reflection and refraction were added to the code  
 -Correction for refractive index due image stretching  
 -Making a map of the code  
