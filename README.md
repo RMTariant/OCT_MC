@@ -16,6 +16,7 @@ Description
   
 ===Added Features===  
 -Reflection and refraction were added to the code  
+-Correction for refractive index due image stretching  
 -Making a map of the code  
 -Electric filter on the OCT raw A-line  
 -The thesis proposed mesh intersection is the same as in St-Jacques code.  
