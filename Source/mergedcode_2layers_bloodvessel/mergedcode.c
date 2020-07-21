@@ -640,6 +640,9 @@ int main(int argc, const char * argv[])
 				}
 				else /* photon has crossed voxel boundary */
 				{
+					/* wakka */
+					
+					
 					/* step to voxel face + "littlest step" so just inside new voxel. */
                     s = ls + FindVoxelFace2(x, y, z, &det_num, Pick_det, detx, det_radius, det_z, cos_accept, Ndetectors, dx, dy, dz, ux, uy, uz);
                     //s_total += s; // RMT Update the total distance here. Not suppose to be here
@@ -1347,6 +1350,8 @@ double min3(double a, double b, double c) {
         m = c;
     return m;
 }
+
+
 
 /***********************************************************
  *	FRESNEL REFLECTANCE

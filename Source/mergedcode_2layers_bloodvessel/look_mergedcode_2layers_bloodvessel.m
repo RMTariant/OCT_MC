@@ -50,6 +50,8 @@ for i=1:Nt
     musv(i,1) = A(j);
     j=j+1;
     gv(i,1) = A(j);
+    j=j+1;
+    nr(i,1) = A(j);
 end
 
 reportHmci(myname)
