@@ -57,6 +57,8 @@ double min2(double a, double b);
 double min3(double a, double b, double c);
 double ReflectRefraction(double n1, double n2, double* x, double* y, double* z, double* ux, double* uy,
 					double* uz, int* face_dir, int* reflected);
+double MirrorReflection(double n1, double n2, double mr, double* x, double* y, double* z, double* ux, 
+					double* uy, double* uz, int* face_dir, int* reflected);
 double FindVoxelFace(double x1,double y1,double z1, double x2, double y2, double z2,
 					double dx,double dy,double dz, double ux, double uy, double uz);
 double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_det,
@@ -85,6 +87,7 @@ double	mua;            /* absorption coefficient [cm^-1] */
 double	mus;            /* scattering coefficient [cm^-1] */
 double	g;              /* anisotropy [-] */
 double	nr;              /* refractive index [-] */
+double	mr;              /* mirror reflection chances [-] */
 double	n1;              /* refractive index previous layer [-] */
 double	n2;              /* refractive index next layer [-] */
 double	Nphotons;       /* number of photons in simulation */
@@ -132,6 +135,7 @@ float 	muav[Ntiss];    // muav[0:Ntiss-1], absorption coefficient of ith tissue 
 float 	musv[Ntiss];    // scattering coeff.
 float 	gv[Ntiss];      // anisotropy of scattering
 float 	nrv[Ntiss];      // refractive index
+float 	mrv[Ntiss];      // mirror reflection chances
 
 /**** KE start: Declaration of variables ****/
 int face_dir; // exited voxel direction of the photon
@@ -276,6 +280,8 @@ int main(int argc, const char * argv[])
 		sscanf(buf, "%f", &gv[i]);		// anisotropy of scatter [dimensionless]
 		fgets(buf, 32, fid);
 		sscanf(buf, "%f", &nrv[i]);		// refractive index
+		fgets(buf, 32, fid);
+		sscanf(buf, "%f", &mrv[i]);		// mirror reflection chances
 	}
     fclose(fid);
 
@@ -327,7 +333,8 @@ int main(int argc, const char * argv[])
         printf("muav[%ld] = %0.4f [cm^-1]\n",i,muav[i]);
         printf("musv[%ld] = %0.4f [cm^-1]\n",i,musv[i]);
         printf("  gv[%ld] = %0.4f [--]\n",i,gv[i]);
-		printf("  nrv[%ld] = %0.4f [--]\n\n",i,nrv[i]);
+		printf("  nrv[%ld] = %0.4f [--]\n",i,nrv[i]);
+		printf("  mrv[%ld] = %0.4f [--]\n\n",i,mrv[i]);
     }
 
     /* IMPORT BINARY TISSUE FILE */
@@ -557,6 +564,7 @@ int main(int argc, const char * argv[])
 		mus 	= musv[type];
 		g 		= gv[type];
 		nr 		= nrv[type];
+		mr 		= mrv[type];
 
         bflag = 1;
         // initialize as 1 = inside volume, but later check as photon propagates.
@@ -604,6 +612,7 @@ int main(int argc, const char * argv[])
                  mus = musv[type];
                  g = gv[type];
 				 nr = nrv[type];
+				 mr = mrv[type];
                  W = W_cont;
                  L_current = L_cont;
                  cont_exist = 0;
@@ -786,28 +795,33 @@ int main(int argc, const char * argv[])
 							n1 = nr;
 							type = v[i];
 							n2 = nrv[type];
+							mr = mrv[type];
 							reflected = 0;
-							// RMT check if change in index of refraction and apply reflection/refraction
-							if(n1 != n2) {
-								ReflectRefraction(n1, n2, &x, &y, &z, &ux, &uy, &uz, &face_dir, &reflected);
-							}
-							// Update the optical properties depending if in next or same voxel
-							if(reflected == 0)
+							// RMT check if reflection
+							if (mr != 0)
 							{
-								type = v[i];
-								mua  = muav[type];
-								mus  = musv[type];
-								g    = gv[type];
-								nr	 = nrv[type];
+								// RMT add mirror reflection
+								MirrorReflection(n1, n2, mr, &x, &y, &z, &ux, &uy, &uz, &face_dir, &reflected);
 							}
 							else
 							{
-								type = v[tempi];
-								mua  = muav[type];
-								mus  = musv[type];
-								g    = gv[type];
-								nr	 = nrv[type];
+								// RMT check if change in index of refraction and apply reflection/refraction
+								if(n1 != n2) 
+								{
+									ReflectRefraction(n1, n2, &x, &y, &z, &ux, &uy, &uz, &face_dir, &reflected);
+								}
 							}
+							// Update the optical properties depending if in next or same voxel
+							if(reflected == 1)
+							{
+								i = tempi;
+							}
+							type = v[i];
+							mua  = muav[type];
+							mus  = musv[type];
+							g    = gv[type];
+							nr	 = nrv[type];
+							mr	 = mrv[type];
 
                         }
                     }
@@ -1456,6 +1470,104 @@ double ReflectRefraction(double n1, double n2, double* x, double* y, double* z, 
 		rp = (n1*cos2-n2*cos1)/(n1*cos2+n2*cos1); // Calculating p polarized reflection
 		Rtot = 0.5*(rs*rs+rp*rp); // Total reflection, no polarisation implemented yet
 		if(RandomNum < Rtot) 
+		{
+			ur2 = -ur1; // The light is reflected in the opposite direction
+			us2 = us1; // The lateral trajectory doesn't change during reflection
+			ut2 = ut1; // The lateral trajectory doesn't change during reflection
+			*reflected = 1;
+		}
+		else
+		{
+			*reflected = 0;
+		}
+	}
+	
+	// Calculate the new photon directions
+	if(*face_dir == 1) {
+		*ux = ur2;
+		*uy = us2;
+		*uz = ut2;
+	} 
+	else if(*face_dir == 2) {
+		*ux = us2;
+		*uy = ur2;
+		*uz = ut2;
+	} 
+	else if(*face_dir == 3) {
+		*ux = us2;
+		*uy = ut2;
+		*uz = ur2;
+	}
+	
+	// Calculate the new photon position
+	*x += (-tempux + *ux) * ls; // Take a ls step back to be at the frontiere and take a ls step in the right direction
+	*y += (-tempuy + *uy) * ls;
+	*z += (-tempuz + *uz) * ls;
+	
+} /******** END SUBROUTINE **********/
+
+
+/***********************************************************
+ *	Mirror reflection - RMT
+ * Gives a reflection with the reflection index chances
+ ****/
+double MirrorReflection(double n1, double n2, double mr, double* x, double* y, double* z, double* ux, double* uy, double* uz, int* face_dir, int* reflected)
+{
+	//Determining which axis is the axial one
+	double tempux = *ux;
+	double tempuy = *uy;
+	double tempuz = *uz;
+	double ur1;
+	double us1;
+	double ut1;
+	double ur2;
+	double us2;
+	double ut2;
+	double ur22;
+	double utot2;
+	double cos1;
+	double cos2;
+	double rs;
+	double rp;
+	double Rtot;
+	
+	if(*face_dir == 1) {
+		ur1 = *ux;
+		us1 = *uy;
+		ut1 = *uz;
+	} 
+	else if(*face_dir == 2) {
+		ur1 = *uy;
+		us1 = *ux;
+		ut1 = *uz;
+	} 
+	else if(*face_dir == 3) {
+		ur1 = *uz;
+		us1 = *ux;
+		ut1 = *uy;
+	}
+	
+	utot2 = n2/n1; // Not normalize 
+	us2 = us1/utot2; // First lateral direction
+	ut2 = ut1/utot2; // Second lateral direction
+	ur22 = 1-us2*us2-ut2*ut2; //Square of the axial direction
+	
+	if(ur22 < 0) // In this case, we have a total inter reflection
+	{
+		ur2 = -ur1; // The light is reflected in the opposite direction
+		us2 = us1; // The lateral trajectory doesn't change during reflection
+		ut2 = ut1; // The lateral trajectory doesn't change during reflection
+		*reflected = 1;
+	}
+	else
+	{
+		ur2 = sqrt(ur22); // Axial direction
+		if(ur1 < 0) // Make sure to have the proper direction that was lost in the squarre
+		{
+			ur2 = -ur2; 
+		}
+
+		if(RandomNum < mr) 
 		{
 			ur2 = -ur1; // The light is reflected in the opposite direction
 			us2 = us1; // The lateral trajectory doesn't change during reflection

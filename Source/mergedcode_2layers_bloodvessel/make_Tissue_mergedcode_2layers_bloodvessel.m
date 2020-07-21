@@ -86,8 +86,12 @@ for i=1:Nt
 end
 
 % Adding refractive index
-nr(1) = 1.3;
-nr(2) = 1.4;
+nr(1) = 1.3; %%%Edit the value
+nr(2) = 1.4; %%%Edit the value
+
+% Adding reflection chances
+mr(1) = 0;
+mr(2) = 0;
 
 % Specify Monte Carlo parameters    
 Nx = Nbins;
@@ -201,6 +205,7 @@ if SAVEON
             fprintf(fid,'%0.4f\n',musv(i));
             fprintf(fid,'%0.4f\n',gv(i));
             fprintf(fid,'%0.4f\n',nr(i));
+            fprintf(fid,'%0.4f\n',mr(i));
         end
     fclose(fid);
 
