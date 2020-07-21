@@ -32,7 +32,7 @@ home
 SAVEON      = 1;        % 1 = save myname_T.bin, myname_H.mci 
                         % 0 = don't save. Just check the program.
 
-myname      = 'skinvessel2layersbp02n14';%_2layers_bloodvessel';% name for files: myname_T.bin, myname_H.mci  
+myname      = 'skinvessel2layersb';%_2layers_bloodvessel';% name for files: myname_T.bin, myname_H.mci  
 time_min    = 1;      	% RMT No longuer used time duration of the simulation [min] <----- run time -----
 Nphotons    = 1e6;      % RMT Number of photons used in the simulation.
 a_coef      = 0.925;    % RMT Biasing coefficient of the importance sampling
