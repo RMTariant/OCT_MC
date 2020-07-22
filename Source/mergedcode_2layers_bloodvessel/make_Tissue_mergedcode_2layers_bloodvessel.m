@@ -97,9 +97,9 @@ mr(2) = 0;
 Nx = Nbins;
 Ny = Nbins;
 Nz = Nbins;
-dx = binsize;
+dx = binsize; %distance between 2 alines
 dy = binsize;
-dz = binsize;
+dz = binsize; %dz = 0.01; %0.1 mm distance between smallest step
 x  = ([1:Nx]'-Nx/2)*dx;
 y  = ([1:Ny]'-Ny/2)*dy;
 z  = [1:Nz]'*dz;
@@ -201,14 +201,15 @@ if SAVEON
         % tissue optical properties
         fprintf(fid,'%d\n',Nt);
         for i=1:Nt
-            fprintf(fid,'%0.4f\n',muav(i));
-            fprintf(fid,'%0.4f\n',musv(i));
-            fprintf(fid,'%0.4f\n',gv(i));
-            fprintf(fid,'%0.4f\n',nr(i));
-            fprintf(fid,'%0.4f\n',mr(i));
+            fprintf(fid,'%0.4f\n',muav(i)); %mua
+            fprintf(fid,'%0.4f\n',musv(i)); %mus
+            fprintf(fid,'%0.4f\n',gv(i)); %g
+            fprintf(fid,'%0.4f\n',nr(i)); %Refractive index
+            fprintf(fid,'%0.4f\n',mr(i)); %Mirror reflection
         end
     fclose(fid);
-
+    
+    
     %% write myname_T.bin file
     filename = sprintf('%s_T.bin',myname);
     disp(['create ' filename])
