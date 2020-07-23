@@ -15,6 +15,7 @@ Description
 -Focusing/diverging beams instead of perfectly foccus  
   
 ===Added Features===  
+-You can choose the maximum number of photon being process at the same time  
 -Added the effect of the likelihood on flux to have a realistic flux with bias scattering  
 -Reflection and refraction were added to the code  
 -Correction for refractive index due image stretching  
