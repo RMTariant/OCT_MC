@@ -27,12 +27,16 @@ tissue(j).name  = 'blood';
 tissue(j).mua = 5; %[cm^-1]
 tissue(j).mus = 650; %[cm^-1]
 tissue(j).g   = 0.9888;
+tissue(j).n   = 1; %Refractive index
+tissue(j).mirror   = 0; %Mirror reflection coeficient
 
 j=2;
 tissue(j).name  = 'standard tissue';
 tissue(j).mua   = 1; %[cm^-1]
 tissue(j).mus   = 10; %[cm^-1]
 tissue(j).g     = 0.7;
+tissue(j).n   = 1; %Refractive index
+tissue(j).mirror   = 0; %Mirror reflection coeficient
 
 disp(sprintf('---- tissueList ------ \tmua   \tmus  \tg  \tmusp'))
 for i=1:length(tissue)

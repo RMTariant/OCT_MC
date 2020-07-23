@@ -83,15 +83,9 @@ for i=1:Nt
     muav(i)  = tissue(i).mua;
     musv(i)  = tissue(i).mus;
     gv(i)    = tissue(i).g;
+    nr(i)    = tissue(i).n;
+    mr(i)    = tissue(i).mirror;
 end
-
-% Adding refractive index
-nr(1) = 1.3; %%%Edit the value
-nr(2) = 1.4; %%%Edit the value
-
-% Adding reflection chances
-mr(1) = 0;
-mr(2) = 0;
 
 % Specify Monte Carlo parameters    
 Nx = Nbins;
