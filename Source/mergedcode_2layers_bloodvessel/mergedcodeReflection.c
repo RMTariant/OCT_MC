@@ -798,7 +798,7 @@ int main(int argc, const char * argv[])
 							mr = mrv[type];
 							reflected = 0;
 							// RMT check if reflection
-							if (mr != 0)
+							if (mr != 0 && face_dir == 3)
 							{
 								// RMT add mirror reflection
 								MirrorReflection(n1, n2, mr, &x, &y, &z, &ux, &uy, &uz, &face_dir, &reflected);
