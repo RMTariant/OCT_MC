@@ -19,8 +19,8 @@ n_cor = 1;
 rn = ones(samplePoints,5); %%%%CHOOSE VALUE%%%%
 rn(1:samplePoints,1) = 1.0; %%%%CHOOSE VALUE%%%%
 rn(1:samplePoints,2) = 1.0; %%%%CHOOSE VALUE%%%%
-rn(1:samplePoints,3) = 1.37; %%%%CHOOSE VALUE%%%%
-rn(1:samplePoints,4) = 1.37; %%%%CHOOSE VALUE%%%%
+rn(1:samplePoints,3) = 1.0; %%%%CHOOSE VALUE%%%%
+rn(1:samplePoints,4) = 1.0; %%%%CHOOSE VALUE%%%%
 noise_amp = 0; %%%Choose amplitude of noise%%%
 
 
@@ -101,7 +101,6 @@ toc
 
 L_threshold = quantile(DetL,L_filter);
 ix = find(DetL < L_threshold );
-
 % end of removing outliers
 %% Load the saved photons
 % S = DetS(ix)'; % row vectors
@@ -222,7 +221,7 @@ x = linspace(-radius,radius,Ndetectors);
 
 figure
 imagesc(x,z,db(OCT))
-title('Blood n=10.4. Surrounding Tissue n=1.3. Filter')
+title('')
 xlabel('Position [cm]')
 ylabel('Depth [cm]')
 
