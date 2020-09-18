@@ -84,6 +84,10 @@ for i=1:Nt
     musv(i)  = tissue(i).mus;
     gv(i)    = tissue(i).g;
 end
+% wakka rmt
+muav(3)  = tissue(2).mua;
+musv(3)  = tissue(2).mus;
+gv(3)    = tissue(2).g;
 
 % Adding refractive index
 nr(1) = 1.3; %%%Edit the value
@@ -157,6 +161,16 @@ r = sqrt (xd ^2 + zd ^2) ; % r from vessel center
  end %ix
  end % iz
 
+%Create three layers
+T(:,:,1:40) = 1;
+T(:,:,41:100) = 2;
+T(:,:,101:200) = 3;
+clear T
+T(1:106,1:106,1:20) = 1;
+T(1:106,1:106,21:66) = 2;
+T(1:106,1:106,66:106) = 3;
+T(1:106,1:106,66) = 4;
+ 
 %%
 if SAVEON
     tic
