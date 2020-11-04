@@ -94,9 +94,10 @@ Ndetectors: Number of detectors/Alines
 det_radius: Radius of the detector in cm  
 cos_accept: Aperture of the detector/cos of the angle  
 Pick_det: Picked detector. Ranged from 1 to Ndetectors in   
-radius: NOT A RADIUS. It is half the B-line width.  
+radius: NOT A RADIUS. It is half the B-line width. 
+waist: 1/e radius of the beam at focus. 
 detx: Position in cm? of the current A-line position  
-launchflag: if = 1 Manually set launch direction to straigth down.  
+launchflag: if = 1 Manually set launch direction to straigth down with a pencil beam.  
 mcflag: 0 = uniform beam. Other values are for 1 = gaussian, 2 = isotropic and 3 rectangular beam  
 bflag: 1 = The photon is still inside the simulated space. 0 = it no longer is.  
 surfflag: 0 = photon is inside the tissue part of the simulated space. 1 = photon is inside the air part of the simulated space.  
