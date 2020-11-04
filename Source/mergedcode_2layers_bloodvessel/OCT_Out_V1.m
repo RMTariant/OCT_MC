@@ -21,7 +21,7 @@ rn(1:samplePoints,1) = 1.0; %%%%CHOOSE VALUE%%%%
 rn(1:samplePoints,2) = 1.0; %%%%CHOOSE VALUE%%%%
 rn(1:samplePoints,3) = 1.0; %%%%CHOOSE VALUE%%%%
 rn(1:samplePoints,4) = 1.0; %%%%CHOOSE VALUE%%%%
-noise_amp = 0; %%%Choose amplitude of noise%%%
+noise_amp = 1e-2; %%%Choose amplitude of noise%%%
 
 
 
