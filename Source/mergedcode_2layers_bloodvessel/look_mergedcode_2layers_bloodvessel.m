@@ -9,7 +9,7 @@ else
     sz = 12; fz = 9; fz2 = 7; % for screen display
 end
 
-myname = 'skinvessel2layersb'; nm = 532;
+myname = 'gaussiantest2'; nm = 532;
 
 % Load header file
 filename = sprintf('%s_H.mci',myname);

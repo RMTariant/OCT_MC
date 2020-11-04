@@ -63,7 +63,7 @@ zfocus      = inf;    	% set z,position of focus (=inf for collimated beam)
 
 % only used if mcflag == 0 or 1 or 3 (not 2=isotropic pt.)
 radius      = 0.0400;   % 1/e radius of beam at tissue surface
-waist       = 0.0400;  	% 1/e radius of beam at focus
+waist       = 0.00016;  	% 1/e2 radius of beam at focus
 
 % only used if launchflag == 1 (manually set launch trajectory):
 ux0         = 0.7;      % trajectory projected onto x axis
@@ -86,6 +86,10 @@ for i=1:Nt
     nr(i)    = tissue(i).n;
     mr(i)    = tissue(i).mirror;
 end
+% wakka rmt
+muav(3)  = tissue(2).mua;
+musv(3)  = tissue(2).mus;
+gv(3)    = tissue(2).g;
 
 % Specify Monte Carlo parameters    
 Nx = Nbins;
@@ -151,6 +155,16 @@ r = sqrt (xd ^2 + zd ^2) ; % r from vessel center
  end %ix
  end % iz
 
+% %Create three layers
+% T(:,:,1:40) = 1;
+% T(:,:,41:100) = 2;
+% T(:,:,101:200) = 3;
+% clear T
+% T(1:106,1:106,1:20) = 1;
+% T(1:106,1:106,21:66) = 2;
+% T(1:106,1:106,66:106) = 3;
+% T(1:106,1:106,66) = 4;
+ 
 %%
 if SAVEON
     tic

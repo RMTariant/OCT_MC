@@ -1,16 +1,18 @@
 %% Parameters
 
 %File name
-myname = 'skinvessel2layersb'; %%%%CHOOSE VALUE%%%%
+myname = 'attenuationtest'; %%%%CHOOSE VALUE%%%%
 %Number of photon loaded at the same time
 nph = 40000; %%%%CHOOSE VALUE%%%%
+%Limit the total number of loaded photons
+maxnph = 1000000;
 %OCT wavelengths IN CENTIMETERS
-lambda_start = 1100e-7; %%%%CHOOSE VALUE%%%%
-lambda_stop = 1400e-7; %%%%CHOOSE VALUE%%%%
+lambda_start = 900e-7; %%%%CHOOSE VALUE%%%%
+lambda_stop = 1600e-7; %%%%CHOOSE VALUE%%%%
 %Number of sample point of the OCT wavelength width
-samplePoints= 1024; %%%%CHOOSE VALUE%%%%
+samplePoints= 2048; %%%%CHOOSE VALUE%%%%
 %Choose to apply electric filter. Put a high value if none
-maxDepth = 1; %%%%CHOOSE VALUE%%%%
+maxDepth = 1.12; %%%%CHOOSE VALUE%%%%
 %Remove the photon with very high likelihood
 L_filter = 1; %%%%CHOOSE VALUE%%%%
 %Compress image for refractive index
@@ -96,6 +98,14 @@ tic
     DetE = fread(fid, 'float');
     fclose(fid);
 toc
+
+%Limit the number of photons
+maxnph = min([length(DetL) maxnph]);
+DetS2 = DetS2(1:maxnph);
+DetW = DetW(1:maxnph);
+DetL = DetL(1:maxnph);
+DetID = DetID(1:maxnph);
+DetE = DetE(1:maxnph);
 
 %% Remove the outliers using .9 quantile of L 
 
@@ -224,6 +234,7 @@ imagesc(x,z,db(OCT))
 title('')
 xlabel('Position [cm]')
 ylabel('Depth [cm]')
+caxis([-261 305])
 
 %% Save the A- scan
 % ID=DetID;
