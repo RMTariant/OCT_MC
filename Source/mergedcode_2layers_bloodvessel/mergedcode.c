@@ -55,6 +55,7 @@ Boolean SameVoxel(double x1,double y1,double z1, double x2, double y2, double z2
 double max2(double a, double b);
 double min2(double a, double b);
 double min3(double a, double b, double c);
+double myErfInv2(double rndE);
 double FindVoxelFace(double x1,double y1,double z1, double x2, double y2, double z2,
 					double dx,double dy,double dz, double ux, double uy, double uz);
 double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_det,
@@ -493,6 +494,17 @@ int main(int argc, const char * argv[])
 				ux		= -(x - xfocus)/temp;
 				uy		= -(y - yfocus)/temp;
 				uz		= sqrt(1 - ux*ux - uy*uy);
+			}
+			else if (mcflag==1)
+			{ // gaussian beam with a 1/e2 waist
+				ux	= 0;
+				uy	= 0;
+				uz	= 1;
+				z	= zs;
+				y   = ys;
+				rnd = myErfInv2(2*RandomGen(1,0,NULL)-1);
+				x   = xs + detx + (waist*rnd/2/sqrt(2));
+
 			}
 			else if (mcflag==2)
 			{ // isotropic pt source
@@ -1408,6 +1420,33 @@ double RFresnel(double n1,		/* incident refractive index.*/
 		}
 	}
     return(r);
+} /******** END SUBROUTINE **********/
+
+
+
+/***********************************************************
+ *	Reverse Erf function - RMT
+ * Used to calculate the gaussian beam profil. Is an approximation.
+ * Work based on "A handy approximation for the error function and its inverse" by Sergei Winitzki.
+ ****/
+double myErfInv2(double rndE)
+{
+	
+   double tt1;
+   double tt2;
+   double lnx;
+   double sgn;
+   
+   sgn = (rndE < 0) ? -1.0f : 1.0f;
+
+   rndE = (1 - rndE)*(1 + rndE);        // x = 1 - x*x;
+   lnx = logf(rndE);
+
+   tt1 = 2/(PI*0.147) + 0.5f * lnx;
+   tt2 = 1/(0.147) * lnx;
+
+   return(sgn*sqrtf(-tt1 + sqrtf(tt1*tt1 - tt2)));
+	
 } /******** END SUBROUTINE **********/
 
 
