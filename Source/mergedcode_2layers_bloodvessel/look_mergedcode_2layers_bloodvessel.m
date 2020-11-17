@@ -9,7 +9,7 @@ else
     sz = 12; fz = 9; fz2 = 7; % for screen display
 end
 
-myname = 'attenuationtest'; nm = 532;
+myname = 'fluencecompared'; nm = 532;
 
 % Load header file
 filename = sprintf('%s_H.mci',myname);
@@ -164,7 +164,7 @@ xmax = max(x); % 0.0398
 xdiff = xmax-xmin; % 0.0796
 
 %% Look at structure, Tzx
-Tzx = reshape(T(Ny/2,:,:),Nx,Nz)'; % reshape(T(100,200,200)) 200x200 double
+Tzx = reshape(T(round(Ny/2),:,:),Nx,Nz)'; % reshape(T(100,200,200)) 200x200 double
 tissue = make_TissueList_mergedcode_2layers_bloodvessel(nm);
 Nt = length(tissue); % different types of tissue, in this case:2
 
@@ -222,7 +222,7 @@ end
 
 
 %% Look at Fluence Fzx @ launch point
-Fzx = reshape(F(Ny/2,:,:),Nx,Nz)'; % in z,x plane through source
+Fzx = reshape(F(round(Ny/2),:,:),Nx,Nz)'; % in z,x plane through source
 %Fzx_norm = Fzx - min(Fzx(:));
 %Fzx_norm = Fzx ./ max(Fzx(:));
 figure(2);clf %deletes from the current figure all graphic objects
@@ -258,7 +258,7 @@ if SAVEPICSON
 end
 
 %% look Fzy
-Fzy = reshape(F(:,Nx/2,:),Ny,Nz)';
+Fzy = reshape(F(:,round(Nx/2),:),Ny,Nz)';
 
 iy = round((dy*Ny/2 + 0.15)/dy);
 iz = round(zs/dz);
@@ -285,8 +285,8 @@ if SAVEPICSON
 end
 
 %% look Azx
-Fzx = reshape(F(Ny/2,:,:),Nx,Nz)'; % in z,x plane through source
-mua = muav(reshape(T(Ny/2,:,:),Nx,Nz)');
+Fzx = reshape(F(round(Ny/2),:,:),Nx,Nz)'; % in z,x plane through source
+mua = muav(reshape(T(round(Ny/2),:,:),Nx,Nz)');
 Azx = Fzx.*mua;
 
 figure(4);clf

@@ -53,6 +53,7 @@ for i=1:Nt
     gv(i,1) = A(j);
     j=j+1;
     nr(i,1) = A(j);
+    j=j+1;
 end
 
 reportHmci(myname)
@@ -151,20 +152,56 @@ Rd = load(filename);
 fprintf('Rd = %0.4f\n',Rd)
 
 %%
-F = F/sum(F(:));
+F = F/sum(F(~isnan(F(:))));
 figure
 x = (0:Nx-1)*dx;
 z = (0:Nz-1)*dz;
-imagesc(x,z,squeeze(db(F(round(Ny/2),:,:))));
+Fzx = reshape(F(round(Ny/2),:,:),Nx,Nz)'; % in z,x plane through source
+imagesc(x,z,log10(Fzx));
 c = colorbar;
 c.Label.String = 'decibel';
 
-%% other stuff
+%% Look at Fluence Fzx @ launch point
+Fzx = reshape(F(round(Ny/2),:,:),Nx,Nz)'; % in z,x plane through source
+%Fzx_norm = Fzx - min(Fzx(:));
+%Fzx_norm = Fzx ./ max(Fzx(:));
+figure(2);clf %deletes from the current figure all graphic objects
+imagesc(x,z,log10(Fzx)) % specifies image location
+% x and z specify the locations of the corner corresponding to 
+% log10(Fzx)(1,1) and log10(Fzx)(m,n)
+%imagesc(x,z,log10(Fzx_norm))
+% displays the data in array log10(Fzx)as an image that uses the full range
+% of colors in the colormap. Each element of log10(Fzx) specifies the color of one pixel of the
+% image. The resulting image is an m-by-n grid of pixels with m rows and n
+% columns in log10(Fzx). The row and column indices of the elements
+% determine the centers of the corresponding pixels.
+hold on
+text(max(x)*1.2,min(z)-0.04*max(z),'log_{10}( \phi )','fontsize',fz)
+colorbar % displays a vertical colorbar to thhe right of the current axes or chart
+% displays the current colormap and indicate the mapping of data values
+% into the colormap
+set(gca,'fontsize',sz)
+xlabel('x [cm]')
+ylabel('z [cm]')
+title('Fluence \phi [W/cm^2/W.delivered] ','fontweight','normal','fontsize',fz)
+%colormap(makec2f)
+%colormap(map) %sets the colormap for the current figure to the colormap
+%specified by map
+axis equal image
+%axis([min(x) max(x) min(z) max(z)])
+%text(min(x)-0.2*max(x),min(z)-0.08*max(z),sprintf('runtime = %0.1f min',time_min),...
+%    'fontsize',fz2)
 
+if SAVEPICSON
+    name = sprintf('%s_Fzx.fig',myname);
+    savefig(name)
+end
 
+%% Look at attenuation at center
 
+att2 = squeeze(fluence.data(:,51,51));
+att1 = squeeze(F(51,51,:));
 
-
-
-
+att22 = att2(40:70);
+att12 = att1(40:70);
 

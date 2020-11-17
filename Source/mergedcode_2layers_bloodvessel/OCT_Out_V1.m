@@ -1,7 +1,7 @@
 %% Parameters
 
 %File name
-myname = 'fluencecompared'; %%%%CHOOSE VALUE%%%%
+myname = 'gaussiantest2'; %%%%CHOOSE VALUE%%%%
 %Number of photon loaded at the same time
 nph = 40000; %%%%CHOOSE VALUE%%%%
 %Limit the total number of loaded photons
@@ -101,7 +101,7 @@ toc
 
 %Limit the number of photons
 maxnph = min([length(DetL) maxnph]);
-DetS2 = DetS2(1:2*maxnph);
+DetS2 = DetS2(1:Nt*maxnph);
 DetW = DetW(1:maxnph);
 DetL = DetL(1:maxnph);
 DetID = DetID(1:maxnph);
