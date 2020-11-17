@@ -32,7 +32,7 @@ home
 SAVEON      = 1;        % 1 = save myname_T.bin, myname_H.mci 
                         % 0 = don't save. Just check the program.
 
-myname      = 'attenuationtest';%_2layers_bloodvessel';% name for files: myname_T.bin, myname_H.mci  
+myname      = 'attenuationtest2';%_2layers_bloodvessel';% name for files: myname_T.bin, myname_H.mci  
 time_min    = 1;      	% RMT No longuer used time duration of the simulation [min] <----- run time -----
 Nphotons    = 1e6;      % RMT Number of photons used in the simulation.
 a_coef      = 0.925;    % RMT Biasing coefficient of the importance sampling
@@ -76,17 +76,22 @@ uz0         = sqrt(1 - ux0^2 - uy0^2); % such that ux^2 + uy^2 + uz^2 = 1
 % Prepare Monte Carlo 
 %%%
 
-Nt = 1;
+Nt = 2;
 
-muav  = 2;
-musv  = 600;
-gv    = 0.9;
+muav(1)  = 2;
+muav(2)  = 5;
+musv(1)  = 200;
+musv(2)  = 600;
+gv(1)    = 0.7;
+gv(2)    = 0.9;
 
 % Adding refractive index
-nr = 1.0; %%%Edit the value
+nr(1) = 1.1; %%%Edit the value
+nr(2) = 1.2;
 
 % Adding reflection chances
-mr = 0;
+mr(1) = 0;
+mr(2) = 0;
 
 % Specify Monte Carlo parameters    
 Nx = Nbins;
@@ -115,6 +120,7 @@ if isinf(zfocus), zfocus = 1e12; end
 
 T = double ( zeros (Ny ,Nx ,Nz));
 T(:) = 1;
+T(:,:,10:end) = 2;
 
 zsurf = 0.000; %position of air/skin surface
 
@@ -212,43 +218,43 @@ set(colorbar,'fontsize',1)
 zdiff = zmax-zmin;
 %%%
 
-for i=1:Nt
-    yy = (Nt-i)/(Nt-1)*Nz*dz;
-    text(max(x)*1.2,yy, tissue(i).name,'fontsize',fz)
-end
-
-text(xmax,zmin - zdiff*0.06, 'Tissue types','fontsize',fz)
-axis equal image
-axis([xmin xmax zmin zmax])
-
-%%% draw launch
-N = 10; % # of beam rays drawn
-switch mcflag
-    case 0 % uniform
-        for i=0:N
-            plot((-radius + 2*radius*i/N)*[1 1],[zs max(z)],'r-')
-        end
-
-    case 1 % Gaussian
-        for i=0:N
-            plot([(-radius + 2*radius*i/N) xfocus],[zs zfocus],'r-')
-        end
-
-    case 2 % iso-point
-        for i=1:N
-            th = (i-1)/19*2*pi;
-            xx = Nx/2*cos(th) + xs;
-            zz = Nx/2*sin(th) + zs;
-            plot([xs xx],[zs zz],'r-')
-        end
-        
-    case 3 % rectangle
-        zz = max(z);
-        for i=1:N
-            xx = -radius + 2*radius*i/20;
-            plot([xx xx],[zs zz],'r-')
-        end
-end
+% for i=1:Nt
+%     yy = (Nt-i)/(Nt-1)*Nz*dz;
+%     text(max(x)*1.2,yy, tissue(i).name,'fontsize',fz)
+% end
+% 
+% text(xmax,zmin - zdiff*0.06, 'Tissue types','fontsize',fz)
+% axis equal image
+% axis([xmin xmax zmin zmax])
+% 
+% %%% draw launch
+% N = 10; % # of beam rays drawn
+% switch mcflag
+%     case 0 % uniform
+%         for i=0:N
+%             plot((-radius + 2*radius*i/N)*[1 1],[zs max(z)],'r-')
+%         end
+% 
+%     case 1 % Gaussian
+%         for i=0:N
+%             plot([(-radius + 2*radius*i/N) xfocus],[zs zfocus],'r-')
+%         end
+% 
+%     case 2 % iso-point
+%         for i=1:N
+%             th = (i-1)/19*2*pi;
+%             xx = Nx/2*cos(th) + xs;
+%             zz = Nx/2*sin(th) + zs;
+%             plot([xs xx],[zs zz],'r-')
+%         end
+%         
+%     case 3 % rectangle
+%         zz = max(z);
+%         for i=1:N
+%             xx = -radius + 2*radius*i/20;
+%             plot([xx xx],[zs zz],'r-')
+%         end
+% end
 
 %savefig(strcat(myname, '.fig'));
 disp('done')

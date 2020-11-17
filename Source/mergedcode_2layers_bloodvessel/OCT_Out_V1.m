@@ -1,7 +1,7 @@
 %% Parameters
 
 %File name
-myname = 'attenuationtest'; %%%%CHOOSE VALUE%%%%
+myname = 'attenuationtest2'; %%%%CHOOSE VALUE%%%%
 %Number of photon loaded at the same time
 nph = 40000; %%%%CHOOSE VALUE%%%%
 %Limit the total number of loaded photons
@@ -19,8 +19,8 @@ L_filter = 1; %%%%CHOOSE VALUE%%%%
 n_cor = 1;
 %Chosse refractive of the different mediums. Index. Can be a function of the wavelength
 rn = ones(samplePoints,5); %%%%CHOOSE VALUE%%%%
-rn(1:samplePoints,1) = 1.0; %%%%CHOOSE VALUE%%%%
-rn(1:samplePoints,2) = 1.0; %%%%CHOOSE VALUE%%%%
+rn(1:samplePoints,1) = 1.1; %%%%CHOOSE VALUE%%%%
+rn(1:samplePoints,2) = 1.2; %%%%CHOOSE VALUE%%%%
 rn(1:samplePoints,3) = 1.0; %%%%CHOOSE VALUE%%%%
 rn(1:samplePoints,4) = 1.0; %%%%CHOOSE VALUE%%%%
 noise_amp = 0; %%%Choose amplitude of noise%%%
@@ -101,7 +101,8 @@ toc
 
 %Limit the number of photons
 maxnph = min([length(DetL) maxnph]);
-DetS2 = DetS2(1:maxnph);
+DetS2 = reshape(DetS2,[Nt,length(DetL)]);
+DetS2 = DetS2(:,1:maxnph);
 DetW = DetW(1:maxnph);
 DetL = DetL(1:maxnph);
 DetID = DetID(1:maxnph);
