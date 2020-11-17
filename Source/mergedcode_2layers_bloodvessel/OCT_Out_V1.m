@@ -1,11 +1,11 @@
 %% Parameters
 
 %File name
-myname = 'attenuationtest'; %%%%CHOOSE VALUE%%%%
+myname = 'fluencecompared'; %%%%CHOOSE VALUE%%%%
 %Number of photon loaded at the same time
 nph = 40000; %%%%CHOOSE VALUE%%%%
 %Limit the total number of loaded photons
-maxnph = 1000000;
+maxnph = 100000;
 %OCT wavelengths IN CENTIMETERS
 lambda_start = 900e-7; %%%%CHOOSE VALUE%%%%
 lambda_stop = 1600e-7; %%%%CHOOSE VALUE%%%%
@@ -101,7 +101,7 @@ toc
 
 %Limit the number of photons
 maxnph = min([length(DetL) maxnph]);
-DetS2 = DetS2(1:maxnph);
+DetS2 = DetS2(1:2*maxnph);
 DetW = DetW(1:maxnph);
 DetL = DetL(1:maxnph);
 DetID = DetID(1:maxnph);

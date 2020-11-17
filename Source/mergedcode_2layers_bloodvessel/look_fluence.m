@@ -9,7 +9,8 @@
 %     sz = 12; fz = 9; fz2 = 7; % for screen display
 % end
 
-myname = 'attenuationtest'; nm = 532;
+myname = 'fluencecompared'; nm = 532;
+cd('C:\Users\raphi\Documents\Doctorat\Uday simulation\data')
 
 % Load header file
 filename = sprintf('%s_H.mci',myname);
@@ -154,7 +155,9 @@ F = F/sum(F(:));
 figure
 x = (0:Nx-1)*dx;
 z = (0:Nz-1)*dz;
-imagesc(x,z,db(F(round(Ny/2),:,:)));
+imagesc(x,z,squeeze(db(F(round(Ny/2),:,:))));
+c = colorbar;
+c.Label.String = 'decibel';
 
 %% other stuff
 
