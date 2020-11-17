@@ -1,13 +1,13 @@
-home; clear
-format compact
-commandwindow
-
-SAVEPICSON = 1;
-if SAVEPICSON
-    sz = 10; fz = 7; fz2 = 5; % to use savepic.m
-else
-    sz = 12; fz = 9; fz2 = 7; % for screen display
-end
+% home; clear
+% format compact
+% commandwindow
+% 
+% SAVEPICSON = 1;
+% if SAVEPICSON
+%     sz = 10; fz = 7; fz2 = 5; % to use savepic.m
+% else
+%     sz = 12; fz = 9; fz2 = 7; % for screen display
+% end
 
 myname = 'attenuationtest'; nm = 532;
 

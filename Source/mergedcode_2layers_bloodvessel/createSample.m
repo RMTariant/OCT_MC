@@ -32,20 +32,21 @@ home
 SAVEON      = 1;        % 1 = save myname_T.bin, myname_H.mci 
                         % 0 = don't save. Just check the program.
 
-myname      = 'attenuationtest';%_2layers_bloodvessel';% name for files: myname_T.bin, myname_H.mci  
+cd('C:\Users\raphi\Documents\Doctorat\Uday simulation\data') % RMT files location
+myname      = 'fluencecompared';%_2layers_bloodvessel';% name for files: myname_T.bin, myname_H.mci  
 time_min    = 1;      	% RMT No longuer used time duration of the simulation [min] <----- run time -----
-Nphotons    = 1e6;      % RMT Number of photons used in the simulation.
-a_coef      = 0.925;    % RMT Biasing coefficient of the importance sampling
-p           = 0.2;      % RMT Probability of additional bias scattering.
-Ndetectors  = 512;      % RMT Number of detector in the simulation
+Nphotons    = 1e7;      % RMT Number of photons used in the simulation.
+a_coef      = 0.9;    % RMT Biasing coefficient of the importance sampling
+p           = 0.5;      % RMT Probability of additional bias scattering.
+Ndetectors  = 1;      % RMT Number of detector in the simulation
 nm          = 532;   	% desired wavelength of simulation
-Nbins       = 20;    	% # of bins in each dimension of cube  Nbins     
-binsize     = 0.0005; 	% size of each bin, eg. [cm] or [mm] binsize   
+Nbins       = 101;    	% # of bins in each dimension of cube  Nbins     
+binsize     = 0.0001; 	% size of each bin, eg. [cm] or [mm] binsize   
 
 % Set Monte Carlo launch flags
 mcflag      = 1;     	% launch: 0 = uniform beam, 1 = Gaussian, 2 = isotropic pt. 
                         % 3 = rectangular beam (use xfocus,yfocus for x,y halfwidths)
-launchflag  = 1;        % 0 = let mcxyz.c calculate launch trajectory
+launchflag  = 0;        % 0 = let mcxyz.c calculate launch trajectory
                         % 1 = manually set launch vector.
 boundaryflag = 2;       % 0 = no boundaries, 1 = escape at boundaries
                         % 2 = escape at surface only. No x, y, bottom z
@@ -62,8 +63,8 @@ yfocus      = 0;        % set y,position of focus
 zfocus      = inf;    	% set z,position of focus (=inf for collimated beam)
 
 % only used if mcflag == 0 or 1 or 3 (not 2=isotropic pt.)
-radius      = 0.0100;   % 1/e radius of beam at tissue surface
-waist       = 0.0001;  	% 1/e2 radius of beam at focus
+radius      = 0.0101;   % 1/e radius of beam at tissue surface
+waist       = 0.002;  	% 1/e2 radius of beam at focus
 
 % only used if launchflag == 1 (manually set launch trajectory):
 ux0         = 0.7;      % trajectory projected onto x axis
@@ -76,17 +77,22 @@ uz0         = sqrt(1 - ux0^2 - uy0^2); % such that ux^2 + uy^2 + uz^2 = 1
 % Prepare Monte Carlo 
 %%%
 
-Nt = 1;
+Nt = 2;
 
-muav  = 2;
-musv  = 600;
-gv    = 0.9;
+muav(1)  = 5;
+musv(1)  = 1000;
+gv(1)    = 0.9;
+muav(2)  = 10;
+musv(2)  = 2000;
+gv(2)   = 0.8;
 
 % Adding refractive index
-nr = 1.0; %%%Edit the value
+nr(1) = 1.3; %%%Edit the value
+nr(2) = 1.4; %%%Edit the value
 
 % Adding reflection chances
-mr = 0;
+mr(1) = 0;
+mr(2) = 0;
 
 % Specify Monte Carlo parameters    
 Nx = Nbins;
@@ -115,6 +121,7 @@ if isinf(zfocus), zfocus = 1e12; end
 
 T = double ( zeros (Ny ,Nx ,Nz));
 T(:) = 1;
+T(:,:,31:end) = 2;
 
 zsurf = 0.000; %position of air/skin surface
 
@@ -193,7 +200,7 @@ end % SAVEON
 
 %% Look at structure of Tzx at iy=Ny/2
 Txzy = shiftdim(T,1);   % Tyxz --> Txzy
-Tzx  = Txzy(:,:,Ny/2)'; % Tzx
+Tzx  = Txzy(:,:,round(Ny/2))'; % Tzx
 
 %%
 figure(2); clf
@@ -211,44 +218,44 @@ set(colorbar,'fontsize',1)
 % label colorbar
 zdiff = zmax-zmin;
 %%%
-
-for i=1:Nt
-    yy = (Nt-i)/(Nt-1)*Nz*dz;
-    text(max(x)*1.2,yy, tissue(i).name,'fontsize',fz)
-end
-
-text(xmax,zmin - zdiff*0.06, 'Tissue types','fontsize',fz)
-axis equal image
-axis([xmin xmax zmin zmax])
-
-%%% draw launch
-N = 10; % # of beam rays drawn
-switch mcflag
-    case 0 % uniform
-        for i=0:N
-            plot((-radius + 2*radius*i/N)*[1 1],[zs max(z)],'r-')
-        end
-
-    case 1 % Gaussian
-        for i=0:N
-            plot([(-radius + 2*radius*i/N) xfocus],[zs zfocus],'r-')
-        end
-
-    case 2 % iso-point
-        for i=1:N
-            th = (i-1)/19*2*pi;
-            xx = Nx/2*cos(th) + xs;
-            zz = Nx/2*sin(th) + zs;
-            plot([xs xx],[zs zz],'r-')
-        end
-        
-    case 3 % rectangle
-        zz = max(z);
-        for i=1:N
-            xx = -radius + 2*radius*i/20;
-            plot([xx xx],[zs zz],'r-')
-        end
-end
+% 
+% for i=1:Nt
+%     yy = (Nt-i)/(Nt-1)*Nz*dz;
+%     text(max(x)*1.2,yy, tissue(i).name,'fontsize',fz)
+% end
+% 
+% text(xmax,zmin - zdiff*0.06, 'Tissue types','fontsize',fz)
+% axis equal image
+% axis([xmin xmax zmin zmax])
+% 
+% %%% draw launch
+% N = 10; % # of beam rays drawn
+% switch mcflag
+%     case 0 % uniform
+%         for i=0:N
+%             plot((-radius + 2*radius*i/N)*[1 1],[zs max(z)],'r-')
+%         end
+% 
+%     case 1 % Gaussian
+%         for i=0:N
+%             plot([(-radius + 2*radius*i/N) xfocus],[zs zfocus],'r-')
+%         end
+% 
+%     case 2 % iso-point
+%         for i=1:N
+%             th = (i-1)/19*2*pi;
+%             xx = Nx/2*cos(th) + xs;
+%             zz = Nx/2*sin(th) + zs;
+%             plot([xs xx],[zs zz],'r-')
+%         end
+%         
+%     case 3 % rectangle
+%         zz = max(z);
+%         for i=1:N
+%             xx = -radius + 2*radius*i/20;
+%             plot([xx xx],[zs zz],'r-')
+%         end
+% end
 
 %savefig(strcat(myname, '.fig'));
 disp('done')
