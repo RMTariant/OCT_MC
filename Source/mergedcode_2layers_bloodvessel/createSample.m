@@ -33,10 +33,10 @@ SAVEON      = 1;        % 1 = save myname_T.bin, myname_H.mci
                         % 0 = don't save. Just check the program.
 
 cd('C:\Users\raphi\Documents\Doctorat\Uday simulation\data') % RMT files location
-myname      = 'fluencecompared4';%_2layers_bloodvessel';% name for files: myname_T.bin, myname_H.mci  
+myname      = 'fluencecompared5';%_2layers_bloodvessel';% name for files: myname_T.bin, myname_H.mci  
 time_min    = 1;      	% RMT No longuer used time duration of the simulation [min] <----- run time -----
 Nphotons    = 14e6;      % RMT Number of photons used in the simulation.
-a_coef      = 0.9;    % RMT Biasing coefficient of the importance sampling
+a_coef      = 0.1;    % RMT Biasing coefficient of the importance sampling
 p           = 0.5;      % RMT Probability of additional bias scattering.
 Ndetectors  = 1;      % RMT Number of detector in the simulation
 nm          = 532;   	% desired wavelength of simulation
