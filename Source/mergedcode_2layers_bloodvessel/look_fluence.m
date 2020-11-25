@@ -9,7 +9,7 @@
 %     sz = 12; fz = 9; fz2 = 7; % for screen display
 % end
 
-myname = 'fluencecompared'; nm = 532;
+myname = 'fluencea09p02v1'; nm = 532;
 cd('C:\Users\raphi\Documents\Doctorat\Uday simulation\data')
 
 % Load header file
@@ -153,19 +153,19 @@ fprintf('Rd = %0.4f\n',Rd)
 
 %%
 F = F/sum(F(~isnan(F(:))));
-figure
+% figure
 x = (0:Nx-1)*dx;
 z = (0:Nz-1)*dz;
-Fzx = reshape(F(round(Ny/2),:,:),Nx,Nz)'; % in z,x plane through source
-imagesc(x,z,log10(Fzx));
-c = colorbar;
-c.Label.String = 'decibel';
+% Fzx = reshape(F(round(Ny/2),:,:),Nx,Nz)'; % in z,x plane through source
+% imagesc(x,z,log10(Fzx));
+% c = colorbar;
+% c.Label.String = 'decibel';
 
 %% Look at Fluence Fzx @ launch point
 Fzx = reshape(F(round(Ny/2),:,:),Nx,Nz)'; % in z,x plane through source
 %Fzx_norm = Fzx - min(Fzx(:));
 %Fzx_norm = Fzx ./ max(Fzx(:));
-figure(2);clf %deletes from the current figure all graphic objects
+figure;clf %deletes from the current figure all graphic objects
 imagesc(x,z,log10(Fzx)) % specifies image location
 % x and z specify the locations of the corner corresponding to 
 % log10(Fzx)(1,1) and log10(Fzx)(m,n)
@@ -192,16 +192,18 @@ axis equal image
 %text(min(x)-0.2*max(x),min(z)-0.08*max(z),sprintf('runtime = %0.1f min',time_min),...
 %    'fontsize',fz2)
 
-if SAVEPICSON
-    name = sprintf('%s_Fzx.fig',myname);
-    savefig(name)
-end
+% if SAVEPICSON
+%     name = sprintf('%s_Fzx.fig',myname);
+%     savefig(name)
+% end
 
 %% Look at attenuation at center
+figure
+plot(db(Fzx(:,round(Nx/2))))
 
-att2 = squeeze(fluence.data(:,51,51));
-att1 = squeeze(F(51,51,:));
-
-att22 = att2(40:70);
-att12 = att1(40:70);
+% att2 = squeeze(fluence.data(:,51,51));
+% att1 = squeeze(F(51,51,:));
+% 
+% att22 = att2(40:70);
+% att12 = att1(40:70);
 

@@ -33,12 +33,12 @@ SAVEON      = 1;        % 1 = save myname_T.bin, myname_H.mci
                         % 0 = don't save. Just check the program.
 
 cd('C:\Users\raphi\Documents\Doctorat\Uday simulation\data') % RMT files location
-myname      = 'fluencecompared5';%_2layers_bloodvessel';% name for files: myname_T.bin, myname_H.mci  
+myname      = 'fluencea09p02';%_2layers_bloodvessel';% name for files: myname_T.bin, myname_H.mci  
 time_min    = 1;      	% RMT No longuer used time duration of the simulation [min] <----- run time -----
-Nphotons    = 14e6;      % RMT Number of photons used in the simulation.
-a_coef      = 0.1;    % RMT Biasing coefficient of the importance sampling
-p           = 0.5;      % RMT Probability of additional bias scattering.
-Ndetectors  = 1;      % RMT Number of detector in the simulation
+Nphotons    = 2e6;      % RMT Number of photons used in the simulation.
+a_coef      = 0.9;      % RMT Biasing coefficient of the importance sampling
+p           = 0.2;      % RMT Probability of additional bias scattering.
+Ndetectors  = 1;        % RMT Number of detector in the simulation
 nm          = 532;   	% desired wavelength of simulation
 Nbins       = 101;    	% # of bins in each dimension of cube  Nbins     
 binsize     = 0.0001; 	% size of each bin, eg. [cm] or [mm] binsize   
@@ -46,7 +46,7 @@ binsize     = 0.0001; 	% size of each bin, eg. [cm] or [mm] binsize
 % Set Monte Carlo launch flags
 mcflag      = 1;     	% launch: 0 = uniform beam, 1 = Gaussian, 2 = isotropic pt. 
                         % 3 = rectangular beam (use xfocus,yfocus for x,y halfwidths)
-launchflag  = 0;        % 0 = let mcxyz.c calculate launch trajectory
+launchflag  = 1;        % 0 = let mcxyz.c calculate launch trajectory
                         % 1 = manually set launch vector.
 boundaryflag = 2;       % 0 = no boundaries, 1 = escape at boundaries
                         % 2 = escape at surface only. No x, y, bottom z
@@ -77,22 +77,27 @@ uz0         = sqrt(1 - ux0^2 - uy0^2); % such that ux^2 + uy^2 + uz^2 = 1
 % Prepare Monte Carlo 
 %%%
 
-Nt = 2;
+Nt = 3;
 
-muav(1)  = 5;
-musv(1)  = 1000;
+muav(1)  = 0.001;
+musv(1)  = 0.01;
 gv(1)    = 0.9;
-muav(2)  = 10;
-musv(2)  = 2000;
-gv(2)   = 0.8;
+muav(2)  = 5;
+musv(2)  = 1000;
+gv(2)    = 0.9;
+muav(3)  = 10;
+musv(3)  = 2000;
+gv(3)   = 0.8;
 
 % Adding refractive index
 nr(1) = 1.3; %%%Edit the value
-nr(2) = 1.4; %%%Edit the value
+nr(2) = 1.3; %%%Edit the value
+nr(3) = 1.4; %%%Edit the value
 
 % Adding reflection chances
 mr(1) = 0;
 mr(2) = 0;
+mr(3) = 0;
 
 % Specify Monte Carlo parameters    
 Nx = Nbins;
@@ -120,8 +125,9 @@ if isinf(zfocus), zfocus = 1e12; end
 %   The tissue list is a library of possible tissue types.
 
 T = double ( zeros (Ny ,Nx ,Nz));
-T(:) = 1;
-T(:,:,31:end) = 2;
+T(:) = 2;
+T(:,:,1:2) = 1;
+T(:,:,31:end) = 3;
 
 zsurf = 0.000; %position of air/skin surface
 
