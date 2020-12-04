@@ -702,7 +702,7 @@ int main(int argc, const char * argv[])
                          if (L_current > 0 &&  det_num == Pick_det)
                          { // avoid NAN and zero likelihood, and avoid cross - detection
                              // Def: float *DetW, *DetL, *DetS, *DetZ;
-                              DetS  = malloc(sizeof(float));
+                             // DetS  = malloc(sizeof(float));
                              DetS = realloc(DetS,(c_photon+2)* sizeof(float)); //RMT
 							 DetS2 = realloc(DetS2,((c_photon+2)*Nt)* sizeof(float));
 							 DetE = realloc(DetE,(c_photon+2)* sizeof(float)); // RMT
@@ -711,7 +711,7 @@ int main(int argc, const char * argv[])
 							 {
 								 DetS2[Nt*c_photon+m] = s_total2[m];
 							 }
-							 //DetE[c_photon]=a_coef; // RMT, redone
+							 DetE[c_photon]=a_coef; // RMT, redone
                              DetID = realloc(DetID,(c_photon+2)* sizeof(int));
                              DetID[c_photon] = det_num;
                              DetW = realloc(DetW,(c_photon+2)* sizeof(float));

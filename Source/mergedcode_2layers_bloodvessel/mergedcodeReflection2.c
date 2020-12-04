@@ -56,15 +56,15 @@ double max2(double a, double b);
 double min2(double a, double b);
 double min3(double a, double b, double c);
 double myErfInv2(double rndE);
-double FindVoxelFace(double x1,double y1,double z1, double x2, double y2, double z2,
-					double dx,double dy,double dz, double ux, double uy, double uz);
-double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_det,
-        double detx, double det_radius, double det_z, double cos_accept,
-        int Ndetectors, double dx, double dy, double dz, double ux, double uy, double uz) ;
 double ReflectRefraction(double n1, double n2, double* x, double* y, double* z, double* ux, double* uy,
 					double* uz, int* face_dir, int* reflected);
 double MirrorReflection(double n1, double n2, double mr, double* x, double* y, double* z, double* ux, 
 					double* uy, double* uz, int* face_dir, int* reflected);
+double FindVoxelFace(double x1,double y1,double z1, double x2, double y2, double z2,
+					double dx,double dy,double dz, double ux, double uy, double uz);
+double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_det,
+        double detx, double det_radius, double det_z, double cos_accept,
+        int Ndetectors, double dx, double dy, double dz, double ux, double uy, double uz, int* face_dir) ;
 
 /* Propagation parameters */
 double	x, y, z;        /* photon position */
@@ -171,7 +171,7 @@ double det_z;
 double f_HG, f_B;
 long c_photon; // count collected photons
 int *DetID;
-float *DetW, *DetL, *DetS, *DetS2, *DetZ, *DetE; // RMT: I added DetE as a debugging variable for DetS
+float *DetW, *DetL, *DetS, *DetS2, *DetZ, *DetE; // RMT: I added DetE as a debugging variable for DetS Removed DetS since included in DetS
 /**** KE end : Declaration of variables ****/
 
 
@@ -279,6 +279,10 @@ int main(int argc, const char * argv[])
 		sscanf(buf, "%f", &musv[i]);	// scattering coeff [cm^-1]
 		fgets(buf, 32, fid);
 		sscanf(buf, "%f", &gv[i]);		// anisotropy of scatter [dimensionless]
+		fgets(buf, 32, fid);
+		sscanf(buf, "%f", &nrv[i]);		// refractive index
+		fgets(buf, 32, fid);
+		sscanf(buf, "%f", &mrv[i]);		// mirror reflection chances
 	}
     fclose(fid);
 
@@ -329,7 +333,9 @@ int main(int argc, const char * argv[])
     {
         printf("muav[%ld] = %0.4f [cm^-1]\n",i,muav[i]);
         printf("musv[%ld] = %0.4f [cm^-1]\n",i,musv[i]);
-        printf("  gv[%ld] = %0.4f [--]\n\n",i,gv[i]);
+        printf("  gv[%ld] = %0.4f [--]\n",i,gv[i]);
+		printf("  nrv[%ld] = %0.4f [--]\n",i,nrv[i]);
+		printf("  mrv[%ld] = %0.4f [--]\n\n",i,mrv[i]);
     }
 
     /* IMPORT BINARY TISSUE FILE */
@@ -394,7 +400,8 @@ int main(int argc, const char * argv[])
     c_photon = 0;
     //a = 0.925; //KE: Lima et al 2012
 	do {
-		t0 = clock(); //RMT
+		printf("test1 \n");
+		//t0 = clock(); //RMT
         // KE: while (i_photon < Nphotons) RMT: Main loop simulating all photons.
 		/**** LAUNCH: Initialize photon position and trajectory *****/
 		i_photon += 1;				/* increment photon count */
@@ -548,7 +555,7 @@ int main(int argc, const char * argv[])
 			}
 		} // end  use mcflag
 		/****************************/
-
+printf("test2 \n");
 		/* Get tissue voxel properties of launchpoint.
 		 * If photon beyond outer edge of defined voxels,
 		 * the tissue equals properties of outermost voxels.
@@ -569,6 +576,8 @@ int main(int argc, const char * argv[])
 		mua 	= muav[type];
 		mus 	= musv[type];
 		g 		= gv[type];
+		nr 		= nrv[type];
+		mr 		= mrv[type];
 
         bflag = 1;
         // initialize as 1 = inside volume, but later check as photon propagates.
@@ -576,9 +585,9 @@ int main(int argc, const char * argv[])
         // NOTE: must launch photons at tissue surface, or surfflag will go to 0.
         det_z = z; //KE
 		
-		t1 = clock()-t0; //RMT
-		t1s += t1; //RMT
-
+		//t1 = clock()-t0; //RMT
+		//t1s += t1; //RMT
+printf("test3 \n");
 		/* HOP_DROP_SPIN_CHECK
 		 Propagate one photon until it dies as determined by ROULETTE.
 		 *******/
@@ -615,6 +624,8 @@ int main(int argc, const char * argv[])
                  mua = muav[type];
                  mus = musv[type];
                  g = gv[type];
+				 nr = nrv[type];
+				 mr = mrv[type];
                  W = W_cont;
                  L_current = L_cont;
                  cont_exist = 0;
@@ -628,7 +639,7 @@ int main(int argc, const char * argv[])
 			// RMT: in this loop, we are looking at the different medium the photon is
 			//      going through. Where it is absorbed, detected or escape the simulation
                 s     = sleft/mus;				/* Step size [cm].*/
-                // printf("mus = %f\n",mus); // KE: check mus
+                // printf("s = %f\n",s); // KE: check mus
 
 				tempx = x + s*ux;				/* Update positions. [cm] */
 				tempy = y + s*uy;
@@ -652,7 +663,7 @@ int main(int argc, const char * argv[])
                     /* decrement WEIGHT by amount absorbed */
 					// If photon within volume of heterogeneity, deposit energy in F[].
 					// Normalize F[] later, when save output.
-                    if (bflag) F[i] += absorb;
+                    if (bflag) F[i] += absorb*L_current;
                     // only save data if blag==1, i.e., photon inside simulation cube
 
 					/* Update sleft */
@@ -668,7 +679,7 @@ int main(int argc, const char * argv[])
 					
 					
 					/* step to voxel face + "littlest step" so just inside new voxel. */
-                    s = ls + FindVoxelFace2(x, y, z, &det_num, Pick_det, detx, det_radius, det_z, cos_accept, Ndetectors, dx, dy, dz, ux, uy, uz);
+                    s = ls + FindVoxelFace2(x, y, z, &det_num, Pick_det, detx, det_radius, det_z, cos_accept, Ndetectors, dx, dy, dz, ux, uy, uz, &face_dir);
                     //s_total += s; // RMT Update the total distance here. Not suppose to be here
 
 					/*** DROP: Drop photon weight (W) into local bin  ***/
@@ -677,7 +688,7 @@ int main(int argc, const char * argv[])
 
 					// If photon within volume of heterogeneity, deposit energy in F[].
 					// Normalize F[] later, when save output.
-                    if (bflag) F[i] += absorb;
+                    if (bflag) F[i] += absorb*L_current;
 
                     if (det_num != -1)
                     { /* check if the photon is detected . */
@@ -687,7 +698,7 @@ int main(int argc, const char * argv[])
                       s_total += s;
 					  s_total2[type-1] += s;
 
-							tsave = clock();
+							//tsave = clock();
                          /* Save properties of interest */
                          if (L_current > 0 &&  det_num == Pick_det)
                          { // avoid NAN and zero likelihood, and avoid cross - detection
@@ -713,8 +724,8 @@ int main(int argc, const char * argv[])
                              /* increment collected photon count */
                              c_photon += 1;
                          }
-							tsave -= clock(); //RMT
-							tsaves += tsave; //RMT
+							//tsave -= clock(); //RMT
+							//tsaves += tsave; //RMT
                          // if( c_photon ==1) { printf (" OK at 590;\ n") ;}
                          photon_status = DEAD; // RMT This might need to be "dead"
                          sleft = 0;
@@ -742,6 +753,7 @@ int main(int argc, const char * argv[])
                         if (iy>Ny) iy=Ny;
                         if (ix<0)  ix=0;
                         if (iy<0)  iy=0;
+
 
                         //*** ESCAPE or not
                         if((surfflag==1) & (z<=zsurf)) // escape at surface
@@ -791,11 +803,38 @@ int main(int argc, const char * argv[])
                                 if (iy<0)   {iy=0;    bflag = 0;}
                             }
                             // update pointer to tissue type
+							tempi = i;
                             i    = (long)(iz*Ny*Nx + ix*Ny + iy);
-                            type = v[i];
-                            mua  = muav[type];
-                            mus  = musv[type];
-                            g    = gv[type];
+							n1 = nr;
+							type = v[i];
+							n2 = nrv[type];
+							mr = mrv[type];
+							reflected = 0;
+							// RMT check if reflection
+							if (mr != 0 && face_dir == 3)
+							{
+								// RMT add mirror reflection
+								MirrorReflection(n1, n2, mr, &x, &y, &z, &ux, &uy, &uz, &face_dir, &reflected);
+							}
+							else
+							{
+								// RMT check if change in index of refraction and apply reflection/refraction
+								if(n1 != n2) 
+								{
+									ReflectRefraction(n1, n2, &x, &y, &z, &ux, &uy, &uz, &face_dir, &reflected);
+								}
+							}
+							// Update the optical properties depending if in next or same voxel
+							if(reflected == 1)
+							{
+								i = tempi;
+							}
+							type = v[i];
+							mua  = muav[type];
+							mus  = musv[type];
+							g    = gv[type];
+							nr	 = nrv[type];
+							mr	 = mrv[type];
 
                         }
                     }
@@ -803,8 +842,9 @@ int main(int argc, const char * argv[])
 
 			} while(sleft>0); //do...while
 
-			t2 = clock() - t1; //RMT
-			t2s += t2; //RMT
+printf("test4 \n");
+			//t2 = clock() - t1; //RMT
+			//t2s += t2; //RMT
 
             /***
             * KE start: this part is from the A.4 of Zhao's thesis
@@ -1080,8 +1120,8 @@ int main(int argc, const char * argv[])
                   uz = uzz;
 					}
 				}
-				t3 = clock()-t2;
-				t3s += t3;
+				//t3 = clock()-t2;
+				//t3s += t3;
 			/***
 			* KE end : this part is from the A.4 of Zhao's thesis
 			***/
@@ -1103,6 +1143,8 @@ int main(int argc, const char * argv[])
         /* if ALIVE, continue propagating */
 		/* If photon DEAD, then launch new photon. */
 
+printf("i_photon = %ld, \n",i_photon);
+
 	} while (i_photon < Nphotons);  /* end RUN */
 	//RMT: End of the monte carlo simulation. All photons were simulated.
 
@@ -1114,10 +1156,10 @@ int main(int argc, const char * argv[])
 	time_min = (double)(finish_time-start_time)/CLOCKS_PER_SEC/60;
 	printf("Elapsed Time for %0.3e photons = %5.3f min\n",Nphotons,time_min);
 	printf("%0.2e photons per minute\n", Nphotons/time_min);
-	printf("%0.2e saving files\n", tsaves/CLOCKS_PER_SEC/60);
-	printf("%0.2e set photon start\n", t1s/CLOCKS_PER_SEC/60);
-	printf("%0.2e propagate\n", t2s/CLOCKS_PER_SEC/60);
-	printf("%0.2e spin and split\n", t3s/CLOCKS_PER_SEC/60);
+	//printf("%0.2e saving files\n", tsaves/CLOCKS_PER_SEC/60);
+	//printf("%0.2e set photon start\n", t1s/CLOCKS_PER_SEC/60);
+	//printf("%0.2e propagate\n", t2s/CLOCKS_PER_SEC/60);
+	//printf("%0.2e spin and split\n", t3s/CLOCKS_PER_SEC/60);
     /**** SAVE
      Convert data to relative fluence rate [cm^-2] and save.
      *****/
@@ -1375,66 +1417,6 @@ double min3(double a, double b, double c) {
     return m;
 }
 
-
-
-/***********************************************************
- *	FRESNEL REFLECTANCE
- * Computes reflectance as photon passes from medium 1 to
- * medium 2 with refractive indices n1,n2. Incident
- * angle a1 is specified by cosine value ca1 = cos(a1).
- * Program returns value of transmitted angle a1 as
- * value in *ca2_Ptr = cos(a2).
- ****/
-double RFresnel(double n1,		/* incident refractive index.*/
-                double n2,		/* transmit refractive index.*/
-                double ca1,		/* cosine of the incident */
-                /* angle a1, 0<a1<90 degrees. */
-                double *ca2_Ptr) 	/* pointer to the cosine */
-/* of the transmission */
-/* angle a2, a2>0. */
-{
-    double r;
-
-    if(n1==n2) { /** matched boundary. **/
-        *ca2_Ptr = ca1;
-        r = 0.0;
-	}
-    else if(ca1>(1.0 - 1.0e-12)) { /** normal incidence. **/
-        *ca2_Ptr = ca1;
-        r = (n2-n1)/(n2+n1);
-        r *= r;
-	}
-    else if(ca1< 1.0e-6)  {	/** very slanted. **/
-        *ca2_Ptr = 0.0;
-        r = 1.0;
-	}
-    else  {			  		/** general. **/
-        double sa1, sa2; /* sine of incident and transmission angles. */
-        double ca2;      /* cosine of transmission angle. */
-        sa1 = sqrt(1-ca1*ca1);
-        sa2 = n1*sa1/n2;
-        if(sa2>=1.0) {
-            /* double check for total internal reflection. */
-            *ca2_Ptr = 0.0;
-            r = 1.0;
-		}
-        else {
-            double cap, cam;	/* cosines of sum ap or diff am of the two */
-            /* angles: ap = a1 + a2, am = a1 - a2. */
-            double sap, sam;	/* sines. */
-            *ca2_Ptr = ca2 = sqrt(1-sa2*sa2);
-            cap = ca1*ca2 - sa1*sa2; /* c+ = cc - ss. */
-            cam = ca1*ca2 + sa1*sa2; /* c- = cc + ss. */
-            sap = sa1*ca2 + ca1*sa2; /* s+ = sc + cs. */
-            sam = sa1*ca2 - ca1*sa2; /* s- = sc - cs. */
-            r = 0.5*sam*sam*(cam*cam+cap*cap)/(sap*sap*cam*cam);
-            /* rearranged for speed. */
-		}
-	}
-    return(r);
-} /******** END SUBROUTINE **********/
-
-
 /***********************************************************
  *	FRESNEL REFLECTANCE & Refraction - RMT
  * Computes reflectance as photon passes from medium 1 to
@@ -1638,7 +1620,6 @@ double MirrorReflection(double n1, double n2, double mr, double* x, double* y, d
 	
 } /******** END SUBROUTINE **********/
 
-
 /***********************************************************
  *	Reverse Erf function - RMT
  * Used to calculate the gaussian beam profil. Is an approximation.
@@ -1662,6 +1643,64 @@ double myErfInv2(double rndE)
 
    return(sgn*sqrtf(-tt1 + sqrtf(tt1*tt1 - tt2)));
 	
+} /******** END SUBROUTINE **********/
+
+
+/***********************************************************
+ *	FRESNEL REFLECTANCE
+ * Computes reflectance as photon passes from medium 1 to
+ * medium 2 with refractive indices n1,n2. Incident
+ * angle a1 is specified by cosine value ca1 = cos(a1).
+ * Program returns value of transmitted angle a1 as
+ * value in *ca2_Ptr = cos(a2).
+ ****/
+double RFresnel(double n1,		/* incident refractive index.*/
+                double n2,		/* transmit refractive index.*/
+                double ca1,		/* cosine of the incident */
+                /* angle a1, 0<a1<90 degrees. */
+                double *ca2_Ptr) 	/* pointer to the cosine */
+/* of the transmission */
+/* angle a2, a2>0. */
+{
+    double r;
+
+    if(n1==n2) { /** matched boundary. **/
+        *ca2_Ptr = ca1;
+        r = 0.0;
+	}
+    else if(ca1>(1.0 - 1.0e-12)) { /** normal incidence. **/
+        *ca2_Ptr = ca1;
+        r = (n2-n1)/(n2+n1);
+        r *= r;
+	}
+    else if(ca1< 1.0e-6)  {	/** very slanted. **/
+        *ca2_Ptr = 0.0;
+        r = 1.0;
+	}
+    else  {			  		/** general. **/
+        double sa1, sa2; /* sine of incident and transmission angles. */
+        double ca2;      /* cosine of transmission angle. */
+        sa1 = sqrt(1-ca1*ca1);
+        sa2 = n1*sa1/n2;
+        if(sa2>=1.0) {
+            /* double check for total internal reflection. */
+            *ca2_Ptr = 0.0;
+            r = 1.0;
+		}
+        else {
+            double cap, cam;	/* cosines of sum ap or diff am of the two */
+            /* angles: ap = a1 + a2, am = a1 - a2. */
+            double sap, sam;	/* sines. */
+            *ca2_Ptr = ca2 = sqrt(1-sa2*sa2);
+            cap = ca1*ca2 - sa1*sa2; /* c+ = cc - ss. */
+            cam = ca1*ca2 + sa1*sa2; /* c- = cc + ss. */
+            sap = sa1*ca2 + ca1*sa2; /* s+ = sc + cs. */
+            sam = sa1*ca2 - ca1*sa2; /* s- = sc - cs. */
+            r = 0.5*sam*sam*(cam*cam+cap*cap)/(sap*sap*cam*cam);
+            /* rearranged for speed. */
+		}
+	}
+    return(r);
 } /******** END SUBROUTINE **********/
 
 
@@ -1790,7 +1829,7 @@ double FindVoxelFace(double x1,double y1,double z1, double x2, double y2, double
 // KE: We also check whether the photon packet is detected by the assigned detector
 /* How much step size will the photon take to get the first voxel crossing in one single
 	long step? */ //
-double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_det, double detx, double det_radius, double det_z, double cos_accept, int Ndetectors, double dx, double dy, double dz, double ux, double uy, double uz)
+double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_det, double detx, double det_radius, double det_z, double cos_accept, int Ndetectors, double dx, double dy, double dz, double ux, double uy, double uz, int* face_dir)
 {
 
     // KE: ix1, iy1, iz1: indices of the voxel where the photon is currently in
@@ -1822,6 +1861,9 @@ double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_de
 			if (fabs(x1 + s * ux - detx) <= det_radius)
                 *det_num = Pick_det;
 		}
+		if (s == xs) *face_dir = 1;		
+		else if (s == ys) *face_dir = 2;
+		else if (s == zs) *face_dir = 3;
         return (s);
 }
 double RFresnel(double n1, double n2, double ca1, double *ca2_Ptr);
