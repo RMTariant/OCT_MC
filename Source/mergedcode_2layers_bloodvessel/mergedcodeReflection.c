@@ -171,7 +171,7 @@ double det_z;
 double f_HG, f_B;
 long c_photon; // count collected photons
 int *DetID;
-float *DetW, *DetL, *DetS2, *DetZ; // RMT: I added DetE as a debugging variable for DetS Removed DetS since included in DetS
+float *DetW, *DetL, *DetS, *DetS2, *DetZ, *DetE; // RMT: I added DetE as a debugging variable for DetS Removed DetS since included in DetS
 /**** KE end : Declaration of variables ****/
 
 
@@ -350,9 +350,9 @@ int main(int argc, const char * argv[])
 	R  = (float *)malloc(Nyx*sizeof(float));	/* escaping flux [W/cm^2/W.delivered] */
 
     DetID  = malloc(sizeof(int));	// KE: photon ID at det_num
-    //DetS = malloc(sizeof(float)); // KE: photon path length
+    DetS = malloc(sizeof(float)); // KE: photon path length
 	DetS2 = malloc(sizeof(float)); // KE: photon path length
-	//DetE = malloc(sizeof(float)); // RMT: Debugging variable. Plays no role.
+	DetE = malloc(sizeof(float)); // RMT: Debugging variable. Plays no role.
     DetW  = malloc(sizeof(float));	// KE: photon weight
     DetL  = malloc(sizeof(float));	// KE: likelihood ratio
     DetZ  = malloc(sizeof(float));	// KE: photons reached depth
@@ -702,11 +702,11 @@ int main(int argc, const char * argv[])
                          if (L_current > 0 &&  det_num == Pick_det)
                          { // avoid NAN and zero likelihood, and avoid cross - detection
                              // Def: float *DetW, *DetL, *DetS, *DetZ;
-                             // DetS  = malloc(sizeof(float));
-                             //DetS = realloc(DetS,(c_photon+2)* sizeof(float)); //RMT
+                              DetS  = malloc(sizeof(float));
+                             DetS = realloc(DetS,(c_photon+2)* sizeof(float)); //RMT
 							 DetS2 = realloc(DetS2,((c_photon+2)*Nt)* sizeof(float));
-							 //DetE = realloc(DetE,(c_photon+2)* sizeof(float)); // RMT
-                             //DetS[c_photon]=s_total; //RMT
+							 DetE = realloc(DetE,(c_photon+2)* sizeof(float)); // RMT
+                             DetS[c_photon]=s_total; //RMT
 							 for (m=0; m<Nt; m++)
 							 {
 								 DetS2[Nt*c_photon+m] = s_total2[m];
@@ -1164,12 +1164,12 @@ int main(int argc, const char * argv[])
 
 
 
-    //strcpy(filename,myname);
-    //strcat(filename,"_DetS.bin");
-    //printf("saving %s\n",filename);
-    //fid = fopen(filename, "wb");   /* 3D voxel output */
-    //fwrite(DetS, sizeof(float), c_photon, fid);
-    //fclose(fid);
+    strcpy(filename,myname);
+    strcat(filename,"_DetS.bin");
+    printf("saving %s\n",filename);
+    fid = fopen(filename, "wb");   /* 3D voxel output */
+    fwrite(DetS, sizeof(float), c_photon, fid);
+    fclose(fid);
 	
     strcpy(filename,myname);
     strcat(filename,"_DetS2.bin");
@@ -1178,12 +1178,12 @@ int main(int argc, const char * argv[])
     fwrite(DetS2, sizeof(float), c_photon*Nt, fid);
     fclose(fid);
 
-	//strcpy(filename,myname); // RMT extra saved data. Whole paragraph was added.
-    //strcat(filename,"_DetE.bin");
-    //printf("saving %s\n",filename);
-    //fid = fopen(filename, "wb");   /* 3D voxel output */
-    //fwrite(DetE, sizeof(float), c_photon, fid);
-    //fclose(fid);
+	strcpy(filename,myname); // RMT extra saved data. Whole paragraph was added.
+    strcat(filename,"_DetE.bin");
+    printf("saving %s\n",filename);
+    fid = fopen(filename, "wb");   /* 3D voxel output */
+    fwrite(DetE, sizeof(float), c_photon, fid);
+    fclose(fid);
 
      // Save the binary file
     strcpy(filename,myname);
@@ -1261,9 +1261,9 @@ int main(int argc, const char * argv[])
     free(R);
     free(DetID);
     free(DetW);
-    //free(DetS);
+    free(DetS);
 	free(DetS2);
-	//free(DetE); // RMT, added probe
+	free(DetE); // RMT, added probe
     free(DetL);
     free(DetZ);
     return 0;

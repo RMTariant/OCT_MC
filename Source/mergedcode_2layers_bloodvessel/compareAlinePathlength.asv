@@ -51,13 +51,11 @@ end
 figure
 plot(db(counts))
 
-clear testW testL testQ testC
 for n = 129:137
     sel = and((pL > (dz*(n-1))),(pL < (dz*n)));
-    testW(n-128) = sum(W(sel));
-    testL(n-128) = sum(L(sel));
-    testQ(n-128) = sum(sel);
-    testC(n-128) = sum(W(sel).*L(sel));
+    testW
+    testL
+    testQ = sum(sel);
 end
 
 % plot(z*2,db(mean(OCT,2)))

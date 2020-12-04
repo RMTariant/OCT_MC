@@ -1,28 +1,29 @@
 %% Parameters
 
 %File name
-myname = 'gaussiantest2'; %%%%CHOOSE VALUE%%%%
+addpath('C:\Users\raphi\Documents\Doctorat\Uday simulation\data')
+myname = 'fluencea09p02'; %%%%CHOOSE VALUE%%%%
 %Number of photon loaded at the same time
-nph = 40000; %%%%CHOOSE VALUE%%%%
+nph = 100000; %%%%CHOOSE VALUE%%%%
 %Limit the total number of loaded photons
-maxnph = 100000;
+maxnph = 1000000;
 %OCT wavelengths IN CENTIMETERS
-lambda_start = 900e-7; %%%%CHOOSE VALUE%%%%
-lambda_stop = 1600e-7; %%%%CHOOSE VALUE%%%%
+lambda_start = 1150e-7; %%%%CHOOSE VALUE%%%%
+lambda_stop = 1450e-7; %%%%CHOOSE VALUE%%%%
 %Number of sample point of the OCT wavelength width
 samplePoints= 2048; %%%%CHOOSE VALUE%%%%
 %Choose to apply electric filter. Put a high value if none
-maxDepth = 1.12; %%%%CHOOSE VALUE%%%%
+maxDepth = 0.25; %%%%CHOOSE VALUE%%%%
 %Remove the photon with very high likelihood
 L_filter = 1; %%%%CHOOSE VALUE%%%%
 %Compress image for refractive index
 n_cor = 1;
 %Chosse refractive of the different mediums. Index. Can be a function of the wavelength
 rn = ones(samplePoints,5); %%%%CHOOSE VALUE%%%%
-rn(1:samplePoints,1) = 1.0; %%%%CHOOSE VALUE%%%%
-rn(1:samplePoints,2) = 1.0; %%%%CHOOSE VALUE%%%%
-rn(1:samplePoints,3) = 1.0; %%%%CHOOSE VALUE%%%%
-rn(1:samplePoints,4) = 1.0; %%%%CHOOSE VALUE%%%%
+rn(1:samplePoints,1) = 1; %%%%CHOOSE VALUE%%%%
+rn(1:samplePoints,2) = 1.4; %%%%CHOOSE VALUE%%%%
+rn(1:samplePoints,3) = 1; %%%%CHOOSE VALUE%%%%
+rn(1:samplePoints,4) = 1; %%%%CHOOSE VALUE%%%%
 noise_amp = 0; %%%Choose amplitude of noise%%%
 
 
@@ -90,14 +91,14 @@ tic
     fclose(fid);
 toc
 
-% Load E probing varaible
-filename = sprintf('%s_DetE.bin',myname);
-disp(['loading ' filename])
-tic
-    fid = fopen(filename, 'rb');
-    DetE = fread(fid, 'float');
-    fclose(fid);
-toc
+% % Load E probing varaible
+% filename = sprintf('%s_DetE.bin',myname);
+% disp(['loading ' filename])
+% tic
+%     fid = fopen(filename, 'rb');
+%     DetE = fread(fid, 'float');
+%     fclose(fid);
+% toc
 
 %Limit the number of photons
 maxnph = min([length(DetL) maxnph]);
@@ -105,12 +106,12 @@ DetS2 = DetS2(1:Nt*maxnph);
 DetW = DetW(1:maxnph);
 DetL = DetL(1:maxnph);
 DetID = DetID(1:maxnph);
-DetE = DetE(1:maxnph);
+% DetE = DetE(1:maxnph);
 
 %% Remove the outliers using .9 quantile of L 
 
 L_threshold = quantile(DetL,L_filter);
-ix = find(DetL < L_threshold );
+ix = find(DetL <= L_threshold );
 % end of removing outliers
 %% Load the saved photons
 % S = DetS(ix)'; % row vectors
@@ -235,6 +236,10 @@ title('')
 xlabel('Position [cm]')
 ylabel('Depth [cm]')
 caxis([-261 305])
+
+%% Average everything!
+figure
+plot(z,db(mean(OCT,2)))
 
 %% Save the A- scan
 % ID=DetID;

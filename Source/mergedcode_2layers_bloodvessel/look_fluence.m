@@ -9,7 +9,7 @@
 %     sz = 12; fz = 9; fz2 = 7; % for screen display
 % end
 
-myname = 'fluencea09p02v1'; nm = 532;
+myname = 'fluencea001p02'; nm = 532;
 cd('C:\Users\raphi\Documents\Doctorat\Uday simulation\data')
 
 % Load header file
@@ -56,61 +56,27 @@ for i=1:Nt
     j=j+1;
 end
 
-reportHmci(myname)
 
-%% Load path lengths of detected photons DetS
-filename = sprintf('%s_DetS.bin',myname);
-disp(['loading ' filename])
-tic
-    fid = fopen(filename, 'rb');
-    DetS = fread(fid, 'float');
-    fclose(fid);
-toc
+% Nphoton = A(1);
+% Nx = A(2);
+% Ny = A(3);
+% Nz = A(4);
+% dx = A(5);
+% dy = A(6);
+% dz = A(7);
+% 
+% Nt = A(22);
+% j = Nt;
+% for i=1:Nt
+%     j=j+1;
+%     muav(i,1) = A(j);
+%     j=j+1;
+%     musv(i,1) = A(j);
+%     j=j+1;
+%     gv(i,1) = A(j);
+% end
 
-%% Load path lengths of detected photons DetS
-filename = sprintf('%s_DetS2.bin',myname);
-disp(['loading ' filename])
-tic
-    fid = fopen(filename, 'rb');
-    DetS2 = fread(fid, 'float');
-    fclose(fid);
-toc
 
-%% Load weights of detected photons DetW
-filename = sprintf('%s_DetW.bin',myname);
-disp(['loading ' filename])
-tic
-    fid = fopen(filename, 'rb');
-    DetW = fread(fid, 'float');
-    fclose(fid);
-toc
-
-%% Load likelihood ratios of detected photons DetL
-filename = sprintf('%s_DetL.bin',myname);
-disp(['loading ' filename])
-tic
-    fid = fopen(filename, 'rb');
-    DetL = fread(fid, 'float');
-    fclose(fid);
-toc
-
-%% Load IDs of detected photons DetID
-filename = sprintf('%s_DetID.bin',myname);
-disp(['loading ' filename])
-tic
-    fid = fopen(filename, 'rb');
-    DetID = fread(fid, 'int');
-    fclose(fid);
-toc
-
-%% Load E probing varaible
-filename = sprintf('%s_DetE.bin',myname);
-disp(['loading ' filename])
-tic
-    fid = fopen(filename, 'rb');
-    DetE = fread(fid, 'float');
-    fclose(fid);
-toc
 
 %% Load Fluence rate F(y,x,z) 
 filename = sprintf('%s_F.bin',myname);
@@ -135,21 +101,7 @@ T = reshape(Data,Ny,Nx,Nz); % T(y,x,z)
 
 clear Data
 
-%% Load Escaping flux R(y,x) at zsurf
-filename = sprintf('%s_Ryx.bin',myname);
-disp(['loading ' filename])
-tic
-    fid = fopen(filename, 'rb');
-    [Data count] = fread(fid, Ny*Nx, 'float');
-    fclose(fid);
-toc
-Ryx = reshape(Data,Ny,Nx); % Ryx(y,x)
 
-%% Rd
-filename = sprintf('%s_Rd.dat',myname);
-disp(['loading ' filename])
-Rd = load(filename);
-fprintf('Rd = %0.4f\n',Rd)
 
 %%
 F = F/sum(F(~isnan(F(:))));
@@ -167,6 +119,7 @@ Fzx = reshape(F(round(Ny/2),:,:),Nx,Nz)'; % in z,x plane through source
 %Fzx_norm = Fzx ./ max(Fzx(:));
 figure;clf %deletes from the current figure all graphic objects
 imagesc(x,z,log10(Fzx)) % specifies image location
+F3 = Fzx;
 % x and z specify the locations of the corner corresponding to 
 % log10(Fzx)(1,1) and log10(Fzx)(m,n)
 %imagesc(x,z,log10(Fzx_norm))
@@ -175,19 +128,19 @@ imagesc(x,z,log10(Fzx)) % specifies image location
 % image. The resulting image is an m-by-n grid of pixels with m rows and n
 % columns in log10(Fzx). The row and column indices of the elements
 % determine the centers of the corresponding pixels.
-hold on
-text(max(x)*1.2,min(z)-0.04*max(z),'log_{10}( \phi )','fontsize',fz)
-colorbar % displays a vertical colorbar to thhe right of the current axes or chart
-% displays the current colormap and indicate the mapping of data values
-% into the colormap
-set(gca,'fontsize',sz)
-xlabel('x [cm]')
-ylabel('z [cm]')
-title('Fluence \phi [W/cm^2/W.delivered] ','fontweight','normal','fontsize',fz)
-%colormap(makec2f)
-%colormap(map) %sets the colormap for the current figure to the colormap
-%specified by map
-axis equal image
+% hold on
+% % text(max(x)*1.2,min(z)-0.04*max(z),'log_{10}( \phi )','fontsize',fz)
+% colorbar % displays a vertical colorbar to thhe right of the current axes or chart
+% % displays the current colormap and indicate the mapping of data values
+% % into the colormap
+% set(gca,'fontsize',sz)
+% xlabel('x [cm]')
+% ylabel('z [cm]')
+% title('Fluence \phi [W/cm^2/W.delivered] ','fontweight','normal','fontsize',fz)
+% %colormap(makec2f)
+% %colormap(map) %sets the colormap for the current figure to the colormap
+% %specified by map
+% axis equal image
 %axis([min(x) max(x) min(z) max(z)])
 %text(min(x)-0.2*max(x),min(z)-0.08*max(z),sprintf('runtime = %0.1f min',time_min),...
 %    'fontsize',fz2)
@@ -197,13 +150,153 @@ axis equal image
 %     savefig(name)
 % end
 
-%% Look at attenuation at center
-figure
-plot(db(Fzx(:,round(Nx/2))))
+%%
+%%%%%%%%%%
+myname = 'fluencea001p02'; nm = 532;
+cd('C:\Users\raphi\Documents\Doctorat\Uday simulation\data')
 
-% att2 = squeeze(fluence.data(:,51,51));
-% att1 = squeeze(F(51,51,:));
-% 
-% att22 = att2(40:70);
-% att12 = att1(40:70);
+% Load header file
+filename = sprintf('%s_F.bin',myname);
+disp(['loading ' filename])
+tic
+    fid = fopen(filename, 'rb');
+    [Data count] = fread(fid, Ny*Nx*Nz, 'float');
+    fclose(fid);
+toc
+F = reshape(Data,Ny,Nx,Nz); % F(y,x,z)
+F1 = reshape(F(round(Ny/2),:,:),Nx,Nz)'; % in z,x plane through source
+
+%%%%%%%%
+myname = 'fluencea09p02'; nm = 532;
+cd('C:\Users\raphi\Documents\Doctorat\Uday simulation\data')
+
+% Load header file
+filename = sprintf('%s_F.bin',myname);
+disp(['loading ' filename])
+tic
+    fid = fopen(filename, 'rb');
+    [Data count] = fread(fid, Ny*Nx*Nz, 'float');
+    fclose(fid);
+toc
+F = reshape(Data,Ny,Nx,Nz); % F(y,x,z)
+F2 = reshape(F(round(Ny/2),:,:),Nx,Nz)'; % in z,x plane through source
+
+%%%%%%%%
+myname = 'fluencea09p05'; nm = 532;
+cd('C:\Users\raphi\Documents\Doctorat\Uday simulation\data')
+
+% Load header file
+filename = sprintf('%s_F.bin',myname);
+disp(['loading ' filename])
+tic
+    fid = fopen(filename, 'rb');
+    [Data count] = fread(fid, Ny*Nx*Nz, 'float');
+    fclose(fid);
+toc
+F = reshape(Data,Ny,Nx,Nz); % F(y,x,z)
+F3 = reshape(F(round(Ny/2),:,:),Nx,Nz)'; % in z,x plane through source
+
+%%%%%%%%
+myname = 'fluencea09p02_o'; nm = 532;
+cd('C:\Users\raphi\Documents\Doctorat\Uday simulation\data')
+
+% Load header file
+filename = sprintf('%s_F.bin',myname);
+disp(['loading ' filename])
+tic
+    fid = fopen(filename, 'rb');
+    [Data count] = fread(fid, Ny*Nx*Nz, 'float');
+    fclose(fid);
+toc
+F = reshape(Data,Ny,Nx,Nz); % F(y,x,z)
+F4 = reshape(F(round(Ny/2),:,:),Nx,Nz)'; % in z,x plane through source
+
+%%%%%%%%
+F5 = fluence.data;
+F5 = reshape(F5(:,:,51),101,101);
+
+
+%% Look at attenuation at center
+
+F1 = F1./F1(10,51);
+F2 = F2./F2(10,51);
+F3 = F3./F3(10,51);
+F4 = F4./F4(10,51);
+F5 = F5./F5(10,51);
+
+figure
+imagesc(x*10,z*10,log10(F1))
+xlabel('x [mm]')
+ylabel('z [mm]')
+title('p=0.2, a=0.001')
+h = colorbar;
+set(get(h,'label'),'string','Intensity (log10)');
+caxis([-5.35 0.25]) 
+figure
+imagesc(x*10,z*10,log10(F2))
+h = colorbar;
+set(get(h,'label'),'string','Intensity (log10)');
+xlabel('x [mm]')
+ylabel('z [mm]')
+title('p=0.2, a=0.9')
+caxis([-5.35 0.25]) 
+figure
+imagesc(x*10,z*10,log10(F3))
+h = colorbar;
+set(get(h,'label'),'string','Intensity (log10)');
+xlabel('x [mm]')
+ylabel('z [mm]')
+title('p=0.5, a=0.9')
+caxis([-5.35 0.25]) 
+figure
+imagesc(x*10,z*10,log10(F4))
+h = colorbar;
+set(get(h,'label'),'string','Intensity (log10)');
+xlabel('x [mm]')
+ylabel('z [mm]')
+title('original Steve-Jacques')
+caxis([-5.35 0.25]) 
+figure
+imagesc(x*10,z*10,log10(F5))
+h = colorbar;
+set(get(h,'label'),'string','Intensity (log10)');
+xlabel('x [mm]')
+ylabel('z [mm]')
+title('MTX simulator')
+caxis([-5.35 0.25]) 
+
+
+figure
+n = 51;
+plot(x*10,log10(F1(:,n)),x*10,log10(F2(:,n)),x*10,log10(F3(:,n)),x*10,log10(F4(:,n)),x*10,log10(F5(:,n)))
+legend('p=0.2, a=0.001','p=0.2, a=0.9','p=0.5, a=0.9','original Steve-Jacques','MTX simulator')
+ylabel('Intensity (log10)')
+xlabel('z [mm]')
+title('Intensity in the middle vs depth')
+
+figure
+n = 65;
+plot(x*10,log10(F1(:,n)),x*10,log10(F2(:,n)),x*10,log10(F3(:,n)),x*10,log10(F4(:,n)),x*10,log10(F5(:,n)))
+legend('p=0.2, a=0.001','p=0.2, a=0.9','p=0.5, a=0.9','original Steve-Jacques','MTX simulator')
+ylabel('Intensity (log10)')
+xlabel('z [mm]')
+title('Intensity on the side vs depth')
+
+figure
+n = 20;
+plot(x*10,log10(F1(n,:)),x*10,log10(F2(n,:)),x*10,log10(F3(n,:)),x*10,log10(F4(n,:)),x*10,log10(F5(n,:)))
+legend('p=0.2, a=0.001','p=0.2, a=0.9','p=0.5, a=0.9','original Steve-Jacques','MTX simulator')
+ylabel('Intensity (log10)')
+xlabel('x [mm]')
+title('Intensity at z = 0.02 mm')
+
+figure
+n = 80;
+plot(x*10,log10(F1(n,:)),x*10,log10(F2(n,:)),x*10,log10(F3(n,:)),x*10,log10(F4(n,:)),x*10,log10(F5(n,:)))
+legend('p=0.2, a=0.001','p=0.2, a=0.9','p=0.5, a=0.9','original Steve-Jacques','MTX simulator')
+ylabel('Intensity (log10)')
+xlabel('x [mm]')
+title('Intensity at z = 0.08 mm')
+
+
 
