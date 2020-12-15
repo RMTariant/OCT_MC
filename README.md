@@ -127,7 +127,7 @@ nrv: Possible refractive index in the simulation
 cont_exist: Determines if a photon will split and continue moving? 0=no and 1=yes  
 first_bias_done: Determines if a scaterred bias has occured yet =1 or not =0  
 temp: Temporary variable used to calculate part of an equation in order tos shorten it.  
-costheta_B: Random result of cos(theta_B). theta_B is the random bias axial angle between the detector and scattered direction  
+theta_B: Random result of cos(theta_B). theta_B is the random bias axial angle between the detector and scattered direction  
 sintheta_B: Random result of sin(theta_B). theta_B is the random bias axial angle between the detector and scattered direction  
 psi: Random psi angle determining the lateral direction  
 cospsi: cos(psi)  
