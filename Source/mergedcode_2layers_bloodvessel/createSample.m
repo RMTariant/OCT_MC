@@ -38,10 +38,11 @@ time_min    = 1;      	% RMT No longuer used time duration of the simulation [mi
 Nphotons    = 1e7;      % RMT Number of photons used in the simulation.
 a_coef      = 0.9;      % RMT Biasing coefficient of the importance sampling
 p           = 0.5;      % RMT Probability of additional bias scattering.
-Ndetectors  = 800;        % RMT Number of detector in the simulation
-nm          = 532;   	% desired wavelength of simulation
+Ndetectors  = 800;      % RMT Number of detector in the simulation
+cos_accept  = 0.99619;  % RMT Cosine of the accepted angle of photon being detected
+det_radius  = 0.001;    % RMT Radius of the detector [cm] at the detector (warning, in the case of OCT, this would be the beam radius at the imaging lens)
 Nbins       = 11;    	% # of bins in each dimension of cube  Nbins     
-binsize     = 0.03; 	% size of each bin, eg. [cm] or [mm] binsize   
+binsize     = 0.03; 	% size of each bin, eg. [cm] binsize   
 
 % Set Monte Carlo launch flags
 mcflag      = 1;     	% launch: 0 = uniform beam, 1 = Gaussian, 2 = isotropic pt. 
@@ -160,6 +161,8 @@ if SAVEON
         fprintf(fid,'%0.4f\n',a_coef);
         fprintf(fid,'%0.4f\n',p);
         fprintf(fid,'%0.0f\n',Ndetectors);
+        fprintf(fid,'%0.4f\n',cos_accept);
+        fprintf(fid,'%0.4f\n',det_radius);
         fprintf(fid,'%d\n'   ,Nx);
         fprintf(fid,'%d\n'   ,Ny);
         fprintf(fid,'%d\n'   ,Nz);

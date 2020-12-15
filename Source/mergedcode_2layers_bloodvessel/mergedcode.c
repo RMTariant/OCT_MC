@@ -200,6 +200,10 @@ int main(int argc, const char * argv[])
 	fgets(buf, 32, fid);
 	sscanf(buf, "%d", &Ndetectors); // RMT chance of a foward photon doing a bias scattering.
 	fgets(buf, 32, fid);
+	sscanf(buf, "%f", &cos_accept); // RMT cosine of the angle of the detected photon.
+	fgets(buf, 32, fid);
+	sscanf(buf, "%f", &det_radius); // RMT radius of the area where a photon is detected.
+	fgets(buf, 32, fid);
 	sscanf(buf, "%d", &Nx);  // # of bins
 	fgets(buf, 32,fid);
 	sscanf(buf, "%d", &Ny);  // # of bins
@@ -274,6 +278,7 @@ int main(int argc, const char * argv[])
     printf("Nx = %d, dx = %0.4f [cm]\n",Nx,dx);
     printf("Ny = %d, dy = %0.4f [cm]\n",Ny,dy);
     printf("Nz = %d, dz = %0.4f [cm]\n",Nz,dz);
+	printf("det_radius = %0.4f, det_radius = %0.4f [cm]\n",cos_accept,det_radius);
 
     printf("xs = %0.4f [cm]\n",xs);
     printf("ys = %0.4f [cm]\n",ys);
@@ -402,8 +407,8 @@ int main(int argc, const char * argv[])
 		}
         z_max = 0; /* photon 's initial depth reached */
         //Ndetectors = 512; // KE: number of detectors RMT: Changed to one for debugging
-        det_radius = 0.001; //KE: Zhao's thesis chapter 3.3.4 10micro m
-        cos_accept = cos(5); //KE: Zhao's thesis chapter 3.3.4
+        //det_radius = 0.001; //KE: Zhao's thesis chapter 3.3.4 10micro m RMT: Now inserted by file.
+        //cos_accept = cos(5); //KE: Zhao's thesis chapter 3.3.4 RMT: Now inserted by file.
 
         //a = (double) RandomGen(1, 0, NULL); //KE
 
