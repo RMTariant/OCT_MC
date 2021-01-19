@@ -400,7 +400,6 @@ int main(int argc, const char * argv[])
     c_photon = 0;
     //a = 0.925; //KE: Lima et al 2012
 	do {
-		printf("test1 \n");
 		//t0 = clock(); //RMT
         // KE: while (i_photon < Nphotons) RMT: Main loop simulating all photons.
 		/**** LAUNCH: Initialize photon position and trajectory *****/
@@ -555,7 +554,7 @@ int main(int argc, const char * argv[])
 			}
 		} // end  use mcflag
 		/****************************/
-printf("test2 \n");
+
 		/* Get tissue voxel properties of launchpoint.
 		 * If photon beyond outer edge of defined voxels,
 		 * the tissue equals properties of outermost voxels.
@@ -587,7 +586,7 @@ printf("test2 \n");
 		
 		//t1 = clock()-t0; //RMT
 		//t1s += t1; //RMT
-printf("test3 \n");
+
 		/* HOP_DROP_SPIN_CHECK
 		 Propagate one photon until it dies as determined by ROULETTE.
 		 *******/
@@ -842,7 +841,6 @@ printf("test3 \n");
 
 			} while(sleft>0); //do...while
 
-printf("test4 \n");
 			//t2 = clock() - t1; //RMT
 			//t2s += t2; //RMT
 
@@ -1142,8 +1140,6 @@ printf("test4 \n");
 		}	 while (photon_status == ALIVE || cont_exist == 1 );  /* end STEP_CHECK_HOP_SPIN */
         /* if ALIVE, continue propagating */
 		/* If photon DEAD, then launch new photon. */
-
-printf("i_photon = %ld, \n",i_photon);
 
 	} while (i_photon < Nphotons);  /* end RUN */
 	//RMT: End of the monte carlo simulation. All photons were simulated.

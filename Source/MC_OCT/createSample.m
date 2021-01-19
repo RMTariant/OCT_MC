@@ -88,12 +88,15 @@ Nt = 3;
 muav(1)  = 0.0001;
 musv(1)  = 0.0001;
 gv(1)    = 0.99;
+nr(1)    = 1.3;
 muav(2)  = 0.0577;
 musv(2)  = 0.2965;
 gv(2)    = 0.5;
+nr(2)    = 1.3;
 muav(3)  = 1;
 musv(3)  = 200;
 gv(3)   = 0.8;
+nr(3)    = 1.3;
 
 % Adding reflection chances
 mr(1) = 0;
@@ -121,7 +124,7 @@ if SAVEON
     filename = sprintf('%s_H.mci',myname);
     fid = fopen(filename,'w');
         % run parameters
-        fprintf(fid,'%0.0f\n',time_min);
+        %fprintf(fid,'%0.0f\n',time_min);
         fprintf(fid,'%0.0f\n',Nphotons);
         fprintf(fid,'%0.4f\n',a_coef);
         fprintf(fid,'%0.4f\n',p);
@@ -154,8 +157,8 @@ if SAVEON
             fprintf(fid,'%0.4f\n',muav(i));
             fprintf(fid,'%0.4f\n',musv(i));
             fprintf(fid,'%0.4f\n',gv(i));
-            %fprintf(fid,'%0.4f\n',nr(i));
-            %fprintf(fid,'%0.4f\n',mr(i));
+            fprintf(fid,'%0.4f\n',nr(i));
+            fprintf(fid,'%0.4f\n',mr(i));
         end
     fclose(fid);
 
