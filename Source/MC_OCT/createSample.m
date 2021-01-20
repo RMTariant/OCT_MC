@@ -124,7 +124,7 @@ if SAVEON
     filename = sprintf('%s_H.mci',myname);
     fid = fopen(filename,'w');
         % run parameters
-        %fprintf(fid,'%0.0f\n',time_min);
+        fprintf(fid,'%0.0f\n',time_min);
         fprintf(fid,'%0.0f\n',Nphotons);
         fprintf(fid,'%0.4f\n',a_coef);
         fprintf(fid,'%0.4f\n',p);

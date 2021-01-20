@@ -91,7 +91,7 @@ double	nr;              /* refractive index [-] */
 double	mr;              /* mirror reflection chances [-] */
 double	n1;              /* refractive index previous layer [-] */
 double	n2;              /* refractive index next layer [-] */
-double	Nphotons;       /* number of photons in simulation */
+long	Nphotons;       /* number of photons in simulation */
 
 /* launch parameters */
 int		mcflag, launchflag, boundaryflag;
@@ -204,7 +204,7 @@ int main(int argc, const char * argv[])
 	fid = fopen(filename,"r");
 	fgets(buf, 32, fid);
 	// run parameters
-	sscanf(buf, "%lf", &Nphotons); // desired time duration of run [min] RMT now photons isntead
+	sscanf(buf, "%ld", &Nphotons); // desired time duration of run [min] RMT now photons isntead
 	fgets(buf, 32, fid);
 	sscanf(buf, "%lf", &a_coef); // RMT chance of a foward photon doing a bias scattering.
 	fgets(buf, 32, fid);
@@ -286,7 +286,7 @@ int main(int argc, const char * argv[])
 	}
     fclose(fid);
 
-    printf("Number of photons = %0.4f \n",Nphotons);
+    printf("Number of photons = %ld \n",Nphotons);
     printf("Nx = %d, dx = %0.4f [cm]\n",Nx,dx);
     printf("Ny = %d, dy = %0.4f [cm]\n",Ny,dy);
     printf("Nz = %d, dz = %0.4f [cm]\n",Nz,dz);
@@ -450,7 +450,7 @@ int main(int argc, const char * argv[])
 		// Print out message about progress.
 		if ((i_photon>200) & (fmod(i_photon, (int)(Nphotons/20))  == 0))
 		{
-            printf("%0.0f%% done\n", i_photon/Nphotons*100); //RMT
+            printf("%ld%% done\n", i_photon/Nphotons*100); //RMT
 			//temp = i_photon/Nphotons*100;
             //printf("%0.1f%% \t\tfmod = %0.3f\n", temp,fmod(temp, 10.0));
             //if ((temp<10) | (temp>90))
@@ -468,7 +468,7 @@ int main(int argc, const char * argv[])
 		{
 			finish_time = clock();
 			//Nphotons = (long)( time_min*60*999*CLOCKS_PER_SEC/(finish_time-temp_time) );
-			printf("Nphotons = %0.0f for unkown time\n",Nphotons)
+			printf("Nphotons = %ld for unkown time\n",Nphotons)
 			;
 		}
 		/**** SET SOURCE
@@ -1150,8 +1150,8 @@ int main(int argc, const char * argv[])
 	printf("------------------------------------------------------\n");
 	finish_time = clock();
 	time_min = (double)(finish_time-start_time)/CLOCKS_PER_SEC/60;
-	printf("Elapsed Time for %0.3e photons = %5.3f min\n",Nphotons,time_min);
-	printf("%0.2e photons per minute\n", Nphotons/time_min);
+	printf("Elapsed Time for %ld photons = %5.3f min\n",Nphotons,time_min);
+	printf("%0.02e photons per minute\n", Nphotons/time_min);
 	//printf("%0.2e saving files\n", tsaves/CLOCKS_PER_SEC/60);
 	//printf("%0.2e set photon start\n", t1s/CLOCKS_PER_SEC/60);
 	//printf("%0.2e propagate\n", t2s/CLOCKS_PER_SEC/60);
@@ -1239,7 +1239,7 @@ int main(int argc, const char * argv[])
 	fclose(fid);
 
 	printf("WRd = %0.0f\n",Rd);
-	printf("Nphotons = %0.2e\n",Nphotons);
+	printf("Nphotons = %ld\n",Nphotons);
 	Rd /= Nphotons;
 	printf("Rd = %0.3e\n",Rd);
 	strcpy(filename,myname);
