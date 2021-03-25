@@ -55,8 +55,6 @@ Boolean SameVoxel(double x1,double y1,double z1, double x2, double y2, double z2
 double max2(double a, double b);
 double min2(double a, double b);
 double min3(double a, double b, double c);
-double FindVoxelFace(double x1,double y1,double z1, double x2, double y2, double z2,
-					double dx,double dy,double dz, double ux, double uy, double uz);
 double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_det, 
         double detx, double det_radius, double det_z, double cos_accept,
         int Ndetectors, double dx, double dy, double dz, double ux, double uy, double uz) ;
@@ -94,7 +92,7 @@ float	waist;
 	
 /* dummy variables */
 double  rnd;            /* assigned random value 0-1 */
-double	r, phi;			/* dummy values */
+double	rr, phi;			/* dummy values */
 long	i,j,NN,Nyx;         /* dummy indices */
 double	tempx, tempy, tempz; /* temporary variables, used during photon step. */
 int 	ix, iy, iz;     /* Added. Used to track photons */
@@ -150,7 +148,7 @@ double det_z;
 double f_HG, f_B;
 long c_photon; // count collected photons
 int *DetID;
-float *DetW, *DetL, *DetS, *DetZ;
+float *DetW, *DetL, *DetS;
 /**** KE end : Declaration of variables ****/  
         
         
@@ -313,26 +311,25 @@ int main(int argc, const char * argv[])
     {
         printf("muav[%ld] = %0.4f [cm^-1]\n",i,muav[i]);
         printf("musv[%ld] = %0.4f [cm^-1]\n",i,musv[i]);
-        printf("  gv[%ld] = %0.4f [--]\n\n",i,gv[i]);
-		printf("  nrv[%ld] = %0.4f [--]\n\n",i,nrv[i]);
+        printf("  gv[%ld] = %0.4f [--]\n",i,gv[i]);
+		printf(" nrv[%ld] = %0.4f [--]\n\n",i,nrv[i]);
     }
     
     /* IMPORT BINARY TISSUE FILE */
 	char 	*v=NULL;
-	float 	*F=NULL;
-	float	*R=NULL;
+	//float 	*F=NULL;
+	//float	*R=NULL;
 	int 	type;
 	NN = Nx*Ny*Nz;
 	Nyx = Nx*Ny;
 	v  = ( char *)malloc(NN*sizeof(char));  /* tissue structure */
-	F  = (float *)malloc(NN*sizeof(float));	/* relative fluence rate [W/cm^2/W.delivered] */
-	R  = (float *)malloc(Nyx*sizeof(float));	/* escaping flux [W/cm^2/W.delivered] */
+	//F  = (float *)malloc(NN*sizeof(float));	/* relative fluence rate [W/cm^2/W.delivered] */
+	//R  = (float *)malloc(Nyx*sizeof(float));	/* escaping flux [W/cm^2/W.delivered] */
     
     DetID  = malloc(sizeof(int));	// KE: photon ID at det_num
     DetS = malloc(sizeof(float)); // KE: photon path length
     DetW  = malloc(sizeof(float));	// KE: photon weight
     DetL  = malloc(sizeof(float));	// KE: likelihood ratio
-    DetZ  = malloc(sizeof(float));	// KE: photons reached depth
 	// read binary file
     strcpy(filename,myname);
     strcat(filename, "_T.bin");
@@ -362,8 +359,8 @@ int main(int argc, const char * argv[])
 	 *****/
 	RandomGen(0, -(int)time(NULL)%(1<<15), NULL); 
 	/* initiate with seed = 1, or any long integer. */
-	for(j=0; j<NN;j++) 	F[j] = 0.0; // ensure F[] starts empty.	
-	for(j=0; j<Nyx;j++) R[j] = 0.0; 
+	//for(j=0; j<NN;j++) 	F[j] = 0.0; // ensure F[] starts empty.	
+	//for(j=0; j<Nyx;j++) R[j] = 0.0; 
 	Rd = 0.0;
 	
 	/**** RUN
@@ -372,7 +369,7 @@ int main(int argc, const char * argv[])
 	printf("------------- Begin Monte Carlo -------------\n");
     printf("%s\n",myname);
     printf("requesting %0.1f min\n",time_min);
-	Nphotons = 200; // will be updated to achieve desired run time, time_min.
+	Nphotons = 999; // will be updated to achieve desired run time, time_min.
 	i_photon = 0;
     c_photon = 0;
     //a = 0.925; //KE: Lima et al 2012
@@ -420,7 +417,7 @@ int main(int argc, const char * argv[])
         /*** KE end : this part is from the A.3 of Zhao's thesis ***/
          
 		// Print out message about progress.
-		if ((i_photon>200) & (fmod(i_photon, (int)(Nphotons/20))  == 0)) 
+		if ((i_photon>999) & (fmod(i_photon, (int)(Nphotons/20))  == 0)) 
 		{
             temp = i_photon/Nphotons*100;
             //printf("%0.1f%% \t\tfmod = %0.3f\n", temp,fmod(temp, 10.0));
@@ -435,7 +432,7 @@ int main(int argc, const char * argv[])
 		// At 1000th photon, update Nphotons to achieve desired runtime (time_min)
 		if (i_photon==1)
 			temp_time = clock();
-		if (i_photon==200) 
+		if (i_photon==999) 
 		{    
 			finish_time = clock();
 			Nphotons = (long)( time_min*60*999*CLOCKS_PER_SEC/(finish_time-temp_time) );
@@ -466,19 +463,19 @@ int main(int argc, const char * argv[])
 			{ // uniform beam
                 // set launch point and width of beam
 				while ((rnd = RandomGen(1,0,NULL)) <= 0.0); // avoids rnd = 0
-				r		= radius*sqrt(rnd); // radius of beam at launch point
+				rr		= radius*sqrt(rnd); // radius of beam at launch point
 				while ((rnd = RandomGen(1,0,NULL)) <= 0.0); // avoids rnd = 0
 				phi		= rnd*2.0*PI;
-				x		= xs + r*cos(phi);
-				y		= ys + r*sin(phi);
+				x		= xs + rr*cos(phi);
+				y		= ys + rr*sin(phi);
 				z		= zs;
 				// set trajectory toward focus
 				while ((rnd = RandomGen(1,0,NULL)) <= 0.0); // avoids rnd = 0
-				r		= waist*sqrt(rnd); // radius of beam at focus
+				rr		= waist*sqrt(rnd); // radius of beam at focus
 				while ((rnd = RandomGen(1,0,NULL)) <= 0.0); // avoids rnd = 0
 				phi		= rnd*2.0*PI;
-				xfocus	= r*cos(phi);
-				yfocus	= r*sin(phi);
+				xfocus	= rr*cos(phi);
+				yfocus	= rr*sin(phi);
 				temp	= sqrt((x - xfocus)*(x - xfocus) + (y - yfocus)*(y - yfocus) 
 					            + zfocus*zfocus);
 				ux		= -(x - xfocus)/temp;
@@ -611,7 +608,7 @@ int main(int argc, const char * argv[])
                     /* decrement WEIGHT by amount absorbed */
 					// If photon within volume of heterogeneity, deposit energy in F[]. 
 					// Normalize F[] later, when save output. 
-                    if (bflag) F[i] += absorb;	
+                    //if (bflag) F[i] += absorb;	
                     // only save data if blag==1, i.e., photon inside simulation cube
 					
 					/* Update sleft */
@@ -629,7 +626,7 @@ int main(int argc, const char * argv[])
                     
 					// If photon within volume of heterogeneity, deposit energy in F[]. 
 					// Normalize F[] later, when save output. 
-                    if (bflag) F[i] += absorb;	
+                    //if (bflag) F[i] += absorb;	
 					
                     if (det_num != -1) 
                     { /* check if the photon is detected . */
@@ -641,18 +638,16 @@ int main(int argc, const char * argv[])
                          /* Save properties of interest */
                          if (L_current > 0 &&  det_num == Pick_det) 
                          { // avoid NAN and zero likelihood, and avoid cross - detection
-                             // Def: float *DetW, *DetL, *DetS, *DetZ;
+                             // Def: float *DetW, *DetL, *DetS;
                              // DetS  = malloc(sizeof(float));                           
-                             DetS = realloc(DetS,(c_photon+2)* sizeof(float));
+                             DetS = realloc(DetS,(c_photon+1)* sizeof(float));
                              DetS[c_photon]=s_total;
-                             DetID = realloc(DetID,(c_photon+2)* sizeof(int));
+                             DetID = realloc(DetID,(c_photon+1)* sizeof(int));
                              DetID[c_photon] = det_num;
-                             DetW = realloc(DetW,(c_photon+2)* sizeof(float));
+                             DetW = realloc(DetW,(c_photon+1)* sizeof(float));
                              DetW[c_photon] = W;
-                             DetL= realloc(DetL,(c_photon+2)* sizeof(float));
+                             DetL= realloc(DetL,(c_photon+1)* sizeof(float));
                              DetL[c_photon] = L_current;
-                             DetZ = realloc(DetZ,(c_photon+2)* sizeof(float));
-                             DetZ[c_photon] = z_max;
                              /* increment collected photon count */
                              c_photon += 1;  
                          }
@@ -685,7 +680,7 @@ int main(int argc, const char * argv[])
                         { 
                             Rd += W;
                             i = (long)(Nx*ix + iy);
-                            R[i] += W;	
+                            //R[i] += W;	
                             surfflag = 0;  // disable repeated assignments to Rd, R[i]
                         }
                         if (z<0) // escape cube
@@ -1074,14 +1069,6 @@ int main(int argc, const char * argv[])
     fwrite(DetL, sizeof(float), c_photon, fid);
     fclose(fid);
     
-     // Save the binary file
-    strcpy(filename,myname);
-    strcat(filename,"_DetZ.bin");
-    printf("saving %s\n",filename);
-    fid = fopen(filename, "wb");   /* 3D voxel output */
-    fwrite(DetZ, sizeof(float), c_photon, fid);
-    fclose(fid);
-    
     // Save the binary file
     strcpy(filename,myname);
     strcat(filename,"_DetID.bin");
@@ -1091,25 +1078,25 @@ int main(int argc, const char * argv[])
     fclose(fid);
     
     // Normalize deposition (A) to yield fluence rate (F).
-    temp = dx*dy*dz*Nphotons;
-    for (i=0; i<NN;i++) F[i] /= (temp*muav[v[i]]);
+    //temp = dx*dy*dz*Nphotons;
+    //for (i=0; i<NN;i++) F[i] /= (temp*muav[v[i]]);
     // Save the binary file
-    strcpy(filename,myname);
-    strcat(filename,"_F.bin");
-    printf("saving %s\n",filename);
-    fid = fopen(filename, "wb");   /* 3D voxel output */
-    fwrite(F, sizeof(float), NN, fid);
-    fclose(fid);
+    //strcpy(filename,myname);
+    //strcat(filename,"_F.bin");
+    //printf("saving %s\n",filename);
+    //fid = fopen(filename, "wb");   /* 3D voxel output */
+    //fwrite(F, sizeof(float), NN, fid);
+    //fclose(fid);
     
     /* save reflectance */
-    temp = dx*dy*Nphotons;
-	for (i=0; i<Nyx; i++) R[i] /= temp;
-	strcpy(filename,myname);
-	strcat(filename,"_Ryx.bin");
-	printf("saving %s\n",filename);
-	fid = fopen(filename, "wb");   /* 2D voxel output */
-	fwrite(R, sizeof(float), Nyx, fid);
-	fclose(fid);
+    //temp = dx*dy*Nphotons;
+	//for (i=0; i<Nyx; i++) R[i] /= temp;
+	//strcpy(filename,myname);
+	//strcat(filename,"_Ryx.bin");
+	//printf("saving %s\n",filename);
+	//fid = fopen(filename, "wb");   /* 2D voxel output */
+	//fwrite(R, sizeof(float), Nyx, fid);
+	//fclose(fid);
 
 	printf("WRd = %0.0f\n",Rd);	
 	printf("Nphotons = %0.2e\n",Nphotons);		
@@ -1130,13 +1117,12 @@ int main(int argc, const char * argv[])
     
     
     free(v);
-    free(F);
-    free(R);
+    //free(F);
+    //free(R);
     free(DetID);
     free(DetW);
     free(DetS);
     free(DetL);
-    free(DetZ);
     return 0;
 } /* end of main */
 
@@ -1285,239 +1271,10 @@ double min3(double a, double b, double c) {
 }
 
 /***********************************************************
- * KE: samplepsi
- ****/
-/*
- void samplepsi()
- {
-     double psi;//, cospsi, sinpsi;
-     double ret[] = {0, 0};
-     psi = 2.0 * PI * RandomNum;
-     // cospsi = cos(psi);
-     ret[0] = cos(psi); // return cospsi
-     if (psi < PI)
-     ret[1] = sqrt(1.0 - ret[0] * ret[0]); //sinpsi  sqrt () is faster than sin (). 
-     else
-     ret[1] = -sqrt(1.0 - ret[0] * ret[0]); // sinpsi
-     return ret;
- }
- */
-/********************
- * my version of FindVoxelFace for no scattering.
- * s = ls + FindVoxelFace2(x,y,z, tempx, tempy, tempz, dx, dy, dz, ux, uy, uz);
- ****/
-// KE: version of Zaho is used
-/*
-double FindVoxelFace2(double x1,double y1,double z1, double x2, double y2, double z2,
-					double dx,double dy,double dz, double ux, double uy, double uz)
-{	
-    int ix1 = floor(x1/dx);
-    int iy1 = floor(y1/dy);
-    int iz1 = floor(z1/dz);
-    
-    int ix2,iy2,iz2;
-    if (ux>=0)
-        ix2=ix1+1;
-    else
-        ix2 = ix1;
-    
-    if (uy>=0)
-        iy2=iy1+1;
-    else
-        iy2 = iy1;
-    
-    if (uz>=0)
-        iz2=iz1+1;
-    else
-        iz2 = iz1;
-    
-    double xs = fabs( (ix2*dx - x1)/ux);
-    double ys = fabs( (iy2*dy - y1)/uy);
-    double zs = fabs( (iz2*dz - z1)/uz);
-    
-    double s = min3(xs,ys,zs);
-    
-    return (s);
-}
-
-*/
-/***********************************************************
- *	FRESNEL REFLECTANCE
- * Computes reflectance as photon passes from medium 1 to 
- * medium 2 with refractive indices n1,n2. Incident
- * angle a1 is specified by cosine value ca1 = cos(a1).
- * Program returns value of transmitted angle a1 as
- * value in *ca2_Ptr = cos(a2).
- ****/
-double RFresnel(double n1,		/* incident refractive index.*/
-                double n2,		/* transmit refractive index.*/
-                double ca1,		/* cosine of the incident */
-                /* angle a1, 0<a1<90 degrees. */
-                double *ca2_Ptr) 	/* pointer to the cosine */
-/* of the transmission */
-/* angle a2, a2>0. */
-{
-    double r;
-    
-    if(n1==n2) { /** matched boundary. **/
-        *ca2_Ptr = ca1;
-        r = 0.0;
-	}
-    else if(ca1>(1.0 - 1.0e-12)) { /** normal incidence. **/
-        *ca2_Ptr = ca1;
-        r = (n2-n1)/(n2+n1);
-        r *= r;
-	}
-    else if(ca1< 1.0e-6)  {	/** very slanted. **/
-        *ca2_Ptr = 0.0;
-        r = 1.0;
-	}
-    else  {			  		/** general. **/
-        double sa1, sa2; /* sine of incident and transmission angles. */
-        double ca2;      /* cosine of transmission angle. */
-        sa1 = sqrt(1-ca1*ca1);
-        sa2 = n1*sa1/n2;
-        if(sa2>=1.0) {	
-            /* double check for total internal reflection. */
-            *ca2_Ptr = 0.0;
-            r = 1.0;
-		}
-        else {
-            double cap, cam;	/* cosines of sum ap or diff am of the two */
-            /* angles: ap = a1 + a2, am = a1 - a2. */
-            double sap, sam;	/* sines. */
-            *ca2_Ptr = ca2 = sqrt(1-sa2*sa2);
-            cap = ca1*ca2 - sa1*sa2; /* c+ = cc - ss. */
-            cam = ca1*ca2 + sa1*sa2; /* c- = cc + ss. */
-            sap = sa1*ca2 + ca1*sa2; /* s+ = sc + cs. */
-            sam = sa1*ca2 - ca1*sa2; /* s- = sc - cs. */
-            r = 0.5*sam*sam*(cam*cam+cap*cap)/(sap*sap*cam*cam); 
-            /* rearranged for speed. */
-		}
-	}
-    return(r);
-} /******** END SUBROUTINE **********/
-
-
-
-/***********************************************************
  * the boundary is the face of some voxel
  * find the the photon's hitting position on the nearest face of the voxel 
  * and update the step size.
 ****/
-double FindVoxelFace(double x1,double y1,double z1, double x2, double y2, double z2,
-					double dx,double dy,double dz, double ux, double uy, double uz)
-{
-    double x_1 = x1/dx;
-    double y_1 = y1/dy;
-    double z_1 = z1/dz;
-    double x_2 = x2/dx;
-    double y_2 = y2/dy;
-    double z_2 = z2/dz;
-    double fx_1 = floor(x_1) ;
-    double fy_1 = floor(y_1) ;
-    double fz_1 = floor(z_1) ;
-    double fx_2 = floor(x_2) ;
-    double fy_2 = floor(y_2) ;
-    double fz_2 = floor(z_2) ;
-    double x=0, y=0, z=0, x0=0, y0=0, z0=0, s=0;
-    
-    if ((fx_1 != fx_2) && (fy_1 != fy_2) && (fz_1 != fz_2) ) { //#10
-        fx_2=fx_1+SIGN(fx_2-fx_1);//added
-        fy_2=fy_1+SIGN(fy_2-fy_1);//added
-        fz_2=fz_1+SIGN(fz_2-fz_1);//added
-        
-        x = (max2(fx_1,fx_2)-x_1)/ux;
-        y = (max2(fy_1,fy_2)-y_1)/uy;
-        z = (max2(fz_1,fz_2)-z_1)/uz;
-        if (x == min3(x,y,z)) {
-            x0 = max2(fx_1,fx_2);
-            y0 = (x0-x_1)/ux*uy+y_1;
-            z0 = (x0-x_1)/ux*uz+z_1;
-        }
-        else if (y == min3(x,y,z)) {
-            y0 = max2(fy_1,fy_2);
-            x0 = (y0-y_1)/uy*ux+x_1;
-            z0 = (y0-y_1)/uy*uz+z_1;
-        }
-        else {
-            z0 = max2(fz_1,fz_2);
-            y0 = (z0-z_1)/uz*uy+y_1;
-            x0 = (z0-z_1)/uz*ux+x_1;
-        }
-    }
-    else if ( (fx_1 != fx_2) && (fy_1 != fy_2) ) { //#2
-        fx_2=fx_1+SIGN(fx_2-fx_1);//added
-        fy_2=fy_1+SIGN(fy_2-fy_1);//added
-        x = (max2(fx_1,fx_2)-x_1)/ux;
-        y = (max2(fy_1,fy_2)-y_1)/uy;
-        if (x == min2(x,y)) {
-            x0 = max2(fx_1,fx_2);
-            y0 = (x0-x_1)/ux*uy+y_1;
-            z0 = (x0-x_1)/ux*uz+z_1;
-        }
-        else {
-            y0 = max2(fy_1, fy_2);
-            x0 = (y0-y_1)/uy*ux+x_1;
-            z0 = (y0-y_1)/uy*uz+z_1;
-        }
-    }
-    else if ( (fy_1 != fy_2) &&(fz_1 != fz_2) ) { //#3
-        fy_2=fy_1+SIGN(fy_2-fy_1);//added
-        fz_2=fz_1+SIGN(fz_2-fz_1);//added
-        y = (max2(fy_1,fy_2)-y_1)/uy;
-        z = (max2(fz_1,fz_2)-z_1)/uz;
-        if (y == min2(y,z)) {
-            y0 = max2(fy_1,fy_2);
-            x0 = (y0-y_1)/uy*ux+x_1;
-            z0 = (y0-y_1)/uy*uz+z_1;
-        }
-        else {
-            z0 = max2(fz_1, fz_2);
-            x0 = (z0-z_1)/uz*ux+x_1;
-            y0 = (z0-z_1)/uz*uy+y_1;
-        }
-    }
-    else if ( (fx_1 != fx_2) && (fz_1 != fz_2) ) { //#4
-        fx_2=fx_1+SIGN(fx_2-fx_1);//added
-        fz_2=fz_1+SIGN(fz_2-fz_1);//added
-        x = (max2(fx_1,fx_2)-x_1)/ux;
-        z = (max2(fz_1,fz_2)-z_1)/uz;
-        if (x == min2(x,z)) {
-            x0 = max2(fx_1,fx_2);
-            y0 = (x0-x_1)/ux*uy+y_1;
-            z0 = (x0-x_1)/ux*uz+z_1;
-        }
-        else {
-            z0 = max2(fz_1, fz_2);
-            x0 = (z0-z_1)/uz*ux+x_1;
-            y0 = (z0-z_1)/uz*uy+y_1;
-        }
-    }
-    else if (fx_1 != fx_2) { //#5
-        fx_2=fx_1+SIGN(fx_2-fx_1);//added
-        x0 = max2(fx_1,fx_2);
-        y0 = (x0-x_1)/ux*uy+y_1;
-        z0 = (x0-x_1)/ux*uz+z_1;
-    }
-    else if (fy_1 != fy_2) { //#6
-        fy_2=fy_1+SIGN(fy_2-fy_1);//added
-        y0 = max2(fy_1, fy_2);
-        x0 = (y0-y_1)/uy*ux+x_1;
-        z0 = (y0-y_1)/uy*uz+z_1;
-    }
-    else { //#7 
-        z0 = max2(fz_1, fz_2);
-        fz_2=fz_1+SIGN(fz_2-fz_1);//added
-        x0 = (z0-z_1)/uz*ux+x_1;
-        y0 = (z0-z_1)/uz*uy+y_1;
-    }
-    //s = ( (x0-fx_1)*dx + (y0-fy_1)*dy + (z0-fz_1)*dz )/3;
-    //s = sqrt( SQR((x0-x_1)*dx) + SQR((y0-y_1)*dy) + SQR((z0-z_1)*dz) );
-    //s = sqrt(SQR(x0-x_1)*SQR(dx) + SQR(y0-y_1)*SQR(dy) + SQR(z0-z_1)*SQR(dz));
-    s = sqrt( SQR((x0-x_1)*dx) + SQR((y0-y_1)*dy) + SQR((z0-z_1)*dz));
-    return (s);
-}
 
 // KE: the FindVoxelFace2 function is in Listing A4 in Zhao's thesis
 // KE: Compute the step size the photon will take to get the first voxel crossing in one single long step.
@@ -1558,4 +1315,3 @@ double FindVoxelFace2(double x1, double y1, double z1, int* det_num, int Pick_de
 		}
         return (s);
 }
-double RFresnel(double n1, double n2, double ca1, double *ca2_Ptr);

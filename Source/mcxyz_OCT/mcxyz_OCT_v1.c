@@ -313,8 +313,8 @@ int main(int argc, const char * argv[])
     {
         printf("muav[%ld] = %0.4f [cm^-1]\n",i,muav[i]);
         printf("musv[%ld] = %0.4f [cm^-1]\n",i,musv[i]);
-        printf("  gv[%ld] = %0.4f [--]\n\n",i,gv[i]);
-		printf("  nrv[%ld] = %0.4f [--]\n\n",i,nrv[i]);
+        printf("  gv[%ld] = %0.4f [--]\n",i,gv[i]);
+		printf(" nrv[%ld] = %0.4f [--]\n\n",i,nrv[i]);
     }
     
     /* IMPORT BINARY TISSUE FILE */
@@ -435,7 +435,7 @@ int main(int argc, const char * argv[])
 		// At 1000th photon, update Nphotons to achieve desired runtime (time_min)
 		if (i_photon==1)
 			temp_time = clock();
-		if (i_photon==200) 
+		if (i_photon==999) 
 		{    
 			finish_time = clock();
 			Nphotons = (long)( time_min*60*999*CLOCKS_PER_SEC/(finish_time-temp_time) );
