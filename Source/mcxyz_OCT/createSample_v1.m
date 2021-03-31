@@ -12,11 +12,11 @@ cd('C:\Users\raphi\Documents\ubuntu_share')
 SAVEON      = 1;        % 1 = save myname_T.bin, myname_H.mci 
                         % 0 = don't save. Just check the program.
 
-myname      = 'test';% name for files: myname_T.bin, myname_H.mci  
-time_min    = 10;      	% time duration of the simulation [min] <----- run time -----
-Nx          = 10;    	% # of bins in each dimension of cube 
-Ny          = 10;    	% # of bins in each dimension of cube 
-Nz          = 10;    	% # of bins in each dimension of cube 
+myname      = 'test2';% name for files: myname_T.bin, myname_H.mci  
+time_min    = 0.5;      	% time duration of the simulation [min] <----- run time -----
+Nx          = 100;    	% # of bins in each dimension of cube 
+Ny          = 100;    	% # of bins in each dimension of cube 
+Nz          = 100;    	% # of bins in each dimension of cube 
 binsize     = 0.01; 	% size of each bin, eg. [cm]
 
 % Set Monte Carlo launch flags (not in use)
@@ -24,7 +24,7 @@ mcflag      = 0;     	% launch: 0 = uniform beam, 1 = Gaussian, 2 = isotropic pt
                         % 3 = rectangular beam (use xfocus,yfocus for x,y halfwidths)
 launchflag  = 1;        % 0 = let mcxyz.c calculate launch trajectory
                         % 1 = manually set launch vector.
-boundaryflag = 2;       % 0 = no boundaries, 1 = escape at boundaries
+boundaryflag = 1;       % 0 = no boundaries, 1 = escape at boundaries
                         % 2 = escape at surface only. No x, y, bottom z
                         % boundaries
 
