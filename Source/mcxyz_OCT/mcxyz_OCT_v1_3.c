@@ -666,6 +666,9 @@ int main(int argc, const char * argv[])
                         y += s*uy;
                         z += s*uz;
 					
+						/* Update total path length */ // RMT
+						s_total += s; //RM
+					
                         // pointers to voxel containing optical properties
                         ix = (int)(Nx/2 + x/dx);
                         iy = (int)(Ny/2 + y/dy);

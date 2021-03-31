@@ -1,7 +1,7 @@
 
-filepath = 'C:\Users\raphi\Documents\Doctorat\Uday simulation\data\';
+filepath = 'C:\Users\raphi\Documents\ubuntu_share\';
 cd(filepath)
-myname = 'test';
+myname = 'test2';
 
 % Load header file
 filename = sprintf('%s_H.mci',myname);
