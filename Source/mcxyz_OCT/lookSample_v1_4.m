@@ -113,6 +113,15 @@ tic
     fclose(fid);
 toc
 
+%% Load the fluence
+filename = sprintf('%s_F.bin',myname);
+disp(['loading ' filename])
+tic
+    fid = fopen(filename, 'rb');
+    [Data count] = fread(fid, Ny*Nx*Nz, 'float');
+    fclose(fid);
+toc
+F = reshape(Data,Ny,Nx,Nz); % F(y,x,z)
 
 %% Load the saved photons
 S = DetS(:)';
