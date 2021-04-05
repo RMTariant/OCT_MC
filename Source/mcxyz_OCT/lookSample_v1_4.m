@@ -1,7 +1,7 @@
 
 filepath = 'C:\Users\raphi\Documents\ubuntu_share\';
 cd(filepath)
-myname = 'test2';
+myname = 'bias';
 
 % Load header file
 filename = sprintf('%s_H.mci',myname);

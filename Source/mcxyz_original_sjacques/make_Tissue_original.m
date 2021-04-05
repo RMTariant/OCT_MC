@@ -35,25 +35,25 @@ home
 SAVEON      = 1;        % 1 = save myname_T.bin, myname_H.mci 
                         % 0 = don't save. Just check the program.
 
-myname      = 'skinvesseloriginal';% name for files: myname_T.bin, myname_H.mci  
-time_min    = 10;      	% time duration of the simulation [min] <----- run time -----
+myname      = 'normal';% name for files: myname_T.bin, myname_H.mci  
+time_min    = 30;      	% time duration of the simulation [min] <----- run time -----
 nm          = 532;   	% desired wavelength of simulation
 Nbins       = 200;    	% # of bins in each dimension of cube 
-binsize     = 0.0005; 	% size of each bin, eg. [cm] or [mm]
+binsize     = 0.0001; 	% size of each bin, eg. [cm] or [mm]
 
 % Set Monte Carlo launch flags
-mcflag      = 0;     	% launch: 0 = uniform beam, 1 = Gaussian, 2 = isotropic pt. 
+mcflag      = 2;     	% launch: 0 = uniform beam, 1 = Gaussian, 2 = isotropic pt. 
                         % 3 = rectangular beam (use xfocus,yfocus for x,y halfwidths)
 launchflag  = 0;        % 0 = let mcxyz.c calculate launch trajectory
                         % 1 = manually set launch vector.
-boundaryflag = 2;       % 0 = no boundaries, 1 = escape at boundaries
+boundaryflag = 1;       % 0 = no boundaries, 1 = escape at boundaries
                         % 2 = escape at surface only. No x, y, bottom z
                         % boundaries
 
 % Sets position of source
 xs          = 0;      	% x of source
 ys          = 0;        % y of source
-zs          = 0.0101;  	% z of source
+zs          = 0.0001;  	% z of source
 
 % Set position of focus, so mcxyz can calculate launch trajectory
 xfocus      = 0;        % set x,position of focus

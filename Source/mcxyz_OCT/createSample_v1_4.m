@@ -12,12 +12,12 @@ cd('C:\Users\raphi\Documents\ubuntu_share')
 SAVEON      = 1;        % 1 = save myname_T.bin, myname_H.mci 
                         % 0 = don't save. Just check the program.
 
-myname      = 'test2';% name for files: myname_T.bin, myname_H.mci  
-time_min    = 1;      	% time duration of the simulation [min] <----- run time -----
-Nx          = 1000;    	% # of bins in each dimension of cube 
-Ny          = 1000;    	% # of bins in each dimension of cube 
-Nz          = 1000;    	% # of bins in each dimension of cube 
-binsize     = 0.0001; 	% size of each bin, eg. [cm]
+myname      = '5dg05';% name for files: myname_T.bin, myname_H.mci  
+time_min    = 300;      	% time duration of the simulation [min] <----- run time -----
+Nx          = 1;    	% # of bins in each dimension of cube 
+Ny          = 1;    	% # of bins in each dimension of cube 
+Nz          = 1;    	% # of bins in each dimension of cube 
+binsize     = 0.5; 	% size of each bin, eg. [cm]
 
 % Set Monte Carlo launch flags (not in use)
 mcflag      = 0;     	% launch: 0 = uniform beam, 1 = Gaussian, 2 = isotropic pt. 
@@ -41,7 +41,7 @@ zfocus      = inf;    	% set z,position of focus (=inf for collimated beam)
 % Set detection parameter
 radius      = 0.05;     % Half width of the BScan
 waist       = 0.05;  	% Width of the scanned beam (Not in use)
-Ndetectors  = 512;      % Number of Aline per BScan
+Ndetectors  = 800;      % Number of Aline per BScan
 det_radius  = 0.1;      % Width of the beam at the imaging lens
 flens       = 2.0;      % Focal lenth of the lens
 cos_accept  = flens./sqrt((det_radius).^2+(flens).^2);
@@ -64,10 +64,10 @@ zsurf = 0.0;  % position of air/skin surface
 T = double(zeros(Nx,Ny,Nz));
 T(:) = 1;
 Nt = 1; %Number if layers
-muav(1) = 20;    %Absorption coef. of first layer
-musv(1) = 100;   %Scattering coef. of first layer
-gv(1) = 0.9;     %Anisotropy of first layer
-nrv(1) = 1;      %Refraction index of first layer
+muav(1) = 1.47e-02*10;    %Absorption coef. of first layer
+musv(1) = 0.658*10;   %Scattering coef. of first layer
+gv(1) = 0.5;     %Anisotropy of first layer
+nrv(1) = 1.4240;      %Refraction index of first layer
 
 %%%%%%%%%% 
 % Prepare Monte Carlo 
@@ -156,7 +156,7 @@ end % SAVEON
 
 %% Look at structure of Tzx at iy=Ny/2
 Txzy = shiftdim(T,1);   % Tyxz --> Txzy
-Tzx  = Txzy(:,:,Ny/2)'; % Tzx
+Tzx  = Txzy(:,:,round(Ny/2))'; % Tzx
 
 %%
 figure; clf
