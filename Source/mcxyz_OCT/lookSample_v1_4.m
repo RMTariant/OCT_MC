@@ -1,7 +1,7 @@
 
 filepath = 'C:\Users\raphi\Documents\ubuntu_share\';
 cd(filepath)
-myname = 'bias';
+myname = '5bg07';
 
 % Load header file
 filename = sprintf('%s_H.mci',myname);
@@ -14,7 +14,7 @@ fclose(fid);
 nph = 100000; %%%%CHOOSE VALUE%%%%
 %Limit the total number of loaded photons if you don't want to analyse all the data
 %Input 0 if you want to load the whole data
-maxnph = 0;
+maxnph = 200000;
 %OCT wavelengths IN CENTIMETERS
 lambda_start = 1150e-7; %%%%CHOOSE VALUE%%%%
 lambda_stop = 1450e-7; %%%%CHOOSE VALUE%%%%
@@ -26,7 +26,7 @@ maxDepth = 0.25; %%%%CHOOSE VALUE%%%%
 n_cor = 1;
 %Chosse refractive of the different mediums. Index. Can be a function of the wavelength
 rn = ones(samplePoints,1); %%%%CHOOSE VALUE%%%%
-rn(1:samplePoints,1) = 1; %%%%CHOOSE VALUE%%%%
+rn(1:samplePoints,1) = 1.3844; %%%%CHOOSE VALUE%%%%
 %rn(1:samplePoints,2) = 1.4; %%%%CHOOSE VALUE%%%%
 %rn(1:samplePoints,3) = 1; %%%%CHOOSE VALUE%%%%
 %rn(1:samplePoints,4) = 1; %%%%CHOOSE VALUE%%%%
@@ -135,6 +135,15 @@ if maxnph ~= 0
     L = L(1:maxnph);
     ID = ID(1:maxnph);
 end
+
+%% Get the fake Aline
+int = W.*L;
+binlimits = linspace(0,dz*Nz,5000);
+binqty = zeros(length(binlimits),1);
+for n = 1:(length(binlimits)-1)
+    binqty(n) = sum((binlimits(n)<S & binlimits(n+1)>S).*int);
+end
+plot(binqty)
 
 %% k sampling, (needs to be corrected for proper values) Raphael
 

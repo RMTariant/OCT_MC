@@ -12,7 +12,7 @@ cd('C:\Users\raphi\Documents\ubuntu_share')
 SAVEON      = 1;        % 1 = save myname_T.bin, myname_H.mci 
                         % 0 = don't save. Just check the program.
 
-myname      = '5dg05';% name for files: myname_T.bin, myname_H.mci  
+myname      = '5bg07';% name for files: myname_T.bin, myname_H.mci  
 time_min    = 300;      	% time duration of the simulation [min] <----- run time -----
 Nx          = 1;    	% # of bins in each dimension of cube 
 Ny          = 1;    	% # of bins in each dimension of cube 
@@ -64,10 +64,10 @@ zsurf = 0.0;  % position of air/skin surface
 T = double(zeros(Nx,Ny,Nz));
 T(:) = 1;
 Nt = 1; %Number if layers
-muav(1) = 1.47e-02*10;    %Absorption coef. of first layer
-musv(1) = 0.658*10;   %Scattering coef. of first layer
-gv(1) = 0.5;     %Anisotropy of first layer
-nrv(1) = 1.4240;      %Refraction index of first layer
+muav(1) = 9.12e-03*10;    %Absorption coef. of first layer
+musv(1) = 1.323*10;   %Scattering coef. of first layer
+gv(1) = 0.7;     %Anisotropy of first layer
+nrv(1) = 1.3844;      %Refraction index of first layer
 
 %%%%%%%%%% 
 % Prepare Monte Carlo 
