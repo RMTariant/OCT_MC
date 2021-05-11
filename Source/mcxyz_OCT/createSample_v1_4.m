@@ -12,12 +12,12 @@ cd('C:\Users\raphi\Documents\ubuntu_share')
 SAVEON      = 1;        % 1 = save myname_T.bin, myname_H.mci 
                         % 0 = don't save. Just check the program.
 
-myname      = '5bg07';% name for files: myname_T.bin, myname_H.mci  
-time_min    = 300;      	% time duration of the simulation [min] <----- run time -----
+myname      = '5ag05Short';% name for files: myname_T.bin, myname_H.mci  
+time_min    = 30;      	% time duration of the simulation [min] <----- run time -----
 Nx          = 1;    	% # of bins in each dimension of cube 
 Ny          = 1;    	% # of bins in each dimension of cube 
 Nz          = 1;    	% # of bins in each dimension of cube 
-binsize     = 0.5; 	% size of each bin, eg. [cm]
+binsize     = 0.3;     	% size of each bin, eg. [cm]
 
 % Set Monte Carlo launch flags (not in use)
 mcflag      = 0;     	% launch: 0 = uniform beam, 1 = Gaussian, 2 = isotropic pt. 
@@ -31,7 +31,7 @@ boundaryflag = 1;       % 0 = no boundaries, 1 = escape at boundaries
 % Sets position of source with 0 centered on each Aline
 xs          = 0;      	% x of source
 ys          = 0;        % y of source
-zs          = 0.0001;  	% z of source must start in simulation
+zs          = 0.0001; % z of source must start in simulation
 
 % Set position of focus, so mcxyz can calculate launch trajectory (not in use)
 xfocus      = 0;        % set x,position of focus
@@ -42,9 +42,10 @@ zfocus      = inf;    	% set z,position of focus (=inf for collimated beam)
 radius      = 0.05;     % Half width of the BScan
 waist       = 0.05;  	% Width of the scanned beam (Not in use)
 Ndetectors  = 800;      % Number of Aline per BScan
-det_radius  = 0.1;      % Width of the beam at the imaging lens
-flens       = 2.0;      % Focal lenth of the lens
-cos_accept  = flens./sqrt((det_radius).^2+(flens).^2);
+flens       = 0.06;        %Focal lens in m 0.01 or 0.06
+beamw       = 0.002;        %Beam diameter at imaging lens in m
+det_radius  = 1310e-7*2/pi/atan(beamw/2/flens);    % Width of the beam at the imaging lens
+cos_accept  = cos(atan(beamw/2/flens)); % Cos of the accepted angle
 
 % only used if launchflag == 1 (manually set launch trajectory): (not in use)
 ux0         = 0;      % trajectory projected onto x axis
@@ -64,10 +65,16 @@ zsurf = 0.0;  % position of air/skin surface
 T = double(zeros(Nx,Ny,Nz));
 T(:) = 1;
 Nt = 1; %Number if layers
-muav(1) = 9.12e-03*10;    %Absorption coef. of first layer
-musv(1) = 1.323*10;   %Scattering coef. of first layer
-gv(1) = 0.7;     %Anisotropy of first layer
-nrv(1) = 1.3844;      %Refraction index of first layer
+muav(1) = 1.472e-1;    %Absorption coef. of first layer
+% musv(1) = 10;   %Scattering coef. of first layer
+gv(1) = 0.5;     %Anisotropy of first layer
+nrv(1) = 1.4240;      %Refraction index of first layer
+musv(1) = 6.58e0/(1-gv(1));       %Change reduced scattering in scattering
+% muav(2) = 0.1;    %Absorption coef. of first layer
+% musv(2) = 1000;   %Scattering coef. of first layer
+% gv(2) = 0.7;     %Anisotropy of first layer
+% nrv(2) = 1;      %Refraction index of first layer
+% T(:,:,2) = 2;
 
 %%%%%%%%%% 
 % Prepare Monte Carlo 
@@ -109,8 +116,8 @@ if SAVEON
         fprintf(fid,'%0.4f\n',a_coef);
         fprintf(fid,'%0.4f\n',p);
         fprintf(fid,'%0.4f\n',Ndetectors);
-        fprintf(fid,'%0.4f\n',det_radius);
-        fprintf(fid,'%0.4f\n',cos_accept);
+        fprintf(fid,'%0.6f\n',det_radius);
+        fprintf(fid,'%0.6f\n',cos_accept);
         fprintf(fid,'%d\n'   ,Nx);
         fprintf(fid,'%d\n'   ,Ny);
         fprintf(fid,'%d\n'   ,Nz);

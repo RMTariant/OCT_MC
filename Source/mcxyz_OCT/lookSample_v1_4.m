@@ -1,7 +1,7 @@
 
 filepath = 'C:\Users\raphi\Documents\ubuntu_share\';
 cd(filepath)
-myname = '5bg07';
+myname = '5dg05Long';
 
 % Load header file
 filename = sprintf('%s_H.mci',myname);
@@ -11,17 +11,17 @@ A = fscanf(fid,'%f',[1 Inf])';
 fclose(fid);
 
 %Number of photon loaded at the same time
-nph = 100000; %%%%CHOOSE VALUE%%%%
+nph = 200000; %%%%CHOOSE VALUE%%%%
 %Limit the total number of loaded photons if you don't want to analyse all the data
 %Input 0 if you want to load the whole data
-maxnph = 200000;
+maxnph = 0;
 %OCT wavelengths IN CENTIMETERS
 lambda_start = 1150e-7; %%%%CHOOSE VALUE%%%%
 lambda_stop = 1450e-7; %%%%CHOOSE VALUE%%%%
 %Number of sample point of the OCT wavelength width
 samplePoints= 2048; %%%%CHOOSE VALUE%%%%
 %Choose to apply electric filter. Put a high value if none
-maxDepth = 0.25; %%%%CHOOSE VALUE%%%%
+maxDepth = 0; %%%%CHOOSE VALUE%%%% 0 if none
 %Compress image for refractive index
 n_cor = 1;
 %Chosse refractive of the different mediums. Index. Can be a function of the wavelength
@@ -77,7 +77,7 @@ for i=1:Nt
     j=j+1;
 end
 
-
+rn(1:samplePoints,1) = nrv; %%%%CHOOSE VALUE%%%%
 
 %% Load path lengths of detected photons DetS
 filename = sprintf('%s_DetS.bin',myname);
@@ -136,14 +136,15 @@ if maxnph ~= 0
     ID = ID(1:maxnph);
 end
 
-%% Get the fake Aline
-int = W.*L;
-binlimits = linspace(0,dz*Nz,5000);
-binqty = zeros(length(binlimits),1);
-for n = 1:(length(binlimits)-1)
-    binqty(n) = sum((binlimits(n)<S & binlimits(n+1)>S).*int);
-end
-plot(binqty)
+%% Inspect data
+% int = W.*L;
+% binlimits = linspace(0,dz*Nz,5000)';
+% binqty = zeros(length(binlimits)-1,1);
+% for n = 1:(length(binlimits)-1)
+%     binqty(n) = sum((binlimits(n)<S & binlimits(n+1)>S).*int);
+% end
+% figure
+% plot((binlimits(1:end-1)+binlimits(2:end))/2,binqty)
 
 %% k sampling, (needs to be corrected for proper values) Raphael
 
@@ -183,6 +184,7 @@ for m = 1:p
     clear signal
     sig = sig + s_sample;
     clear s_sample
+    m/p
 end
 
 %Adding noise
@@ -200,35 +202,36 @@ I = (abs(sig + ref_amp + noise1)).^2 - (abs(sig - ref_amp + noise2) ).^2;
 
 %% Processing the OCT signal
 
-%Apply low pass filter
-ksampling = 2*pi/(k(1)-k(2));
-rawAline = lowpass(I.*hann(length(k)),maxDepth*2*n_cor,ksampling);
+%Apply low pass filter and hanning window
+ksampling = 2*pi*n_cor/(k(1)-k(2));
+if maxDepth == 0
+    rawAline = I.*hann(length(k));
+else
+    rawAline = lowpass(I.*hann(length(k)),maxDepth,ksampling);
+end
 
 %Calculate Aline
-M10 = length(rawAline(:,1))*10;
+M10 = length(rawAline(:,1))*10; %Zero padding
 OCT = abs(fft(rawAline,M10)).^2;
 OCT = OCT(1:floor(length(OCT(:,1))/2)+1,:);
 OCT(2:end-1) = 2*OCT(2:end-1);
 
 
 %% Displaying image
-
-z = pi/(k(1)-k(2))/(M10/length(rawAline(:,1)))*(0:(length(k)/2))/length(k)./n_cor;
+z = (0:M10/2)/M10.*ksampling;
 x = linspace(-radius,radius,Ndetectors);
 
-% figure
-% imagesc(x,z,db(OCT))
-% title('Refractive index equal to 1')
-% xlabel('Position [cm]')
-% ylabel('Depth [cm]')
 
 figure
 imagesc(x,z,db(OCT))
 title('')
 xlabel('Position [cm]')
 ylabel('Depth [cm]')
-caxis([-261 305])
+% caxis([-261 305])
 
-%% Average everything!
+%% Average all Alines in one
+z = z/100;
 figure
 plot(z,db(mean(OCT,2)))
+toc
+D5g05Long = [z', mean(OCT,2)];
