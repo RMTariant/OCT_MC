@@ -8,17 +8,24 @@ Use the most recent version in mcxyz_OCT. In order:
 2. Run the .c code with the newly created files.
 3. Use the lookSample to generate the Aline or B-Scan.
   
-===Missing Features / Bugs (to be implemented)===  
--Check why a low value of mua and g (maybe mus) slows the simulation a lot  
--Need to change how the BScan width is controlled  
--Testing the functions  
--Removing the extra code  
--Mirror reflection  
--Check if Noise is good  
--Gaussian beam source  
--Wavelength width on the detection  
--Focusing/diverging beams instead of perfectly foccus  
   
+===References===  
+1.  Zhao S. Advanced Monte Carlo Simulation and MachineLearning for Frequency Domain Optical Coherence Tomo-graphy. en. 2016 :157  
+
+2.  Lima IT, Kalra A and Sherif SS. Improved importancesampling for Monte Carlo simulation of time-domainoptical coherence tomography. en. Biomedical OpticsExpress  2011  May;    2:1069. DOI: 10.1364/BOE.2.001069. Available from: https://www.osapublishing.org/boe/abstract.cfm?uri=boe-2-5-1069 [Accessed on: 2021May 12]
+
+3.  Malektaji S, Lima IT, Escobar I. MR and Sherif SS.Massively parallel simulator of optical coherence tomo-graphy of inhomogeneous turbid media. en. ComputerMethods and        Programs in Biomedicine  2017  Oct;150:97–105. DOI: 10.1016/j.cmpb.2017.08.001. Avail-able from: https : / / www . sciencedirect . com / science /article/pii/S0169260716303091 [Accessed on: 2021 Feb15]
+
+4.  Malektaji S, Jr ITL and Sherif SS. Monte Carlo simu-lation of optical coherence tomography for turbid mediawith arbitrary spatial distributions. Journal of BiomedicalOptics 2014 Apr; 19. Publisher: International Society forOptics and Photonics:046001. DOI: 10.1117/1.JBO.19.4.046001. Available from: https://www.spiedigitallibrary.org/journals/journal-of-biomedical-optics/volume-19/issue- 4/046001/Monte- Carlo- simulation- of- optical-coherence- tomography- for- turbid- media/10.1117/1.JBO.19.4.046001.short [Accessed on: 2021 Feb 15]
+
+
+===Missing Features / Bugs (to be implemented)===  
+-Gaussian beam source  
+-Focusing/diverging beams instead of perfectly foccus  
+-Customizable surface reflection
+-Add the impact of laser coherence  
+
+
 ===Added Features===  
 -You can choose the maximum number of photon being process at the same time  
 -Added the effect of the likelihood on flux to have a realistic flux with bias scattering  
@@ -37,7 +44,7 @@ Use the most recent version in mcxyz_OCT. In order:
 -OCT matlab script now allows for taking into account the refractive index impact on the OCT image.  
 -Flat noise was added  
   
-MergedCode.c  
+mcxyz_OCT.c  
   
 ===Parameters===  
 a_coef: Biasing coefficient of the importance sampling. Default = 0.5  
