@@ -7,8 +7,6 @@ Use the most recent version in mcxyz_OCT. In order:
 1. You need to use the createSample Matlab file to generate the data for the Monte Carlo simulator.
 2. Run the .c code with the newly created files.
 3. Use the lookSample to generate the Aline or B-Scan.
-
-In order, you need to use the 
   
 ===Missing Features / Bugs (to be implemented)===  
 -Check why a low value of mua and g (maybe mus) slows the simulation a lot  
