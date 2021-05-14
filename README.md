@@ -8,6 +8,7 @@ Use the most recent version in mcxyz_OCT. In order:
 2. Run the .c code with the newly created files.
 3. Use the lookSample to generate the Aline or B-Scan.
   
+Note: The simulator was verified to be accurate when using a long focal length (Rayleigth length of 5 mm) for the imaging lens on a single layer sample. Focus needs to be implemented to be accurate with shorter focal length (Rayleigth length of 0.5 mm) however.
   
 ===References===  
 1.  Zhao S. Advanced Monte Carlo Simulation and MachineLearning for Frequency Domain Optical Coherence Tomo-graphy. en. 2016 :157  
