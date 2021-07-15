@@ -107,7 +107,7 @@ Ndetectors: Number of detectors/Alines
 det_radius: Radius of the detector in cm  
 cos_accept: Aperture of the detector/cos of the angle  
 Pick_det: Picked detector. Ranged from 1 to Ndetectors in   
-radius: NOT A RADIUS. It is half the B-line width 
+radius: NOT A RADIUS. It is half the B-line width  
 waist: 1/e2 radius of the beam at focus 
 detx: Position in cm? of the current A-line position  
 launchflag: if = 1 Manually set launch direction to straigth down with a pencil beam.  
